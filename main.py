@@ -4,21 +4,22 @@ from typing import AsyncGenerator
 import uvicorn
 from fastapi import FastAPI
 
-from database.session import init_db
+from database.session import init_db, get_session
+from repositories.pars_class import CalendarDayPars
 from routers import day_info_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    # await init_db()
+    await init_db()
+    async for session in get_session():
+        parser = CalendarDayPars(session)
+        await parser.get_days_info()
     yield
 
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(day_info_router)
-# @app.get("/")
-# async def read_root():
-#     return {"message": "Hello World"}
 
 
 if __name__ == "__main__":

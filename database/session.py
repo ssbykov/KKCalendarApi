@@ -28,31 +28,6 @@ init_data: list[dict[str, Any]] = [
     {"model_class": ArchModel, "schema_class": ArchSchema},
 ]
 
-days = [
-    {
-        "date": "23.01.2025",
-        "moon_day": "24.12i",
-        "first_element_id": 1,
-        "second_element_id": 2,
-        "arch_id": 3,
-        "la_id": 3,
-        "yelam_id": 2,
-        "haircutting_id": 5,
-        "descriptions": []
-    },
-    {
-        "date": "24.01.2025",
-        "moon_day": "25.12i",
-        "first_element_id": 2,
-        "second_element_id": 3,
-        "arch_id": 4,
-        "la_id": 5,
-        "yelam_id": 3,
-        "haircutting_id": 4,
-        "descriptions": []
-    }
-]
-
 
 async def init_model(session: AsyncSession, model_class: Type[Base], schema_class: Type[DayDataSchema]) -> None:
     # async for session in get_session():
@@ -62,7 +37,6 @@ async def init_model(session: AsyncSession, model_class: Type[Base], schema_clas
         for el in model_class.init_data:
             el_schema = schema_class(**el)
             session.add(el_schema.to_orm(model_class))
-        # await session.commit()
 
 
 async def init_db() -> None:
@@ -73,6 +47,4 @@ async def init_db() -> None:
         for data in init_data:
             await init_model(session, **data)
 
-        for day in days:
-            session.add(DayInfo(**day))
         await session.commit()

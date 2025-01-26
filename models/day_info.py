@@ -12,7 +12,7 @@ class DayInfo(Base):
     __tablename__ = "day_info"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    date: Mapped[str] = mapped_column(String(10), nullable=False)
+    date: Mapped[str] = mapped_column(String(10), nullable=False, unique=True)
     moon_day: Mapped[str] = mapped_column(String(15), nullable=False)
     first_element_id: Mapped[int] = mapped_column(ForeignKey("elements.id"), nullable=False)
     first_element = relationship(
@@ -26,13 +26,13 @@ class DayInfo(Base):
         foreign_keys=[second_element_id],
         backref=backref("second_element", lazy='dynamic')
     )
-    arch_id: Mapped[str] = mapped_column(ForeignKey("arch.id"), nullable=False)
+    arch_id: Mapped[int] = mapped_column(ForeignKey("arch.id"), nullable=False)
     arch = relationship("ArchModel", backref=backref("arch", lazy='dynamic'))
-    la_id: Mapped[str] = mapped_column(ForeignKey("la.id"), nullable=False)
+    la_id: Mapped[int] = mapped_column(ForeignKey("la.id"), nullable=False)
     la = relationship("LaModel", backref=backref("la", lazy='dynamic'))
-    yelam_id: Mapped[str] = mapped_column(ForeignKey("yelam.id"), nullable=False)
+    yelam_id: Mapped[int] = mapped_column(ForeignKey("yelam.id"), nullable=False)
     yelam = relationship("YelamModel", backref=backref("yelam", lazy='dynamic'))
-    haircutting_id: Mapped[str] = mapped_column(ForeignKey("haircutting.id"), nullable=False)
+    haircutting_id: Mapped[int] = mapped_column(ForeignKey("haircutting.id"), nullable=False)
     haircutting = relationship("HaircuttingModel", backref=backref("haircutting", lazy='dynamic'))
     descriptions: Mapped[list["Description"]] = relationship("Description", back_populates="day_info")
 
@@ -46,7 +46,7 @@ class ElementModel(Base):
     ]
     __tablename__ = "elements"
     id: Mapped[int] = mapped_column(primary_key=True, index=True, unique=True)
-    name: Mapped[str] = mapped_column(String(15), nullable=False)
+    name: Mapped[str] = mapped_column(String(15), nullable=False, unique=True)
 
 
 class LaModel(Base):
@@ -87,7 +87,7 @@ class LaModel(Base):
 
     __tablename__ = "la"
     id: Mapped[int] = mapped_column(primary_key=True, index=True, unique=True)
-    moon_day: Mapped[int] = mapped_column(nullable=False)
+    moon_day: Mapped[int] = mapped_column(nullable=False, unique=True)
     en_name: Mapped[str] = mapped_column(String(30), nullable=False)
     ru_name: Mapped[str] = mapped_column(String(30), nullable=False)
 
@@ -114,7 +114,7 @@ class ArchModel(Base):
 
     __tablename__ = "arch"
     id: Mapped[int] = mapped_column(primary_key=True, index=True, unique=True)
-    moon_day: Mapped[int] = mapped_column(nullable=False)
+    moon_day: Mapped[int] = mapped_column(nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(10), nullable=False)
     en_desc: Mapped[str] = mapped_column(String(100), nullable=False)
     ru_desc: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -137,7 +137,7 @@ class YelamModel(Base):
     ]
     __tablename__ = "yelam"
     id: Mapped[int] = mapped_column(primary_key=True, index=True, unique=True)
-    month: Mapped[int] = mapped_column(nullable=False)
+    month: Mapped[int] = mapped_column(nullable=False, unique=True)
     en_name: Mapped[str] = mapped_column(String(30), nullable=False)
     ru_name: Mapped[str] = mapped_column(String(30), nullable=False)
 
@@ -195,9 +195,9 @@ class HaircuttingModel(Base):
 
     __tablename__ = "haircutting"
     id: Mapped[int] = mapped_column(primary_key=True, index=True, unique=True)
-    moon_day: Mapped[int] = mapped_column(nullable=False)
-    en_name: Mapped[str] = mapped_column(String(50), nullable=False)
-    ru_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    moon_day: Mapped[int] = mapped_column(nullable=False, unique=True)
+    en_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    ru_name: Mapped[str] = mapped_column(String(100), nullable=False)
     is_inauspicious: Mapped[bool] = mapped_column(nullable=False)
 
 

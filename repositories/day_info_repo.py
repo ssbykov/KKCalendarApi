@@ -1,18 +1,22 @@
-from typing import Sequence
+from typing import Sequence, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, Mapped
 
-from models.day_info import DayInfo
+from models.day_info import DayInfo, ElementModel, HaircuttingModel, LaModel, YelamModel, ArchModel
+from schemas.day_info import DayInfoSchema, ParthDayInfoSchema
 
-
-# @router.get("/haircutting")
-# async def get_haircutting_days(session: SessionDep):
-#     result = await session.execute(select(HaircuttingModel))
-#     return result.scalars().all()
 
 class DayInfoRepository:
+    _instance: Optional['DayInfoRepository'] = None
+
+    def __new__(cls, session: AsyncSession) -> 'DayInfoRepository':
+        if cls._instance is None:
+            cls._instance = super(DayInfoRepository, cls).__new__(cls)
+            cls._instance.session = session
+        return cls._instance
+
     def __init__(self, session: AsyncSession):
         self.session = session
         self.main_request = (
@@ -37,4 +41,51 @@ class DayInfoRepository:
         request = self.main_request.filter(DayInfo.date == date)
         result = await self.session.execute(request)
         day_info = result.scalars().first()
-        return day_info
+        if day_info:
+            return day_info
+        raise ValueError
+
+    async def get_elements(self) -> Sequence[ElementModel]:
+        result = await self.session.execute(select(ElementModel))
+        elements = result.scalars().all()
+        if elements:
+            return elements
+        raise ValueError
+
+    async def get_haircutting_day_id(self, moon_day: int) -> int:
+        request = select(HaircuttingModel).filter(HaircuttingModel.moon_day == moon_day)
+        result = await self.session.execute(request)
+        haircutting_day = result.scalars().first()
+        if haircutting_day:
+            return haircutting_day.id
+        raise ValueError
+
+    async def get_la_id(self, moon_day: str) -> int:
+        request = select(LaModel).filter(LaModel.moon_day == moon_day)
+        result = await self.session.execute(request)
+        la_id = result.scalars().first()
+        if la_id:
+            return la_id.id
+        raise ValueError
+
+    async def get_yelam_day_id(self, moon: str) -> int:
+        month = moon[:-1] if len(moon) == 3 else moon
+        request = select(YelamModel).filter(YelamModel.month == month)
+        result = await self.session.execute(request)
+        yelam_id = result.scalars().first()
+        if yelam_id:
+            return yelam_id.id
+        raise ValueError
+
+    async def get_arch_id(self, moon_day: str) -> int:
+        request = select(ArchModel).filter(ArchModel.moon_day == moon_day[-1])
+        result = await self.session.execute(request)
+        arch_id = result.scalars().first()
+        if arch_id:
+            return arch_id.id
+        raise ValueError
+
+    async def add_days(self, days_info: list[ParthDayInfoSchema]) -> None:
+        days = (day_info.to_orm(DayInfo) for day_info in days_info)
+        self.session.add_all(days)
+        await self.session.commit()
