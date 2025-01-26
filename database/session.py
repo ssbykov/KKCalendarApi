@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 
 from core.config import settings
 from database.database import Base
-from models.day_info import YelamModel, HaircuttingModel, LaModel, ElementModel, ArchModel, DayInfo
+from models import *
 from schemas.day_info import DayDataSchema, ArchSchema, ElementSchema, HaircuttingSchema, LaSchema, YelamSchema
 
 engine = create_async_engine(settings.DATABASE_URL, future=True, echo=True)
@@ -30,7 +30,6 @@ init_data: list[dict[str, Any]] = [
 
 
 async def init_model(session: AsyncSession, model_class: Type[Base], schema_class: Type[DayDataSchema]) -> None:
-    # async for session in get_session():
     result = await session.execute(select(func.count()).select_from(model_class))
     count = result.scalar()
     if count == 0:

@@ -2,10 +2,10 @@ from typing import Sequence, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload, Mapped
+from sqlalchemy.orm import selectinload
 
 from models.day_info import DayInfo, ElementModel, HaircuttingModel, LaModel, YelamModel, ArchModel
-from schemas.day_info import DayInfoSchema, ParthDayInfoSchema
+from schemas.day_info import ParthDayInfoSchema
 
 
 class DayInfoRepository:

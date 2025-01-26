@@ -1,11 +1,7 @@
 from sqlalchemy import String, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship, backref, DeclarativeBase
+from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 
 from database.database import Base
-
-
-# class Base(DeclarativeBase):
-#     pass
 
 
 class DayInfo(Base):
