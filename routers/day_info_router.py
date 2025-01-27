@@ -19,7 +19,7 @@ async def get_all_days(session: SessionDep) -> Sequence[DayInfo]:
     return all_days
 
 
-@router.get("/days/{date}", response_model=DayInfoSchema)
+@router.get("/days/", response_model=DayInfoSchema)
 async def get_day_info(date: str, session: SessionDep) -> DayInfo:
     repo = DayInfoRepository(session)
     return await repo.get_day_by_date(date=date)
