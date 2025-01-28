@@ -35,7 +35,7 @@ async def init_model(session: AsyncSession, model_class: Type[Base], schema_clas
     if count == 0:
         for el in model_class.init_data:
             el_schema = schema_class(**el)
-            session.add(el_schema.to_orm(model_class))
+            session.add(el_schema.to_orm())
 
 
 async def init_db() -> None:

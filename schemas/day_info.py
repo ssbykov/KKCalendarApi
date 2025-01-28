@@ -1,17 +1,21 @@
 from datetime import datetime
-from typing import Type
+from typing import Type, List, Optional
 
 from pydantic import BaseModel, field_validator
 from pydantic import Field
+from sqlalchemy.orm import class_mapper
 
 from database.database import Base
+from models.day_info import DescriptionModel, ElementModel, ArchModel, LaModel, HaircuttingModel, YelamModel, DayInfo
 
 
 class DayDataSchema(BaseModel):
-    def to_orm(self, model_class: Type[Base]) -> Base:
-        column_names = [column.name for column in model_class.__table__.columns if column.name != "id"]
+    base_class: Type[Base] = Field(default=None, exclude=True)
+
+    def to_orm(self) -> Base:
+        column_names = [column.name for column in self.base_class.__table__.columns if column.name != "id"]
         if column_names == list(self.model_dump().keys()):
-            return model_class(**self.model_dump())
+            return self.base_class(**self.model_dump())
         raise ValueError("Параметры model_class не соответствуют параметрам базового класса.")
 
 
@@ -19,6 +23,7 @@ class YelamSchema(DayDataSchema):
     month: int = Field(ge=0, le=12)
     en_name: str = Field(max_length=20)
     ru_name: str = Field(max_length=20)
+    base_class: Type[Base] = Field(default=YelamModel, exclude=True)
 
     model_config = {
         "from_attributes": True
@@ -30,6 +35,7 @@ class HaircuttingSchema(DayDataSchema):
     en_name: str = Field(max_length=100)
     ru_name: str = Field(max_length=100)
     is_inauspicious: bool
+    base_class: Type[Base] = Field(default=HaircuttingModel, exclude=True)
 
     model_config = {
         "from_attributes": True
@@ -40,6 +46,7 @@ class LaSchema(DayDataSchema):
     moon_day: int = Field(ge=0, le=30)
     en_name: str = Field(max_length=40)
     ru_name: str = Field(max_length=40)
+    base_class: Type[Base] = Field(default=LaModel, exclude=True)
 
     model_config = {
         "from_attributes": True
@@ -51,6 +58,7 @@ class ArchSchema(DayDataSchema):
     name: str = Field(max_length=10)
     en_desc: str = Field(max_length=100)
     ru_desc: str = Field(max_length=100)
+    base_class: Type[Base] = Field(default=ArchModel, exclude=True)
 
     model_config = {
         "from_attributes": True
@@ -59,6 +67,18 @@ class ArchSchema(DayDataSchema):
 
 class ElementSchema(DayDataSchema):
     name: str = Field(max_length=40)
+    base_class: Type[Base] = Field(default=ElementModel, exclude=True)
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
+class DescriptionSchema(DayDataSchema):
+    id: int
+    text: str
+    link: str
+    day_info_id: int
 
     model_config = {
         "from_attributes": True
@@ -75,6 +95,17 @@ class DayInfoSchema(BaseModel):
     la: LaSchema
     yelam: YelamSchema
     haircutting: HaircuttingSchema
+    descriptions: List[DescriptionSchema]
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
+class ParthDescriptionSchema(DayDataSchema):
+    text: str
+    link: str
+    base_class: Type[Base] = Field(default=DescriptionModel, exclude=True)
 
     model_config = {
         "from_attributes": True
@@ -90,6 +121,27 @@ class ParthDayInfoSchema(DayDataSchema):
     la_id: int
     yelam_id: int
     haircutting_id: int
+    descriptions: Optional[List[ParthDescriptionSchema]]
+    base_class: Type[Base] = Field(default=DayInfo, exclude=True)
+
+    def to_orm(self) -> Base:
+        column_names = list(column.name for column in self.base_class.__table__.columns if column.name != "id")
+        relationships = []
+        for column in class_mapper(self.base_class).relationships.values():
+            if column.uselist:
+                relationships.append(column.key)
+        if column_names + relationships == list(self.model_dump().keys()):
+            dump = {k: v for k, v in self.model_dump().items() if k not in relationships}
+            model = self.base_class(**dump)
+            for relationship in relationships:
+                attribute = self.__getattribute__(relationship)
+                if not attribute:
+                    continue
+                inner_model_class = attribute[0].base_class
+                for relationship_dump in self.model_dump().get(relationship):
+                    model.__getattribute__(relationship).append(inner_model_class(**relationship_dump))
+            return model
+        raise ValueError("Параметры model_class не соответствуют параметрам базового класса.")
 
     @field_validator("date")
     def validate_date_format(cls, value: str) -> str:
