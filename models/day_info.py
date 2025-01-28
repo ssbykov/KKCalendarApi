@@ -202,5 +202,6 @@ class Description(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     text: Mapped[str] = mapped_column(nullable=False)
+    link: Mapped[str] = mapped_column(nullable=True)
     day_info_id: Mapped[int] = mapped_column(ForeignKey("day_info.id"), nullable=False)
     day_info: Mapped[DayInfo] = relationship("DayInfo", back_populates="descriptions")
