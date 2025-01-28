@@ -30,7 +30,7 @@ class DayInfo(Base):
     yelam = relationship("YelamModel", backref=backref("yelam", lazy='dynamic'))
     haircutting_id: Mapped[int] = mapped_column(ForeignKey("haircutting.id"), nullable=False)
     haircutting = relationship("HaircuttingModel", backref=backref("haircutting", lazy='dynamic'))
-    descriptions: Mapped[list["Description"]] = relationship("Description", back_populates="day_info")
+    descriptions: Mapped[list["DescriptionModel"]] = relationship("DescriptionModel", back_populates="day_info")
 
 
 class ElementModel(Base):
@@ -197,7 +197,7 @@ class HaircuttingModel(Base):
     is_inauspicious: Mapped[bool] = mapped_column(nullable=False)
 
 
-class Description(Base):
+class DescriptionModel(Base):
     __tablename__ = "descriptions"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
