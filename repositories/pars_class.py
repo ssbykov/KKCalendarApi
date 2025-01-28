@@ -6,7 +6,7 @@ from fake_headers import Headers  # type: ignore
 
 from database.session import SessionDep
 from repositories.day_info_repo import DayInfoRepository
-from schemas.day_info import ParthDayInfoSchema
+from schemas.day_info import ParthDayInfoSchema, ParthDescriptionSchema
 
 
 class CalendarDayPars:
@@ -47,11 +47,20 @@ class CalendarDayPars:
                 moon_data = day_list[0].split(":")[1].strip(" .")
                 moon, moon_day = moon_data.split(".")
 
-                first_element, second_element = await self._find_elements(day_list)
+                first_element, second_element, elements = await self._find_elements(day_list)
                 arch_id = await self.repo.get_arch_id(moon_day)
                 la_id = await self.repo.get_la_id(moon_day)
                 haircutting_id = await self.repo.get_haircutting_day_id(moon_day)
                 yelam_id = await self.repo.get_yelam_day_id(moon)
+                links = [(a.get_text().strip(), a['href']) for a in day.find_all('a')]
+                elements_index = day_list.index(elements)
+                filter_words = ["🌑", "100 times day", "🌕", "10000000 times day", "100000 times day"]
+                description_list = [
+                    (next((link for link in links if link[0] == item.strip()), (item.strip(), "")))
+                    for item in day_list[1:elements_index] if item not in filter_words
+                ]
+                descriptions = list(ParthDescriptionSchema(text=description[0], link=description[1])
+                                    for description in description_list)
                 day_info = ParthDayInfoSchema(
                     date=str(pars_date),
                     moon_day=moon_data,
@@ -60,37 +69,17 @@ class CalendarDayPars:
                     arch_id=arch_id,
                     la_id=la_id,
                     yelam_id=yelam_id,
-                    haircutting_id=haircutting_id
+                    haircutting_id=haircutting_id,
+                    descriptions=descriptions,
                 )
                 days_info.append(day_info)
         await self.repo.add_days(days_info)
-                # links = [(a.get_text().strip(), a['href']) for a in day.find_all('a')]
-                #
-                # filter_words = ["🌑", "100 times day", "🌕", "10000000 times day", "100000 times day"]
-                # description_list = [
-                #     (next((link for link in links if link[0] == item.strip()), (item.strip(), "")))
-                #     for item in day_list[1:elements_index] if item not in filter_words
-                # ]
-                #
-                # elements_value = day_list[elements_index]
-                #
-                # tibet_day_info = next(
-                #     (item.split(": ") for item in day_list if item.split(":")[0] in self.tibet_days),
-                #     (None, None))
-                # tibet_day, do_not = tibet_day_info
-                #
-                # la: str | None = next((item.split(":")[1].strip() for item in day_list if item.startswith("LA")),
-                #                       None)
-                # yelam: str | None = next(
-                #     (item.split(":")[1].strip() for item in day_list if item.startswith("Yelam")), None)
-                #
-                # haircutting_day_info = next(item for item in day_list if "haircutting day" in item)
 
-    async def _find_elements(self, day_list: list[str], ) -> tuple[int, int]:
+    async def _find_elements(self, day_list: list[str], ) -> tuple[int, int, str]:
         elements = await self.repo.get_elements()
         for i in range(len(elements)):
             for j in range(len(elements)):
                 combined_element = f"{elements[i].name}-{elements[j].name}"
                 if combined_element in day_list:
-                    return elements[i].id, elements[j].id
+                    return elements[i].id, elements[j].id, combined_element
         raise ValueError
