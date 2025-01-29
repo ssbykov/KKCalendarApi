@@ -1,10 +1,16 @@
 import os
-from pydantic_settings  import BaseSettings
+from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite+aiosqlite:///./calendar.db"
-    JWT_SECRET: str = os.getenv("JWT_SECRET", "supersecretkey")
-    JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    DATABASE_URL: str = (
+        f"postgresql+asyncpg://"
+        f"{os.getenv('DB_USER')}"
+        f":{os.getenv('DB_PASS')}"
+        f"@{os.getenv('DB_HOST')}"
+        f":{os.getenv('DB_PORT')}"
+        f"/{os.getenv('DB_BASE')}"
+    )
+
 
 settings = Settings()
