@@ -4,14 +4,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
-from models.day_info import DayInfo, ElementModel, HaircuttingModel, LaModel, YelamModel, ArchModel
+from models.day_info import (
+    DayInfo,
+    ElementModel,
+    HaircuttingModel,
+    LaModel,
+    YelamModel,
+    ArchModel,
+)
 from schemas.day_info import ParthDayInfoSchema
 
 
 class DayInfoRepository:
-    _instance: Optional['DayInfoRepository'] = None
+    _instance: Optional["DayInfoRepository"] = None
 
-    def __new__(cls, session: AsyncSession) -> 'DayInfoRepository':
+    def __new__(cls, session: AsyncSession) -> "DayInfoRepository":
         if cls._instance is None:
             cls._instance = super(DayInfoRepository, cls).__new__(cls)
             cls._instance.session = session
@@ -19,17 +26,14 @@ class DayInfoRepository:
 
     def __init__(self, session: AsyncSession):
         self.session = session
-        self.main_request = (
-            select(DayInfo)
-            .options(
-                selectinload(DayInfo.first_element),
-                selectinload(DayInfo.second_element),
-                selectinload(DayInfo.arch),
-                selectinload(DayInfo.la),
-                selectinload(DayInfo.yelam),
-                selectinload(DayInfo.haircutting),
-                selectinload(DayInfo.descriptions)
-            )
+        self.main_request = select(DayInfo).options(
+            selectinload(DayInfo.first_element),
+            selectinload(DayInfo.second_element),
+            selectinload(DayInfo.arch),
+            selectinload(DayInfo.la),
+            selectinload(DayInfo.yelam),
+            selectinload(DayInfo.haircutting),
+            selectinload(DayInfo.descriptions),
         )
 
     async def get_all_days(self) -> Sequence[DayInfo]:

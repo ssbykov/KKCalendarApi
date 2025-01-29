@@ -11,5 +11,9 @@ class User(Base, SQLAlchemyBaseUserTable[int]):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)  # type: ignore[assignment]
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), onupdate=func.now())
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), onupdate=func.now()
+    )
