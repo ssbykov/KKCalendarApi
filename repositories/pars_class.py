@@ -49,8 +49,8 @@ class CalendarDayPars:
 
                 first_element, second_element, elements = await self._find_elements(day_list)
                 arch_id = await self.repo.get_arch_id(moon_day)
-                la_id = await self.repo.get_la_id(moon_day)
-                haircutting_id = await self.repo.get_haircutting_day_id(moon_day)
+                la_id = await self.repo.get_la_id(int(moon_day))
+                haircutting_id = await self.repo.get_haircutting_day_id(int(moon_day))
                 yelam_id = await self.repo.get_yelam_day_id(moon)
                 links = [(a.get_text().strip(), a['href']) for a in day.find_all('a')]
                 elements_index = day_list.index(elements)

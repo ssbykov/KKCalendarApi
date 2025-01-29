@@ -30,7 +30,11 @@ class DayInfo(Base):
     yelam = relationship("YelamModel", backref=backref("yelam", lazy='dynamic'))
     haircutting_id: Mapped[int] = mapped_column(ForeignKey("haircutting.id"), nullable=False)
     haircutting = relationship("HaircuttingModel", backref=backref("haircutting", lazy='dynamic'))
-    descriptions: Mapped[list["DescriptionModel"]] = relationship("DescriptionModel", back_populates="day_info")
+    descriptions: Mapped[list["DescriptionModel"]] = relationship(
+        "DescriptionModel",
+        back_populates="day_info",
+        cascade="all, delete-orphan"
+    )
 
 
 class ElementModel(Base):
@@ -84,8 +88,8 @@ class LaModel(Base):
     __tablename__ = "la"
     id: Mapped[int] = mapped_column(primary_key=True, index=True, unique=True)
     moon_day: Mapped[int] = mapped_column(nullable=False, unique=True)
-    en_name: Mapped[str] = mapped_column(String(30), nullable=False)
-    ru_name: Mapped[str] = mapped_column(String(30), nullable=False)
+    en_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    ru_name: Mapped[str] = mapped_column(String(100), nullable=False)
 
 
 class ArchModel(Base):
@@ -203,5 +207,5 @@ class DescriptionModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     text: Mapped[str] = mapped_column(nullable=False)
     link: Mapped[str] = mapped_column(nullable=True)
-    day_info_id: Mapped[int] = mapped_column(ForeignKey("day_info.id"), nullable=False)
+    day_info_id: Mapped[int] = mapped_column(ForeignKey("day_info.id", ondelete='CASCADE'), nullable=False)
     day_info: Mapped[DayInfo] = relationship("DayInfo", back_populates="descriptions")

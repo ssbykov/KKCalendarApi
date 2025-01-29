@@ -60,7 +60,7 @@ class DayInfoRepository:
             return haircutting_day.id
         raise ValueError
 
-    async def get_la_id(self, moon_day: str) -> int:
+    async def get_la_id(self, moon_day: int) -> int:
         request = select(LaModel).filter(LaModel.moon_day == moon_day)
         result = await self.session.execute(request)
         la_id = result.scalars().first()
@@ -70,7 +70,7 @@ class DayInfoRepository:
 
     async def get_yelam_day_id(self, moon: str) -> int:
         month = moon[:-1] if len(moon) == 3 else moon
-        request = select(YelamModel).filter(YelamModel.month == month)
+        request = select(YelamModel).filter(YelamModel.month == int(month))
         result = await self.session.execute(request)
         yelam_id = result.scalars().first()
         if yelam_id:
@@ -78,7 +78,7 @@ class DayInfoRepository:
         raise ValueError
 
     async def get_arch_id(self, moon_day: str) -> int:
-        request = select(ArchModel).filter(ArchModel.moon_day == moon_day[-1])
+        request = select(ArchModel).filter(ArchModel.moon_day == int(moon_day[-1]))
         result = await self.session.execute(request)
         arch_id = result.scalars().first()
         if arch_id:
@@ -86,6 +86,6 @@ class DayInfoRepository:
         raise ValueError
 
     async def add_days(self, days_info: list[ParthDayInfoSchema]) -> None:
-        days = (day_info.to_orm(DayInfo) for day_info in days_info)
+        days = (day_info.to_orm() for day_info in days_info)
         self.session.add_all(days)
         await self.session.commit()
