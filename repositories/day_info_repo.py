@@ -43,14 +43,14 @@ class DayInfoRepository:
         day_info = result.scalars().first()
         if day_info:
             return day_info
-        raise ValueError
+        raise ValueError(f"День с датой {date} не найден")
 
     async def get_elements(self) -> Sequence[ElementModel]:
         result = await self.session.execute(select(ElementModel))
         elements = result.scalars().all()
         if elements:
             return elements
-        raise ValueError
+        raise ValueError("Элементы не найдены")
 
     async def get_haircutting_day_id(self, moon_day: int) -> int:
         request = select(HaircuttingModel).filter(HaircuttingModel.moon_day == moon_day)
@@ -58,7 +58,7 @@ class DayInfoRepository:
         haircutting_day = result.scalars().first()
         if haircutting_day:
             return haircutting_day.id
-        raise ValueError
+        raise ValueError("День стрижки не найден")
 
     async def get_la_id(self, moon_day: int) -> int:
         request = select(LaModel).filter(LaModel.moon_day == moon_day)
@@ -66,7 +66,7 @@ class DayInfoRepository:
         la_id = result.scalars().first()
         if la_id:
             return la_id.id
-        raise ValueError
+        raise ValueError("День Ла не найден")
 
     async def get_yelam_day_id(self, moon: str) -> int:
         month = moon[:-1] if len(moon) == 3 else moon
@@ -75,7 +75,7 @@ class DayInfoRepository:
         yelam_id = result.scalars().first()
         if yelam_id:
             return yelam_id.id
-        raise ValueError
+        raise ValueError("Йелам не найден")
 
     async def get_arch_id(self, moon_day: str) -> int:
         request = select(ArchModel).filter(ArchModel.moon_day == int(moon_day[-1]))
@@ -83,7 +83,7 @@ class DayInfoRepository:
         arch_id = result.scalars().first()
         if arch_id:
             return arch_id.id
-        raise ValueError
+        raise ValueError("Арка не найдена")
 
     async def add_days(self, days_info: list[ParthDayInfoSchema]) -> None:
         days = (day_info.to_orm() for day_info in days_info)
