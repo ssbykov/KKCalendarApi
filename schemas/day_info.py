@@ -21,11 +21,8 @@ class DayDataSchema(BaseModel):
     base_class: Type[Base] = Field(default=Base, exclude=True)
 
     def to_orm(self) -> Base:
-        column_names = [
-            column.name
-            for column in self.base_class.__table__.columns
-            if column.name != "id"
-        ]
+        column_names = list(self.base_class.__table__.columns.keys())
+        column_names.remove("id")
         if column_names == list(self.model_dump().keys()):
             return self.base_class(**self.model_dump())
         raise ValueError(
@@ -123,29 +120,26 @@ class ParthDayInfoSchema(DayDataSchema):
     base_class: Type[Base] = Field(default=DayInfo, exclude=True)
 
     def to_orm(self) -> Base:
-        column_names = list(
-            column.name
-            for column in self.base_class.__table__.columns
-            if column.name != "id"
-        )
-        relationships = []
-        for column in class_mapper(self.base_class).relationships.values():
-            if column.uselist:
-                relationships.append(column.key)
+        column_names = list(self.base_class.__table__.columns.keys())
+        column_names.remove("id")
+        relationships = [
+            column.key
+            for column in class_mapper(self.base_class).relationships.values()
+            if column.uselist
+        ]
         if column_names + relationships == list(self.model_dump().keys()):
             dump = {
                 k: v for k, v in self.model_dump().items() if k not in relationships
             }
             model = self.base_class(**dump)
             for relationship in relationships:
-                attribute = self.__getattribute__(relationship)
-                if not attribute:
-                    continue
-                inner_model_class = attribute[0].base_class
-                for relationship_dump in self.model_dump().get(relationship, []):
-                    model.__getattribute__(relationship).append(
-                        inner_model_class(**relationship_dump)
-                    )
+                attribute = getattr(self, relationship)
+                if attribute:
+                    relationship_class = attribute[0].base_class
+                    for relationship_dump in self.model_dump().get(relationship, []):
+                        getattr(model, relationship).append(
+                            relationship_class(**relationship_dump)
+                        )
             return model
         raise ValueError(
             "Параметры model_class не соответствуют параметрам базового класса."
