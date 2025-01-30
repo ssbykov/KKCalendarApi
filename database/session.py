@@ -17,7 +17,11 @@ from schemas.day_info import (
 )
 
 engine = create_async_engine(settings.DATABASE_URL, future=True, echo=True)
-async_session = async_sessionmaker(engine, expire_on_commit=False)
+async_session = async_sessionmaker(
+    bind=engine,
+    autoflush=False,
+    expire_on_commit=False,
+)
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
@@ -54,5 +58,5 @@ async def init_db() -> None:
     async for session in get_session():
         for data in init_data:
             await init_model(session, **data)
-
+        await session.flush()
         await session.commit()

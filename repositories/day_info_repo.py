@@ -85,4 +85,5 @@ class DayInfoRepository:
     async def add_days(self, days_info: list[ParthDayInfoSchema]) -> None:
         days = (day_info.to_orm() for day_info in days_info)
         self.session.add_all(days)
+        await self.session.flush()
         await self.session.commit()
