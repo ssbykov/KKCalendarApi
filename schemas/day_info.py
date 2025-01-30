@@ -18,9 +18,16 @@ from models.day_info import (
 
 
 class DayDataSchema(BaseModel):
+    """
+    Базовый класс для схем, которые могут быть преобразованы в ORM-модели.
+    """
+
     base_class: Type[Base] = Field(default=Base, exclude=True)
 
     def to_orm(self) -> Base:
+        """
+        Преобразует схему в ORM-модель.
+        """
         column_names = list(self.base_class.__table__.columns.keys())
         column_names.remove("id")
         if column_names == list(self.model_dump().keys()):
@@ -127,16 +134,16 @@ class ParthDayInfoSchema(DayDataSchema):
             for column in class_mapper(self.base_class).relationships.values()
             if column.uselist
         ]
-        if column_names + relationships == list(self.model_dump().keys()):
-            dump = {
-                k: v for k, v in self.model_dump().items() if k not in relationships
-            }
-            model = self.base_class(**dump)
+        dump = self.model_dump()
+        if column_names + relationships == list(dump.keys()):
+            model = self.base_class(
+                **{k: v for k, v in dump.items() if k not in relationships}
+            )
             for relationship in relationships:
                 attribute = getattr(self, relationship)
                 if attribute:
                     relationship_class = attribute[0].base_class
-                    for relationship_dump in self.model_dump().get(relationship, []):
+                    for relationship_dump in dump.get(relationship, []):
                         getattr(model, relationship).append(
                             relationship_class(**relationship_dump)
                         )
