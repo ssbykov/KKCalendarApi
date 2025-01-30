@@ -7,7 +7,6 @@ from database.database import Base
 class DayInfo(Base):
     __tablename__ = "day_info"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
     date: Mapped[str] = mapped_column(String(10), nullable=False, unique=True)
     moon_day: Mapped[str] = mapped_column(String(15), nullable=False)
     first_element_id: Mapped[int] = mapped_column(
@@ -51,7 +50,6 @@ class ElementModel(Base):
         {"name": "Water"},
     ]
     __tablename__ = "elements"
-    id: Mapped[int] = mapped_column(primary_key=True, index=True, unique=True)
     name: Mapped[str] = mapped_column(String(15), nullable=False, unique=True)
 
 
@@ -106,7 +104,6 @@ class LaModel(Base):
     ]
 
     __tablename__ = "la"
-    id: Mapped[int] = mapped_column(primary_key=True, index=True, unique=True)
     moon_day: Mapped[int] = mapped_column(nullable=False, unique=True)
     en_name: Mapped[str] = mapped_column(String(100), nullable=False)
     ru_name: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -177,7 +174,6 @@ class ArchModel(Base):
     ]
 
     __tablename__ = "arch"
-    id: Mapped[int] = mapped_column(primary_key=True, index=True, unique=True)
     moon_day: Mapped[int] = mapped_column(nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(10), nullable=False)
     en_desc: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -200,7 +196,6 @@ class YelamModel(Base):
         {"month": 12, "en_name": "North-East", "ru_name": "Северо-Восток"},
     ]
     __tablename__ = "yelam"
-    id: Mapped[int] = mapped_column(primary_key=True, index=True, unique=True)
     month: Mapped[int] = mapped_column(nullable=False, unique=True)
     en_name: Mapped[str] = mapped_column(String(30), nullable=False)
     ru_name: Mapped[str] = mapped_column(String(30), nullable=False)
@@ -391,7 +386,6 @@ class HaircuttingModel(Base):
     ]
 
     __tablename__ = "haircutting"
-    id: Mapped[int] = mapped_column(primary_key=True, index=True, unique=True)
     moon_day: Mapped[int] = mapped_column(nullable=False, unique=True)
     en_name: Mapped[str] = mapped_column(String(100), nullable=False)
     ru_name: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -401,7 +395,6 @@ class HaircuttingModel(Base):
 class DescriptionModel(Base):
     __tablename__ = "descriptions"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
     text: Mapped[str] = mapped_column(nullable=False)
     link: Mapped[str] = mapped_column(nullable=True)
     day_info_id: Mapped[int] = mapped_column(
