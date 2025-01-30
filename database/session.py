@@ -1,7 +1,4 @@
 from typing import Annotated, AsyncGenerator, Type, Any
-from dotenv import load_dotenv
-
-load_dotenv()
 
 from fastapi import Depends
 from sqlalchemy import select, func
