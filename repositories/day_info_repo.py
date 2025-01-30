@@ -4,14 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
-from models.day_info import (
-    DayInfo,
-    ElementModel,
-    HaircuttingModel,
-    LaModel,
-    YelamModel,
-    ArchModel,
-)
+from models import *
 from schemas.day_info import ParthDayInfoSchema
 
 
