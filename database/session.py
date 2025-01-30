@@ -5,8 +5,8 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 from core.config import settings
-from database.database import Base
 from models import *
+from models.base import Base
 from schemas.day_info import (
     DayDataSchema,
     ArchSchema,

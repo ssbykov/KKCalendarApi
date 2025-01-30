@@ -4,7 +4,7 @@ from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from sqlalchemy import DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from database.database import Base
+from models.base import Base
 
 
 class User(Base, SQLAlchemyBaseUserTable[int]):

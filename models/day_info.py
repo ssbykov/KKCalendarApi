@@ -1,7 +1,7 @@
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 
-from database.database import Base
+from models.base import Base
 from models.init_data import ELEMENTS, LA, ARCHES, YELAM, HAIRCUTTING_DAYS
 
 
