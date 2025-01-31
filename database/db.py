@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 
 from core.config import settings
 from database.models import *
-from schemas.day_info import (
+from database.schemas import (
     DayDataSchema,
     ArchSchema,
     ElementSchema,

@@ -12,7 +12,7 @@ from database import (
     YelamModel,
     ArchModel,
 )
-from schemas.day_info import ParthDayInfoSchema
+from database.schemas import DayInfoSchemaCreate
 
 
 class DayInfoRepository:
@@ -89,7 +89,7 @@ class DayInfoRepository:
             return arch_id.id
         raise ValueError("Арка не найдена")
 
-    async def add_days(self, days_info: list[ParthDayInfoSchema]) -> None:
+    async def add_days(self, days_info: list[DayInfoSchemaCreate]) -> None:
         days = (day_info.to_orm() for day_info in days_info)
         self.session.add_all(days)
         await self.session.flush()

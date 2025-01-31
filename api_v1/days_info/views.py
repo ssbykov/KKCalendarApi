@@ -4,8 +4,8 @@ from fastapi import APIRouter
 from typing_extensions import Sequence
 
 from database import SessionDep, DayInfo
+from database.schemas import DayInfoSchema
 from repositories.day_info_repo import DayInfoRepository
-from schemas.day_info import DayInfoSchema
 from schemas.types import DateSchema
 
 router = APIRouter(prefix="/days", tags=["Days info"])

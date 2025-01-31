@@ -5,7 +5,7 @@ from pydantic import BaseModel, field_validator
 from pydantic import Field
 from sqlalchemy.orm import class_mapper
 
-from database.models import (
+from database import (
     Base,
     DescriptionModel,
     ElementModel,
@@ -82,11 +82,20 @@ class ElementSchema(DayDataSchema):
     model_config = {"from_attributes": True}
 
 
-class DescriptionSchema(DayDataSchema):
-    id: int
+class DescriptionSchemaBase(DayDataSchema):
     text: str
     link: str
+
+
+class DescriptionSchema(DescriptionSchemaBase):
+    id: int
     day_info_id: int
+
+    model_config = {"from_attributes": True}
+
+
+class DescriptionSchemaCreate(DescriptionSchemaBase):
+    base_class: Type[Base] = Field(default=DescriptionModel, exclude=True)
 
     model_config = {"from_attributes": True}
 
@@ -106,15 +115,7 @@ class DayInfoSchema(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class ParthDescriptionSchema(DayDataSchema):
-    text: str
-    link: str
-    base_class: Type[Base] = Field(default=DescriptionModel, exclude=True)
-
-    model_config = {"from_attributes": True}
-
-
-class ParthDayInfoSchema(DayDataSchema):
+class DayInfoSchemaCreate(DayDataSchema):
     date: str
     moon_day: str
     first_element_id: int
@@ -123,7 +124,7 @@ class ParthDayInfoSchema(DayDataSchema):
     la_id: int
     yelam_id: int
     haircutting_id: int
-    descriptions: Optional[List[ParthDescriptionSchema]]
+    descriptions: Optional[List[DescriptionSchemaCreate]]
     base_class: Type[Base] = Field(default=DayInfo, exclude=True)
 
     def to_orm(self) -> Base:

@@ -6,7 +6,7 @@ from fake_headers import Headers  # type: ignore
 
 from database import SessionDep
 from repositories.day_info_repo import DayInfoRepository
-from schemas.day_info import ParthDayInfoSchema, ParthDescriptionSchema
+from database.schemas import DayInfoSchemaCreate, DescriptionSchemaCreate
 
 
 class CalendarDayPars:
@@ -38,7 +38,7 @@ class CalendarDayPars:
                 months.append(calendar_date)
 
         # Обработка блоков с днями
-        days_info: list[ParthDayInfoSchema] = []
+        days_info: list[DayInfoSchemaCreate] = []
         for index, block in enumerate(doc.find_all(class_=self.DAY_TAG)):
             for day in block.find_all(class_="zfr3Q CDt4Ke"):
                 day_list = day.get_text().split(" ⋅ ")
@@ -78,10 +78,10 @@ class CalendarDayPars:
                     if item not in filter_words
                 ]
                 descriptions = list(
-                    ParthDescriptionSchema(text=description[0], link=description[1])
+                    DescriptionSchemaCreate(text=description[0], link=description[1])
                     for description in description_list
                 )
-                day_info = ParthDayInfoSchema(
+                day_info = DayInfoSchemaCreate(
                     date=str(pars_date),
                     moon_day=moon_data,
                     first_element_id=first_element,
