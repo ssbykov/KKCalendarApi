@@ -4,7 +4,7 @@ from typing import AsyncGenerator
 import uvicorn
 from fastapi import FastAPI
 
-from database.db_helper import db_helper
+from database import db_helper
 from repositories.pars_class import CalendarDayPars
 from routers import day_info_router
 

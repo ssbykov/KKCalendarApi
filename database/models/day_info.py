@@ -1,8 +1,8 @@
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 
-from models.base import Base
-from models.init_data import ELEMENTS, LA, ARCHES, YELAM, HAIRCUTTING_DAYS
+from .base import Base
+from .init_data import ELEMENTS, LA, ARCHES, YELAM, HAIRCUTTING_DAYS
 
 
 class DayInfo(Base):
