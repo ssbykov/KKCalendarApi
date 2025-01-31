@@ -42,7 +42,7 @@ class DayInfoRepository:
         return day_info_list
 
     async def get_day_by_date(self, date: str) -> DayInfo:
-        request = self.main_stmt.filter(DayInfo.date == date)
+        request = self.main_stmt.where(DayInfo.date == date)
         result = await self.session.execute(request)
         day_info = result.scalars().first()
         if day_info:
@@ -57,7 +57,7 @@ class DayInfoRepository:
         raise ValueError("Элементы не найдены")
 
     async def get_haircutting_day_id(self, moon_day: int) -> int:
-        stmt = select(HaircuttingModel).filter(HaircuttingModel.moon_day == moon_day)
+        stmt = select(HaircuttingModel).where(HaircuttingModel.moon_day == moon_day)
         result = await self.session.execute(stmt)
         haircutting_day = result.scalars().first()
         if haircutting_day:
@@ -65,7 +65,7 @@ class DayInfoRepository:
         raise ValueError("День стрижки не найден")
 
     async def get_la_id(self, moon_day: int) -> int:
-        stmt = select(LaModel).filter(LaModel.moon_day == moon_day)
+        stmt = select(LaModel).where(LaModel.moon_day == moon_day)
         result = await self.session.execute(stmt)
         la_id = result.scalars().first()
         if la_id:
@@ -74,7 +74,7 @@ class DayInfoRepository:
 
     async def get_yelam_day_id(self, moon: str) -> int:
         month = moon[:-1] if len(moon) == 3 else moon
-        stmt = select(YelamModel).filter(YelamModel.month == int(month))
+        stmt = select(YelamModel).where(YelamModel.month == int(month))
         result = await self.session.execute(stmt)
         yelam_id = result.scalars().first()
         if yelam_id:
@@ -82,7 +82,7 @@ class DayInfoRepository:
         raise ValueError("Йелам не найден")
 
     async def get_arch_id(self, moon_day: str) -> int:
-        stmt = select(ArchModel).filter(ArchModel.moon_day == int(moon_day[-1]))
+        stmt = select(ArchModel).where(ArchModel.moon_day == int(moon_day[-1]))
         result = await self.session.execute(stmt)
         arch_id = result.scalars().first()
         if arch_id:
