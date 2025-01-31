@@ -6,7 +6,7 @@ load_dotenv()
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = (
+    DB_URL: str = (
         f"postgresql+asyncpg://"
         f"{os.getenv('DB_USER')}"
         f":{os.getenv('DB_PASS')}"
@@ -14,6 +14,8 @@ class Settings(BaseSettings):
         f":{os.getenv('DB_PORT')}"
         f"/{os.getenv('DB_BASE')}"
     )
+    # DB_ECHO: bool = False
+    DB_ECHO: bool = True  # поменять на False
 
 
 settings = Settings()

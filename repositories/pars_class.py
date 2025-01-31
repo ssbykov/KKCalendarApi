@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup as bs
 from fake_headers import Headers  # type: ignore
 
-from database.session import SessionDep
+from database.db_helper import SessionDep
 from repositories.day_info_repo import DayInfoRepository
 from schemas.day_info import ParthDayInfoSchema, ParthDescriptionSchema
 

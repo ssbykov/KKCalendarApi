@@ -4,15 +4,15 @@ from typing import AsyncGenerator
 import uvicorn
 from fastapi import FastAPI
 
-from database.session import get_session, init_db
+from database.db_helper import db_helper
 from repositories.pars_class import CalendarDayPars
 from routers import day_info_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    await init_db()
-    async for session in get_session():
+    await db_helper.init_db()
+    async for session in db_helper.get_session():
         parser = CalendarDayPars(session)
         await parser.get_days_info()
     yield

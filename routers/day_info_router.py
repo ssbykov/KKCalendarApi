@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter
 from typing_extensions import Sequence
 
-from database.session import SessionDep
+from database.db_helper import SessionDep
 from models import DayInfo
 from repositories.day_info_repo import DayInfoRepository
 from schemas.day_info import DayInfoSchema
