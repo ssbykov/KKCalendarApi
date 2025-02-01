@@ -14,7 +14,7 @@ class DayInfo(Base):
         ForeignKey("elements.id"), nullable=False
     )
     first_element = relationship(
-        "ElementModel",
+        "Element",
         foreign_keys=[first_element_id],
         backref=backref("first_element", lazy="dynamic"),
     )
@@ -22,53 +22,55 @@ class DayInfo(Base):
         ForeignKey("elements.id"), nullable=False
     )
     second_element = relationship(
-        "ElementModel",
+        "Element",
         foreign_keys=[second_element_id],
         backref=backref("second_element", lazy="dynamic"),
     )
-    arch_id: Mapped[int] = mapped_column(ForeignKey("arch.id"), nullable=False)
-    arch = relationship("ArchModel", backref=backref("arch", lazy="dynamic"))
-    la_id: Mapped[int] = mapped_column(ForeignKey("la.id"), nullable=False)
-    la = relationship("LaModel", backref=backref("la", lazy="dynamic"))
+    arch_id: Mapped[int] = mapped_column(
+        ForeignKey("skylight_arches.id"), nullable=False
+    )
+    arch = relationship("SkylightArch", backref=backref("arch", lazy="dynamic"))
+    la_id: Mapped[int] = mapped_column(ForeignKey("la_positions.id"), nullable=False)
+    la = relationship("LaPosition", backref=backref("la", lazy="dynamic"))
     yelam_id: Mapped[int] = mapped_column(ForeignKey("yelam.id"), nullable=False)
-    yelam = relationship("YelamModel", backref=backref("yelam", lazy="dynamic"))
+    yelam = relationship("Yelam", backref=backref("yelam", lazy="dynamic"))
     haircutting_id: Mapped[int] = mapped_column(
-        ForeignKey("haircutting.id"), nullable=False
+        ForeignKey("haircutting_days.id"), nullable=False
     )
     haircutting = relationship(
-        "HaircuttingModel", backref=backref("haircutting", lazy="dynamic")
+        "HaircuttingDay", backref=backref("haircutting", lazy="dynamic")
     )
-    descriptions: Mapped[list["DescriptionModel"]] = relationship(
-        "DescriptionModel", back_populates="day_info", cascade="all, delete-orphan"
+    descriptions: Mapped[list["Description"]] = relationship(
+        "Description", back_populates="day_info", cascade="all, delete-orphan"
     )
 
 
-class ElementModel(Base):
+class Element(Base):
     init_data = ELEMENTS
     __tablename__ = "elements"
     name: Mapped[str] = mapped_column(String(15), nullable=False, unique=True)
 
 
-class LaModel(Base):
+class LaPosition(Base):
     init_data = LA
 
-    __tablename__ = "la"
+    __tablename__ = "la_positions"
     moon_day: Mapped[int] = mapped_column(nullable=False, unique=True)
     en_name: Mapped[str] = mapped_column(String(100), nullable=False)
     ru_name: Mapped[str] = mapped_column(String(100), nullable=False)
 
 
-class ArchModel(Base):
+class SkylightArch(Base):
     init_data = ARCHES
 
-    __tablename__ = "arch"
+    __tablename__ = "skylight_arches"
     moon_day: Mapped[int] = mapped_column(nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(10), nullable=False)
     en_desc: Mapped[str] = mapped_column(String(100), nullable=False)
     ru_desc: Mapped[str] = mapped_column(String(100), nullable=False)
 
 
-class YelamModel(Base):
+class Yelam(Base):
     init_data = YELAM
     __tablename__ = "yelam"
     month: Mapped[int] = mapped_column(nullable=False, unique=True)
@@ -76,16 +78,16 @@ class YelamModel(Base):
     ru_name: Mapped[str] = mapped_column(String(30), nullable=False)
 
 
-class HaircuttingModel(Base):
+class HaircuttingDay(Base):
     init_data = HAIRCUTTING_DAYS
-    __tablename__ = "haircutting"
+    __tablename__ = "haircutting_days"
     moon_day: Mapped[int] = mapped_column(nullable=False, unique=True)
     en_name: Mapped[str] = mapped_column(String(100), nullable=False)
     ru_name: Mapped[str] = mapped_column(String(100), nullable=False)
     is_inauspicious: Mapped[bool] = mapped_column(nullable=False)
 
 
-class DescriptionModel(Base):
+class Description(Base):
     __tablename__ = "descriptions"
 
     text: Mapped[str] = mapped_column(nullable=False)

@@ -4,9 +4,9 @@ from typing import AsyncGenerator
 import uvicorn
 from fastapi import FastAPI
 
+from api_v1.days_info import days_info_router
 from database import db_helper
 from repositories.pars_class import CalendarDayPars
-from routers import day_info_router
 
 
 @asynccontextmanager
@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(day_info_router)
+app.include_router(days_info_router)
 
 
 if __name__ == "__main__":

@@ -6,11 +6,11 @@ from sqlalchemy.orm import selectinload
 
 from database import (
     DayInfo,
-    ElementModel,
-    HaircuttingModel,
-    LaModel,
-    YelamModel,
-    ArchModel,
+    Element,
+    HaircuttingDay,
+    LaPosition,
+    Yelam,
+    SkylightArch,
 )
 from database.schemas import DayInfoSchemaCreate
 
@@ -49,15 +49,15 @@ class DayInfoRepository:
             return day_info
         raise ValueError(f"День с датой {date} не найден")
 
-    async def get_elements(self) -> Sequence[ElementModel]:
-        result = await self.session.execute(select(ElementModel))
+    async def get_elements(self) -> Sequence[Element]:
+        result = await self.session.execute(select(Element))
         elements = result.scalars().all()
         if elements:
             return elements
         raise ValueError("Элементы не найдены")
 
     async def get_haircutting_day_id(self, moon_day: int) -> int:
-        stmt = select(HaircuttingModel).where(HaircuttingModel.moon_day == moon_day)
+        stmt = select(HaircuttingDay).where(HaircuttingDay.moon_day == moon_day)
         result = await self.session.execute(stmt)
         haircutting_day = result.scalars().first()
         if haircutting_day:
@@ -65,7 +65,7 @@ class DayInfoRepository:
         raise ValueError("День стрижки не найден")
 
     async def get_la_id(self, moon_day: int) -> int:
-        stmt = select(LaModel).where(LaModel.moon_day == moon_day)
+        stmt = select(LaPosition).where(LaPosition.moon_day == moon_day)
         result = await self.session.execute(stmt)
         la_id = result.scalars().first()
         if la_id:
@@ -74,7 +74,7 @@ class DayInfoRepository:
 
     async def get_yelam_day_id(self, moon: str) -> int:
         month = moon[:-1] if len(moon) == 3 else moon
-        stmt = select(YelamModel).where(YelamModel.month == int(month))
+        stmt = select(Yelam).where(Yelam.month == int(month))
         result = await self.session.execute(stmt)
         yelam_id = result.scalars().first()
         if yelam_id:
@@ -82,7 +82,7 @@ class DayInfoRepository:
         raise ValueError("Йелам не найден")
 
     async def get_arch_id(self, moon_day: str) -> int:
-        stmt = select(ArchModel).where(ArchModel.moon_day == int(moon_day[-1]))
+        stmt = select(SkylightArch).where(SkylightArch.moon_day == int(moon_day[-1]))
         result = await self.session.execute(stmt)
         arch_id = result.scalars().first()
         if arch_id:

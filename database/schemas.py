@@ -7,12 +7,12 @@ from sqlalchemy.orm import class_mapper
 
 from database import (
     Base,
-    DescriptionModel,
-    ElementModel,
-    ArchModel,
-    LaModel,
-    HaircuttingModel,
-    YelamModel,
+    Description,
+    Element,
+    SkylightArch,
+    LaPosition,
+    HaircuttingDay,
+    Yelam,
     DayInfo,
 )
 
@@ -41,7 +41,7 @@ class YelamSchema(DayDataSchema):
     month: int = Field(ge=0, le=12)
     en_name: str = Field(max_length=20)
     ru_name: str = Field(max_length=20)
-    base_class: Type[Base] = Field(default=YelamModel, exclude=True)
+    base_class: Type[Base] = Field(default=Yelam, exclude=True)
 
     model_config = {"from_attributes": True}
 
@@ -51,7 +51,7 @@ class HaircuttingSchema(DayDataSchema):
     en_name: str = Field(max_length=100)
     ru_name: str = Field(max_length=100)
     is_inauspicious: bool
-    base_class: Type[Base] = Field(default=HaircuttingModel, exclude=True)
+    base_class: Type[Base] = Field(default=HaircuttingDay, exclude=True)
 
     model_config = {"from_attributes": True}
 
@@ -60,7 +60,7 @@ class LaSchema(DayDataSchema):
     moon_day: int = Field(ge=0, le=30)
     en_name: str = Field(max_length=40)
     ru_name: str = Field(max_length=40)
-    base_class: Type[Base] = Field(default=LaModel, exclude=True)
+    base_class: Type[Base] = Field(default=LaPosition, exclude=True)
 
     model_config = {"from_attributes": True}
 
@@ -70,14 +70,14 @@ class ArchSchema(DayDataSchema):
     name: str = Field(max_length=10)
     en_desc: str = Field(max_length=100)
     ru_desc: str = Field(max_length=100)
-    base_class: Type[Base] = Field(default=ArchModel, exclude=True)
+    base_class: Type[Base] = Field(default=SkylightArch, exclude=True)
 
     model_config = {"from_attributes": True}
 
 
 class ElementSchema(DayDataSchema):
     name: str = Field(max_length=40)
-    base_class: Type[Base] = Field(default=ElementModel, exclude=True)
+    base_class: Type[Base] = Field(default=Element, exclude=True)
 
     model_config = {"from_attributes": True}
 
@@ -95,7 +95,7 @@ class DescriptionSchema(DescriptionSchemaBase):
 
 
 class DescriptionSchemaCreate(DescriptionSchemaBase):
-    base_class: Type[Base] = Field(default=DescriptionModel, exclude=True)
+    base_class: Type[Base] = Field(default=Description, exclude=True)
 
     model_config = {"from_attributes": True}
 

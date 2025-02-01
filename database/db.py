@@ -60,9 +60,9 @@ db_helper = DbHelper(url=settings.DB_URL, echo=settings.DB_ECHO)
 SessionDep = Annotated[AsyncSession, Depends(db_helper.get_session)]
 
 init_data: list[dict[str, Any]] = [
-    {"model_class": YelamModel, "schema_class": YelamSchema},
-    {"model_class": HaircuttingModel, "schema_class": HaircuttingSchema},
-    {"model_class": LaModel, "schema_class": LaSchema},
-    {"model_class": ElementModel, "schema_class": ElementSchema},
-    {"model_class": ArchModel, "schema_class": ArchSchema},
+    {"model_class": Yelam, "schema_class": YelamSchema},
+    {"model_class": HaircuttingDay, "schema_class": HaircuttingSchema},
+    {"model_class": LaPosition, "schema_class": LaSchema},
+    {"model_class": Element, "schema_class": ElementSchema},
+    {"model_class": SkylightArch, "schema_class": ArchSchema},
 ]
