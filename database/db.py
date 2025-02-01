@@ -52,7 +52,6 @@ class DbHelper:
         async for session in self.get_session():
             for data in init_data:
                 await self._init_model(session, **data)
-            await session.flush()
             await session.commit()
 
 

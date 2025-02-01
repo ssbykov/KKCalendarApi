@@ -1,13 +1,12 @@
+from datetime import date
 from typing import List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from typing_extensions import Sequence
 
+from api_v1.days_info.crud import DayInfoRepository
 from database import SessionDep, DayInfo
 from database.schemas import DayInfoSchema
-from api_v1.days_info.crud import DayInfoRepository
-from datetime import date
-from schemas.types import DateSchema
 
 router = APIRouter(prefix="/days", tags=["Days info"])
 

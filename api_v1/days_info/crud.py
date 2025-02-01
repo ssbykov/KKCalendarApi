@@ -1,11 +1,10 @@
+from datetime import date
 from typing import Sequence, Optional
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from datetime import date
-
 
 from database import (
     DayInfo,
@@ -95,5 +94,4 @@ class DayInfoRepository:
     async def add_days(self, days_info: list[DayInfoSchemaCreate]) -> None:
         days = (day_info.to_orm() for day_info in days_info)
         self.session.add_all(days)
-        await self.session.flush()
         await self.session.commit()
