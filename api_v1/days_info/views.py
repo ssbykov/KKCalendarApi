@@ -5,7 +5,7 @@ from typing_extensions import Sequence
 
 from database import SessionDep, DayInfo
 from database.schemas import DayInfoSchema
-from repositories.day_info_repo import DayInfoRepository
+from api_v1.days_info.crud import DayInfoRepository
 from schemas.types import DateSchema
 
 router = APIRouter(prefix="/days", tags=["Days info"])

@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup as bs
 from fake_headers import Headers  # type: ignore
 
 from database import SessionDep
-from repositories.day_info_repo import DayInfoRepository
+from api_v1.days_info.crud import DayInfoRepository
 from database.schemas import DayInfoSchemaCreate, DescriptionSchemaCreate
 
 
