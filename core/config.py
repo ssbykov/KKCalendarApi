@@ -6,6 +6,7 @@ load_dotenv()
 
 
 class Settings(BaseSettings):
+    api_v1_prefix: str = "/api/v1"
     DB_URL: str = (
         f"postgresql+asyncpg://"
         f"{os.getenv('DB_USER')}"

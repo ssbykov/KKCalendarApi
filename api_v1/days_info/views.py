@@ -8,7 +8,7 @@ from api_v1.days_info.crud import DayInfoRepository
 from database import SessionDep, DayInfo
 from database.schemas import DayInfoSchema
 
-router = APIRouter(prefix="/days", tags=["Days info"])
+router = APIRouter(tags=["Days info"])
 
 
 @router.get("/all", response_model=List[DayInfoSchema] | str)
