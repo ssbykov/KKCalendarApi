@@ -1,8 +1,11 @@
 from typing import Sequence, Optional
 
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
+from datetime import date
+
 
 from database import (
     DayInfo,
@@ -41,13 +44,13 @@ class DayInfoRepository:
         day_info_list = result.scalars().all()
         return day_info_list
 
-    async def get_day_by_date(self, date: str) -> DayInfo:
-        request = self.main_stmt.where(DayInfo.date == date)
+    async def get_day_by_day(self, day: date) -> DayInfo:
+        request = self.main_stmt.where(DayInfo.date == str(day))
         result = await self.session.execute(request)
         day_info = result.scalars().first()
         if day_info:
             return day_info
-        raise ValueError(f"День с датой {date} не найден")
+        raise HTTPException(status_code=404, detail=f"День с датой {date} не найден")
 
     async def get_elements(self) -> Sequence[Element]:
         result = await self.session.execute(select(Element))

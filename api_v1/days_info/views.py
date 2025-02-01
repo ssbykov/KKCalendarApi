@@ -1,11 +1,12 @@
 from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from typing_extensions import Sequence
 
 from database import SessionDep, DayInfo
 from database.schemas import DayInfoSchema
 from api_v1.days_info.crud import DayInfoRepository
+from datetime import date
 from schemas.types import DateSchema
 
 router = APIRouter(prefix="/days", tags=["Days info"])
@@ -22,12 +23,6 @@ async def get_all_days(session: SessionDep) -> Sequence[DayInfo] | str:
 
 
 @router.get("/", response_model=DayInfoSchema | str)
-async def get_day_info(date: str, session: SessionDep) -> DayInfo | str:
-    try:
-        date_model = DateSchema(date=date)
-        repo = DayInfoRepository(session)
-        return await repo.get_day_by_date(date=date_model.date)
-    except ValueError as e:
-        return f"Ошибка валидации даты: {e}"
-    except Exception as e:
-        return f"Произошла ошибка: {e}"
+async def get_day_info(day: date, session: SessionDep) -> DayInfo | str:
+    repo = DayInfoRepository(session)
+    return await repo.get_day_by_day(day=day)
