@@ -46,9 +46,6 @@ class DbHelper:
                 session.add(el_schema.to_orm())
 
     async def init_db(self) -> None:
-        async with self.engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
-            await conn.run_sync(Base.metadata.create_all)
         async for session in self.get_session():
             for data in init_data:
                 await self._init_model(session, **data)
