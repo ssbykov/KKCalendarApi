@@ -64,8 +64,9 @@ class CalendarDayPars:
                     "🌑",
                     "100 times day",
                     "🌕",
-                    "10000000 times day",
-                    "100000 times day",
+                    "10 000 000 times day",
+                    "100 000 times day",
+                    "10 000 times day",
                 ]
                 description_list = [
                     (
