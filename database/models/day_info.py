@@ -1,3 +1,5 @@
+from typing import Any
+
 from sqlalchemy import String, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 
@@ -43,6 +45,9 @@ class DayInfo(Base):
     descriptions: Mapped[list["Description"]] = relationship(
         "Description", back_populates="day_info", cascade="all, delete-orphan"
     )
+
+    def to_dict(self):
+        return to_dict(self, ["id", "_sa_instance_state"])
 
 
 class Element(Base):
@@ -99,3 +104,11 @@ class Description(Base):
         ForeignKey("day_info.id", ondelete="CASCADE"), nullable=False
     )
     day_info: Mapped[DayInfo] = relationship("DayInfo", back_populates="descriptions")
+
+    def to_dict(self):
+        return to_dict(self, ["id", "day_info_id", "_sa_instance_state"])
+
+
+def to_dict(obj: Base, exclude_params: list[str]) -> dict[str, Any]:
+    data_dict = {k: v for k, v in obj.__dict__.items() if k not in exclude_params}
+    return data_dict
