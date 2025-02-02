@@ -79,7 +79,10 @@ class CalendarDayPars:
                     if item not in filter_words
                 ]
                 descriptions = list(
-                    DescriptionSchemaCreate(text=description[0], link=description[1])
+                    DescriptionSchemaCreate(
+                        en_name=description[0],
+                        link=description[1],
+                    )
                     for description in description_list
                 )
                 day_info = DayInfoSchemaCreate(
