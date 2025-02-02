@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 
 from .base import Base
@@ -90,7 +90,10 @@ class HaircuttingDay(Base):
 class Description(Base):
     __tablename__ = "descriptions"
 
-    text: Mapped[str] = mapped_column(nullable=False)
+    en_name: Mapped[str] = mapped_column(nullable=False)
+    ru_name: Mapped[str] = mapped_column(nullable=True)
+    ru_text: Mapped[str] = mapped_column(Text, nullable=True)
+    en_text: Mapped[str] = mapped_column(Text, nullable=True)
     link: Mapped[str] = mapped_column(nullable=True)
     day_info_id: Mapped[int] = mapped_column(
         ForeignKey("day_info.id", ondelete="CASCADE"), nullable=False
