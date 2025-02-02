@@ -83,8 +83,11 @@ class ElementSchema(DayDataSchema):
 
 
 class DescriptionSchemaBase(DayDataSchema):
-    text: str
-    link: str
+    en_name: str
+    ru_name: str | None = None
+    en_text: str | None = None
+    ru_text: str | None = None
+    link: str | None = None
 
 
 class DescriptionSchema(DescriptionSchemaBase):
