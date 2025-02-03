@@ -2,8 +2,8 @@ from datetime import date
 from typing import Sequence, Optional
 
 from fastapi import HTTPException
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
 from database import (
@@ -13,6 +13,7 @@ from database import (
     LaPosition,
     Yelam,
     SkylightArch,
+    Description,
 )
 from database.schemas import DayInfoSchemaCreate
 
@@ -92,6 +93,64 @@ class DayInfoRepository:
         raise ValueError("Арка не найдена")
 
     async def add_days(self, days_info: list[DayInfoSchemaCreate]) -> None:
-        days = (day_info.to_orm() for day_info in days_info)
-        self.session.add_all(days)
+        """
+        Добавляет новые записи в таблицу `day_info` и обновляет существующие, если данные отличаются.
+
+        :param days_info: список объектов `DayInfoSchemaCreate` с новыми или обновленными данными.
+        """
+        # Определяем диапазон дат для выборки из базы
+        start_date = min(days_info, key=lambda day_info: day_info.date).date
+        end_date = max(days_info, key=lambda day_info: day_info.date).date
+
+        # Запрос к БД: загружаем существующие записи в указанном диапазоне с descriptions
+        query = (
+            select(DayInfo)
+            .options(selectinload(DayInfo.descriptions))
+            .filter(DayInfo.date.between(start_date, end_date))
+        )
+        result = await self.session.execute(query)
+
+        # Создаем словари для быстрого доступа к существующим данным
+        days_dict_in_base = {}  # Данные в виде словаря (date -> dict)
+        days_info_in_base = {}  # Объекты DayInfo из базы (date -> объект DayInfo)
+
+        desc_key = "descriptions"
+        for day in result.scalars():
+            day_to_dict = day.to_dict()
+            day_to_dict[desc_key] = [
+                desc.to_dict() for desc in day_to_dict.get(desc_key)
+            ]
+            days_dict_in_base[day.date] = day_to_dict
+            days_info_in_base[day.date] = day
+
+        # Обрабатываем новые и обновленные данные
+        for day in days_info:
+            # Преобразуем объект `DayInfoSchemaCreate` в словарь
+            day_dump = day.model_dump()
+            day_date = day_dump["date"]
+
+            if day_date not in days_info_in_base:
+                # Если даты нет в базе — создаем новую запись
+                new_day = DayInfoSchemaCreate(**day_dump).to_orm()
+                self.session.add(new_day)
+            else:
+                # Если дата есть, проверяем, изменились ли данные
+                db_day = days_info_in_base[day_date]
+                if day_dump != days_dict_in_base[day_date]:
+                    for key, value in day_dump.items():
+                        if key != desc_key:
+                            setattr(db_day, key, value)
+
+                    # Обновляем descriptions только если они изменились
+                    if day_dump[desc_key] != days_dict_in_base[day_date][desc_key]:
+                        await self.session.execute(
+                            delete(Description).where(
+                                Description.day_info_id == db_day.id
+                            )
+                        )
+                        # Добавляем новые descriptions
+                        db_day.descriptions = [
+                            Description(**desc) for desc in day_dump[desc_key]
+                        ]
+
         await self.session.commit()
