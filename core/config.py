@@ -1,13 +1,14 @@
 import os
+
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
-class Settings(BaseSettings):
-    api_v1_prefix: str = "/api/v1"
-    DB_URL: str = (
+class DbSettings(BaseModel):
+    url: str = (
         f"postgresql+asyncpg://"
         f"{os.getenv('DB_USER')}"
         f":{os.getenv('DB_PASS')}"
@@ -15,8 +16,12 @@ class Settings(BaseSettings):
         f":{os.getenv('DB_PORT')}"
         f"/{os.getenv('DB_BASE')}"
     )
-    # DB_ECHO: bool = False
-    DB_ECHO: bool = True  # поменять на False
+    echo: bool = False
+
+
+class Settings(BaseSettings):
+    api_v1_prefix: str = "/api/v1"
+    db: DbSettings = DbSettings()
 
 
 settings = Settings()
