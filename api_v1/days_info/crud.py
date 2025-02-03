@@ -118,15 +118,15 @@ class DayInfoRepository:
         for day in result.scalars():
             day_to_dict = day.to_dict()
             day_to_dict[desc_key] = [
-                desc.to_dict() for desc in day_to_dict.get(desc_key)
+                desc.to_dict() for desc in day_to_dict.get(desc_key)  # type: ignore
             ]
             days_dict_in_base[day.date] = day_to_dict
             days_info_in_base[day.date] = day
 
         # Обрабатываем новые и обновленные данные
-        for day in days_info:
+        for day_info in days_info:
             # Преобразуем объект `DayInfoSchemaCreate` в словарь
-            day_dump = day.model_dump()
+            day_dump = day_info.model_dump()
             day_date = day_dump["date"]
 
             if day_date not in days_info_in_base:

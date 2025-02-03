@@ -46,7 +46,7 @@ class DayInfo(Base):
         "Description", back_populates="day_info", cascade="all, delete-orphan"
     )
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
         return to_dict(self, ["id", "_sa_instance_state"])
 
 
@@ -105,7 +105,7 @@ class Description(Base):
     )
     day_info: Mapped[DayInfo] = relationship("DayInfo", back_populates="descriptions")
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, str]:
         return to_dict(self, ["id", "day_info_id", "_sa_instance_state"])
 
 
