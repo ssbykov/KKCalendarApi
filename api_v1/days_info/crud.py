@@ -14,6 +14,7 @@ from database import (
     Yelam,
     SkylightArch,
     Description,
+    Base,
 )
 from database.schemas import DayInfoSchemaCreate
 
@@ -23,12 +24,12 @@ class DayInfoRepository:
 
     def __new__(cls, session: AsyncSession) -> "DayInfoRepository":
         if cls._instance is None:
-            cls._instance = super(DayInfoRepository, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
             cls._instance.session = session
+            cls._instance._init_main_query()
         return cls._instance
 
-    def __init__(self, session: AsyncSession):
-        self.session = session
+    def _init_main_query(self) -> None:
         self.main_stmt = select(DayInfo).options(
             selectinload(DayInfo.first_element),
             selectinload(DayInfo.second_element),
@@ -39,15 +40,23 @@ class DayInfoRepository:
             selectinload(DayInfo.descriptions),
         )
 
+    @staticmethod
+    async def _get_id(session: AsyncSession, model: type[Base], condition) -> int:
+        """Общий метод для получения ID объекта по условию."""
+        stmt = select(model).where(condition)
+        result = await session.scalar(stmt)
+        if not result:
+            raise ValueError("Параметр не найден!")
+        return result.id
+
     async def get_all_days(self) -> Sequence[DayInfo]:
         result = await self.session.execute(self.main_stmt)
         day_info_list = result.scalars().all()
         return day_info_list
 
     async def get_day_by_day(self, day: date) -> DayInfo:
-        request = self.main_stmt.where(DayInfo.date == str(day))
-        result = await self.session.execute(request)
-        day_info = result.scalars().first()
+        stmt = self.main_stmt.where(DayInfo.date == str(day))
+        day_info = await self.session.scalar(stmt)
         if day_info:
             return day_info
         raise HTTPException(status_code=404, detail=f"День с датой {date} не найден")
@@ -60,37 +69,24 @@ class DayInfoRepository:
         raise ValueError("Элементы не найдены")
 
     async def get_haircutting_day_id(self, moon_day: int) -> int:
-        stmt = select(HaircuttingDay).where(HaircuttingDay.moon_day == moon_day)
-        result = await self.session.execute(stmt)
-        haircutting_day = result.scalars().first()
-        if haircutting_day:
-            return haircutting_day.id
-        raise ValueError("День стрижки не найден")
+        return await self._get_id(
+            self.session, HaircuttingDay, HaircuttingDay.moon_day == moon_day
+        )
 
     async def get_la_id(self, moon_day: int) -> int:
-        stmt = select(LaPosition).where(LaPosition.moon_day == moon_day)
-        result = await self.session.execute(stmt)
-        la_id = result.scalars().first()
-        if la_id:
-            return la_id.id
-        raise ValueError("День Ла не найден")
+        return await self._get_id(
+            self.session, LaPosition, LaPosition.moon_day == moon_day
+        )
 
     async def get_yelam_day_id(self, moon: str) -> int:
         month = moon[:-1] if len(moon) == 3 else moon
-        stmt = select(Yelam).where(Yelam.month == int(month))
-        result = await self.session.execute(stmt)
-        yelam_id = result.scalars().first()
-        if yelam_id:
-            return yelam_id.id
-        raise ValueError("Йелам не найден")
+        return await self._get_id(self.session, Yelam, Yelam.month == int(month))
 
     async def get_arch_id(self, moon_day: str) -> int:
-        stmt = select(SkylightArch).where(SkylightArch.moon_day == int(moon_day[-1]))
-        result = await self.session.execute(stmt)
-        arch_id = result.scalars().first()
-        if arch_id:
-            return arch_id.id
-        raise ValueError("Арка не найдена")
+        day = int(moon_day[-1])
+        return await self._get_id(
+            self.session, SkylightArch, SkylightArch.moon_day == day
+        )
 
     async def add_days(self, days_info: list[DayInfoSchemaCreate]) -> None:
         """
@@ -99,8 +95,8 @@ class DayInfoRepository:
         :param days_info: список объектов `DayInfoSchemaCreate` с новыми или обновленными данными.
         """
         # Определяем диапазон дат для выборки из базы
-        start_date = min(days_info, key=lambda day_info: day_info.date).date
-        end_date = max(days_info, key=lambda day_info: day_info.date).date
+        start_date = min(days_info, key=lambda d: d.date).date
+        end_date = max(days_info, key=lambda d: d.date).date
 
         # Запрос к БД: загружаем существующие записи в указанном диапазоне с descriptions
         query = (
