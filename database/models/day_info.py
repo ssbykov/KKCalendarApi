@@ -53,7 +53,10 @@ class DayInfo(Base):
 class Element(Base):
     init_data = ELEMENTS
     __tablename__ = "elements"
-    name: Mapped[str] = mapped_column(String(15), nullable=False, unique=True)
+    en_name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
+    ru_name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
+    ru_text: Mapped[str] = mapped_column(Text, nullable=True)
+    en_text: Mapped[str] = mapped_column(Text, nullable=True)
 
 
 class LaPosition(Base):
