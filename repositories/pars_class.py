@@ -51,15 +51,13 @@ class CalendarDayPars:
                 moon_data = day_list[0].split(":")[1].strip(" .")
                 moon, moon_day = moon_data.split(".")
 
-                first_element, second_element, elements = await self._find_elements(
-                    day_list
-                )
+                elements_id, elements_index = await self._find_elements(day_list)
                 arch_id = await self.repo.get_arch_id(moon_day)
                 la_id = await self.repo.get_la_id(int(moon_day))
                 haircutting_id = await self.repo.get_haircutting_day_id(int(moon_day))
                 yelam_id = await self.repo.get_yelam_day_id(moon)
                 links = [(a.get_text().strip(), a["href"]) for a in day.find_all("a")]
-                elements_index = day_list.index(elements)
+                # elements_index = day_list.index(elements)
                 filter_words = [
                     "🌑",
                     "100 times day",
@@ -88,8 +86,7 @@ class CalendarDayPars:
                 day_info = DayInfoSchemaCreate(
                     date=str(pars_date),
                     moon_day=moon_data,
-                    first_element_id=first_element,
-                    second_element_id=second_element,
+                    elements_id=elements_id,
                     arch_id=arch_id,
                     la_id=la_id,
                     yelam_id=yelam_id,
@@ -102,11 +99,13 @@ class CalendarDayPars:
     async def _find_elements(
         self,
         day_list: list[str],
-    ) -> tuple[int, int, str]:
+    ) -> tuple[int, int]:
         elements = await self.repo.get_elements()
-        for i in range(len(elements)):
-            for j in range(len(elements)):
-                combined_element = f"{elements[i].name}-{elements[j].name}"
-                if combined_element in day_list:
-                    return elements[i].id, elements[j].id, combined_element
+        result = [
+            (el.id, day_list.index(el.en_name))
+            for el in elements
+            if el.en_name in day_list
+        ]
+        if result:
+            return result[0]
         raise ValueError
