@@ -57,6 +57,7 @@ class Element(Base):
     ru_name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
     ru_text: Mapped[str] = mapped_column(Text, nullable=True)
     en_text: Mapped[str] = mapped_column(Text, nullable=True)
+    is_positive: Mapped[bool] = mapped_column(nullable=False)
 
 
 class LaPosition(Base):
