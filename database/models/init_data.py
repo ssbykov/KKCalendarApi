@@ -186,23 +186,30 @@ ELEMENTS = [
         "en_name": "Earth-Earth",
         "ru_name": "Земля-Земля",
         "is_positive": True,
-        "ru_text": "Достижение. Одно из трех превосходных благоприятных сочетаний."
+        "ru_text": "དངོས་གྲུབ་ NGÖDRUB - ДОСТИЖЕНИЕ. Одно из трех превосходных благоприятных сочетаний."
         " Энергия этого дня способствует совершенствованию,"
         " приобретению и исполнению желаний; он очень благоприятен для закладки фундамента дома,"
         " начала строительных работ, покупки земли и осуществления деятельности,"
         " направленной на улучшение и стабилизацию.",
-        "en_text": "",
+        "en_text": "དངོས་གྲུབ་ NGÖDRUB - ACCOMPLISHMENT. One of the three excellent auspicious conjunctions."
+        " The energy of this day favors perfection, acquisition and the accomplishment of one's wishes and desires;"
+        " it is very favorable to laying the foundations of a house, beginning construction projects,"
+        " buying land and accomplish activities of enhancement and stabilisation.",
     },
     {
         "en_name": "Water-Water",
         "ru_name": "Вода-Вода",
         "is_positive": True,
-        "ru_text": "Нектар. Одно из трех превосходных благоприятных сочетаний."
+        "ru_text": "བདུད་རྩི DUTSI - НЕКТАР. Одно из трех превосходных благоприятных сочетаний."
         " Энергия этого дня способствует увеличению жизненной силы и долголетию;"
         " он очень благоприятен для вступления в брак, получения посвящений,"
         " выполнения практик долголетия и приготовления лекарств;"
         " он также благоприятны для развития личной силы (вангтанг), дружбы и торговли.",
-        "en_text": "",
+        "en_text": "བདུད་རྩི DUTSI - NECTAR. One of the three excellent auspicious conjunctions."
+        " The energy of this days favors the increase of the life force and longevity;"
+        " it is very propitious for marriage, receiving empowerments,"
+        " accomplishing practices of longevity and preparing medicine;"
+        " it is also favorable for developing one's personal power (wangtang), friendship and commerce.",
     },
     {
         "en_name": "Fire-Water",
@@ -218,69 +225,88 @@ ELEMENTS = [
         "en_name": "Fire-Wind",
         "ru_name": "Огонь-Ветер",
         "is_positive": True,
-        "ru_text": "Сила. Одно из трех хороших благоприятных сочетаний."
+        "ru_text": " ྟོབས་ལྡན་ TOBDEN - СИЛА. Одно из трех хороших благоприятных сочетаний."
         " Энергия этого дня способствует накоплению жизненной энергии и сил;"
         " благоприятствует благоприятным занятиям, молитвам, подношениям божествам и умиротворению,"
         " обогащению и мощным действиям. Удача.",
-        "en_text": "",
+        "en_text": "སྟོབས་ལྡན་ TOBDEN - POWERFUL. One of the three good favorable conjunctions."
+        " The energy of this day favors the gathering of vitality and strength;"
+        " auspicious engagements, prayers, offerings to deities and appeasing,"
+        " enrichment and powerful activities are favored. Good fortune.",
     },
     {
         "en_name": "Earth-Water",
         "ru_name": "Земля-Вода",
         "is_positive": True,
-        "ru_text": "Молодость. Одно из трех превосходных благоприятных сочетаний."
+        "ru_text": "ལང་ཆོ༹་ LANCHÖ - МОЛОДОСТЬ. Одно из трех превосходных благоприятных сочетаний."
         " Это сочетание принесёт большую удачу и счастье. Оно благоприятно для радостных занятий и вечеринок,"
         " ношения новой одежды, украшения драгоценностями и прослушивания музыки.",
-        "en_text": "",
+        "en_text": "ལང་ཆོ༹་ LANCHÖ - YOUTH. One of the three excellent auspicious conjunctions."
+        " This combintaion will bring great good fortune and happiness."
+        " It is propitious for engaging in joyful activities and having a party,"
+        " wearing new clothes, adorning in jewelry and play music.",
     },
     {
         "en_name": "Fire-Fire",
         "ru_name": "Огонь-Огонь",
         "is_positive": True,
-        "ru_text": "Успех, развитие. Одно из трех хороших благоприятных сочетаний."
+        "ru_text": "འཕེལ་འགྱུར་ PELGYUR - РАЗВИТИЕ. Одно из трех хороших благоприятных сочетаний."
         " Энергия дня способствует росту и увеличивает пользу от деятельности (например, торговли),"
         " которая обеспечивает материальную поддержку, такую как еда и одежда."
         " Следует проявлять щедрость и сеять зерно."
         " Подношение божествам своих вещей позволяет осуществить все наши желания.",
-        "en_text": "",
+        "en_text": "འཕེལ་འགྱུར་ PELGYUR - PROGRESS. One of the three good favorable conjunctions."
+        " The energy of the day favors growth and increases the benefits of activities (such as commerce)"
+        " that provide material support like food and clothes. One should practice generosity and sow grains."
+        " Offering one's possessions to deities allows accomplishment of all our wishes.",
     },
     {
         "en_name": "Wind-Wind",
         "ru_name": "Ветер-Ветер",
         "is_positive": True,
-        "ru_text": "Превосходство. Одно из трех хороших благоприятных сочетаний."
+        "ru_text": "ཕུན་ཚོགས་ PUNGCHOG - ПРЕВОСХОДСТВО. Одно из трех хороших благоприятных сочетаний."
         " Энергия этого дня способствует быстрому и успешному завершению таких дел,"
         " как религиозные практики и путешествия. Желания и намерения быстро исполняются."
         " Придёт счастье. Следует совершать быстрые и энергичные действия.",
-        "en_text": "",
+        "en_text": "ཕུན་ཚོགས་ PUNGCHOG - EXCELLENCE. One of the three good favorable conjunctions."
+        " The energy of this day brings activities such as religious practice and travel"
+        " to a speedy and successful fruition. Wishes and intentions are quickly accomplished."
+        " Happiness will come. One should accomplish quick and energetic actions.",
     },
     {
         "en_name": "Earth-Wind",
         "ru_name": "Земля-Ветер",
         "is_positive": False,
-        "ru_text": "Недостаток, дефицит. Одно из трех неблагоприятных сочетаний."
+        "ru_text": "མི་འཕྲོད་ MIPROD - НЕДОСТАТОК, ДЕФИЦИТ. Одно из трех неблагоприятных сочетаний."
         " Энергия дня предвещает бедность, неудачу, ослабление сил и ограбление ворами;"
         " позитивная деятельность будет затруднена, а негативная — усилена.",
-        "en_text": "",
+        "en_text": "མི་འཕྲོད་ MIPROD - DEFICIENCY. One of the three unfavorable conjunctions."
+        " The energy of the day portends poverty, failure and the diminishment of one's strength"
+        " and plundering by thieves; positive activities will be impeded and negative activities strengthened.",
     },
     {
         "en_name": "Water-Wind",
         "ru_name": "Вода-Ветер",
         "is_positive": False,
-        "ru_text": "Разлад. Одно из трёх неблагоприятных сочетаний."
+        "ru_text": "མི་མཐུན་ MITHUN - Разлад. Одно из трёх неблагоприятных сочетаний."
         " Действия в этот день будут отмечены разобщённостью и разногласиями."
         " Могут возникнуть разлука с друзьями, клевета, изоляция и враги."
         " Увеличится количество негативных действий, которые вредят единству.",
-        "en_text": "",
+        "en_text": "མི་མཐུན་ MITHUN - DISCORD. One of the three unfavorable conjunctions."
+        " Activities on this day will be marked by divisiveness and disagreement."
+        " Separation from friends, calumny, isolation and enemies can arise."
+        " Negative actions that harm unity will increase.",
     },
     {
         "en_name": "Earth-Fire",
         "ru_name": "Земля-Огонь",
         "is_positive": False,
-        "ru_text": "Сжигание. Одно из трех неблагоприятных сочетаний."
+        "ru_text": "སྲེག་པ་ REGPA - СЖИГАНИЕ. Одно из трех неблагоприятных сочетаний."
         " Энергия дня будет способствовать препятствиям в делах, страданиям, раздорам и недовольству."
         " Могут возникнуть насильственные действия, ссоры и вредные поступки.",
-        "en_text": "",
+        "en_text": "སྲེག་པ་ REGPA - BURNING. One of the three unfavorable conjunctions."
+        " The day's energy will favor obstruction of activities, suffering, strife and displeasure."
+        " Violent actions, quarrels and harmful actions can arise.",
     },
 ]
 
