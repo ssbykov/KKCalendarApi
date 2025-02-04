@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 
 from database import (
     DayInfo,
-    Element,
+    Elements,
     HaircuttingDay,
     LaPosition,
     Yelam,
@@ -31,8 +31,7 @@ class DayInfoRepository:
 
     def _init_main_query(self) -> None:
         self.main_stmt = select(DayInfo).options(
-            selectinload(DayInfo.first_element),
-            selectinload(DayInfo.second_element),
+            selectinload(DayInfo.elements),
             selectinload(DayInfo.arch),
             selectinload(DayInfo.la),
             selectinload(DayInfo.yelam),
@@ -61,8 +60,8 @@ class DayInfoRepository:
             return day_info
         raise HTTPException(status_code=404, detail=f"День с датой {date} не найден")
 
-    async def get_elements(self) -> Sequence[Element]:
-        result = await self.session.execute(select(Element))
+    async def get_elements(self) -> Sequence[Elements]:
+        result = await self.session.execute(select(Elements))
         elements = result.scalars().all()
         if elements:
             return elements
