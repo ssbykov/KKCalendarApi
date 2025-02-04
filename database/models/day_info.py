@@ -86,6 +86,15 @@ class HaircuttingDay(Base):
     is_inauspicious: Mapped[bool] = mapped_column(nullable=False)
 
 
+class SpecialDay(Base):
+    __tablename__ = "specialdays"
+    moon_days: Mapped[str] = mapped_column(String(10), nullable=True)
+    en_name: Mapped[str] = mapped_column(nullable=False)
+    ru_name: Mapped[str] = mapped_column(nullable=True)
+    ru_text: Mapped[str] = mapped_column(Text, nullable=True)
+    en_text: Mapped[str] = mapped_column(Text, nullable=True)
+
+
 class Description(Base):
     __tablename__ = "descriptions"
 
