@@ -12,21 +12,11 @@ class DayInfo(Base):
 
     date: Mapped[str] = mapped_column(String(10), nullable=False, unique=True)
     moon_day: Mapped[str] = mapped_column(String(15), nullable=False)
-    first_element_id: Mapped[int] = mapped_column(
-        ForeignKey("elements.id"), nullable=False
-    )
-    first_element = relationship(
-        "Element",
-        foreign_keys=[first_element_id],
-        backref=backref("first_element", lazy="dynamic"),
-    )
-    second_element_id: Mapped[int] = mapped_column(
-        ForeignKey("elements.id"), nullable=False
-    )
-    second_element = relationship(
-        "Element",
-        foreign_keys=[second_element_id],
-        backref=backref("second_element", lazy="dynamic"),
+    elements_id: Mapped[int] = mapped_column(ForeignKey("elements.id"), nullable=False)
+    elements = relationship(
+        "Elements",
+        foreign_keys=[elements_id],
+        backref=backref("elements", lazy="dynamic"),
     )
     arch_id: Mapped[int] = mapped_column(
         ForeignKey("skylight_arches.id"), nullable=False
@@ -50,7 +40,7 @@ class DayInfo(Base):
         return to_dict(self, ["id", "_sa_instance_state"])
 
 
-class Element(Base):
+class Elements(Base):
     init_data = ELEMENTS
     __tablename__ = "elements"
     en_name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)

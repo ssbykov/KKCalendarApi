@@ -8,7 +8,7 @@ from sqlalchemy.orm import class_mapper
 from database import (
     Base,
     Description,
-    Element,
+    Elements,
     SkylightArch,
     LaPosition,
     HaircuttingDay,
@@ -75,9 +75,13 @@ class ArchSchema(DayDataSchema):
     model_config = {"from_attributes": True}
 
 
-class ElementSchema(DayDataSchema):
-    name: str = Field(max_length=40)
-    base_class: Type[Base] = Field(default=Element, exclude=True)
+class ElementsSchema(DayDataSchema):
+    en_name: str = Field(max_length=100)
+    ru_name: str = Field(max_length=100)
+    ru_text: str
+    en_text: str
+    is_positive: bool
+    base_class: Type[Base] = Field(default=Elements, exclude=True)
 
     model_config = {"from_attributes": True}
 
@@ -107,8 +111,7 @@ class DayInfoSchema(BaseModel):
     id: int
     date: str
     moon_day: str
-    first_element: ElementSchema
-    second_element: ElementSchema
+    elements: ElementsSchema
     arch: ArchSchema
     la: LaSchema
     yelam: YelamSchema
@@ -121,8 +124,7 @@ class DayInfoSchema(BaseModel):
 class DayInfoSchemaCreate(DayDataSchema):
     date: str
     moon_day: str
-    first_element_id: int
-    second_element_id: int
+    elements_id: int
     arch_id: int
     la_id: int
     yelam_id: int

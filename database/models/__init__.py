@@ -3,7 +3,7 @@ from .day_info import (
     Yelam,
     HaircuttingDay,
     LaPosition,
-    Element,
+    Elements,
     SkylightArch,
     Description,
 )
@@ -16,7 +16,7 @@ __all__ = [
     "Yelam",
     "HaircuttingDay",
     "LaPosition",
-    "Element",
+    "Elements",
     "SkylightArch",
     "Description",
     "User",

@@ -9,7 +9,7 @@ from database.models import *
 from database.schemas import (
     DayDataSchema,
     ArchSchema,
-    ElementSchema,
+    ElementsSchema,
     HaircuttingSchema,
     LaSchema,
     YelamSchema,
@@ -59,6 +59,6 @@ init_data: list[dict[str, Any]] = [
     {"model_class": Yelam, "schema_class": YelamSchema},
     {"model_class": HaircuttingDay, "schema_class": HaircuttingSchema},
     {"model_class": LaPosition, "schema_class": LaSchema},
-    {"model_class": Element, "schema_class": ElementSchema},
+    {"model_class": Elements, "schema_class": ElementsSchema},
     {"model_class": SkylightArch, "schema_class": ArchSchema},
 ]
