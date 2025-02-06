@@ -436,3 +436,292 @@ YELAM = [
     {"month": 11, "en_name": "East", "ru_name": "Восток"},
     {"month": 12, "en_name": "North-East", "ru_name": "Северо-Восток"},
 ]
+
+DAYS_LIST = [
+    {
+        "name": "Chötrül Düchen",
+        "moon_day": "15.1",
+        "en_name": "Chötrül Düchen - The 'Festival of Miracles'.",
+        "ru_name": "Чотрул Дучен - Фестиваль чудес",
+        "ru_text": "Один из четырёх главных буддийских праздников."
+        " 15-й день первого лунного месяца. Он также происходит в полнолуние и в День будды Амитабхи,"
+        " то есть в пятнадцатый день первого Тибетского месяца."
+        " Первые пятнадцать дней года празднуются в честь пятнадцати дней, во время которых Будда являл различные чудеса,"
+        " чтобы увеличить заслугу и преданность будущих учеников. Во время Чотрул Дучена последствия от"
+        " позитивных и негативных действий умножаются в 💥10 миллионов💥 раз.",
+        "en_text": "15th day of the first lunar month."
+        " One of the four major Buddhist holidays. It occurs on the full moon and Amitabha Buddha's Day also,"
+        " so the fifteenth day of the first Tibetan month."
+        " The first fifteen days of the year celebrate the fifteen days on which,"
+        " in order to increase the merit and the devotion of future disciples,"
+        " Buddha displayed a different miracles. On Chötrül Düchen as all Düchen the effects of"
+        " positive and negative actions are multiplied 💥10 million💥 times",
+    },
+    {
+        "name": "Saga Dawa Düchen",
+        "moon_day": "15.4",
+        "en_name": "Saga Dawa Düchen - Enlightenment and Mahaparinirvana of Buddha Shakyamuni.",
+        "ru_name": "Сага Дава Дучен - Просветление и Махапаринирвана Будды Шакьямуни.",
+        "ru_text": " Самый священный день для буддистов. 15-й (полнолуние) день четвертого лунного месяца."
+        " В Бодхгае, Индия, в последний час ночи, в одно мгновение Великий Бодхисаттва"
+        " положил конец безначальным страданиям рождения, старости и смерти, которые непрестанно продолжаются."
+        " Он, в возрасте тридцати пяти лет, достиг состояния Будды — несравненного,"
+        " совершенного и полного просветления, и обрел три знания."
+        " Поднявшись на семь деревьев Тала, он провозгласил: «Цепь разорвана, эмоции успокоены, страдание прекращено»."
+        " В этот день также отмечается годовщина его паринирваны в Кушинагаре, Индия."
+        " Эффект всех действий умножается в 💥10 миллионов💥 раз!",
+        "en_text": "The Most Sacred Day for Buddhist. 15th (full moon) day of the fourth lunar month."
+        " In Bodhgaya, India, at the last watch of night, in a single instant,"
+        " the Great Bodhisattva put an end to the beginningless suffering of birth,"
+        " old age and death, which comes forth ceaselessly."
+        " He, at the age of thirty-five, attained Buddhahood—peerless, perfect and complete enlightenment,"
+        " and acquired the three knowledges. Rising seven Tala trees high, he announced:"
+        " “The chain is broken, the emotions stilled, suffering is ended”."
+        " This day also marks the anniversary of his parinirvana at Kushinagara, India."
+        " Effects of all actions are multiplied 10 million times!",
+    },
+    {
+        "name": "Chökhor Düchen",
+        "moon_day": "4.6",
+        "en_name": "Chökhor Düchen - The Day of The Buddha's First Teaching.",
+        "ru_name": "Чокхор Дучен — день первого поучения Будды",
+        "ru_text": "4-й день 6-го тибетского лунного месяца."
+        ' Будда в первый раз повернул колесо Дхармы в Сарнатхе в Индии, дав поучения о "Четырёх благородных истинах".'
+        " Эффект от всех позитивных и негативных действий умножается в 💥10 миллионов💥 раз!",
+        "en_text": "The 4th day of the 6th Tibetan Lunar month."
+        " The Buddha turned the Wheel of Dharma for the first time, at Sarnath, India,"
+        " by teaching the 'Four Noble Truths'. Effects of all positive and negative actions are multiplied 💥10 million💥 times!",
+    },
+    {
+        "name": "Lha Bab Düchen",
+        "moon_day": "22.9",
+        "en_name": "Lha Bab Düchen - Buddha's descent from heaven realm.",
+        "ru_name": "Лха Баб Дучен - сошествие Будды с небес",
+        "ru_text": "Это 22-й день 9-го лунного месяца."
+        " Мать Будды Майадеви возродилась на небесах Индры."
+        " Чтобы отплатить ей за доброту и освободить ее, а также принести пользу богам,"
+        " Будда провел три месяца, обучая в царстве богов. Когда он собирался вернуться в этот мир,"
+        " Индра и Брахма проявили три лестницы по 80 000 йоджан (योजन),"
+        " каждая из которых достигала этого мира в Санкисе."
+        " Когда Будда спускался по центральной, они сопровождали его слева и справа, неся зонтики в знак почтения."
+        " Он спустился на землю в Санкисе (संकिसा), которая находится в современном Уттар-Прадеше"
+        " и которая считается одним из восьми святых мест. Это день Дхармачакры,"
+        " один из четырех дней в году, насчитывающих по 10 миллионов раз:"
+        " все позитивные и негативные действия умножаются на 💥10 миллионов💥!",
+        "en_text": "This is the 22nd day of the 9th lunar month."
+        " The Buddha’s mother Mayadevi was reborn in Indra’s heaven. To repay her kindness and to liberate her,"
+        " and also to benefit the gods, Buddha spent three months teachings in the realm of the gods."
+        " When he was about to return to this world, Indra and Brahma manifested three stairs of 80,000"
+        " yojanas (योजन) each reaching this world in Sankisa."
+        " As the Buddha walked down the central one, they accompanied him to his left and"
+        " right carrying umbrellas to honour him. He descended to earth in Sankisa (संकिसा),"
+        " which is located in modern Uttar Pradesh, and which is counted among the eight holy places."
+        " It is a Dharmachakra day, one of the four 10 million times days of the year:"
+        " all positive and negative actions are multiplied by 10 million!",
+    },
+    # Ежегодные специальные лунные дни
+    {
+        "name": "Kutampa",
+        "moon_day": "",
+        "en_name": "Kutampa - Birthday of Shakyamuni Buddha.",
+        "ru_name": "Кутампа - День рождения Будды Шакьямуни.",
+        "ru_text": "Это 7-й день 4-го лунного месяца."
+        " Эффект от всех позитивных и негативных действий умножается в 💥100 000💥 (сто тысяч) раз!",
+        "en_text": "It is the 7th day of the 4th lunar month."
+        " The effect of all positive and negative actions is multiplied by 💥100,000💥 (one hundred thousand) times!",
+    },
+    {
+        "name": "Losar",
+        "moon_day": "",
+        "en_name": "Losar - Tibetan New Year.",
+        "ru_name": "Лосар - Тибетский новый год.",
+        "ru_text": "С {tibetan_year}-м годом всех живых существ!",
+        "en_text": "",
+    },
+    {
+        "name": "Demonstration of Miracles",
+        "moon_day": "",
+        "en_name": "Demonstration of Miracles",
+        "ru_name": "Демонстрация чудес",
+        "ru_text": "С 1-го по 15-й день первого лунного месяца."
+        " В эти дни все положительные и отрицательные действия умножаются в 💥100 000💥 раз.",
+        "en_text": "From the 1st to the 15th day of the first lunar month."
+        " On these days, all positive and negative actions are multiplied by 💥100,000💥 times.",
+    },
+    {
+        "name": "Gutor དགུ་གཏོར་",
+        "moon_day": "",
+        "en_name": "Gutor དགུ་གཏོར་ - The practice of the great Mahakala puja.",
+        "ru_name": "Гутор (тиб. དགུ་གཏོར) - практика великой пуджи Махакалы.",
+        "ru_text": "Начинается за несколько дней до нового лунного года,"
+        " заканчивается танцами Махакалы и подношениями тормы на 29-й день 12-го лунного месяца (Гутор).",
+        "en_text": "Begun in the monasteries a few days before, "
+        " ends with Mahakala dances and torma offerings on the 29th day of the 12th lunar month (Gutor).",
+    },
+    {
+        "name": "Dzam Ling Chi Sang",
+        "moon_day": "15.5",
+        "en_name": "Dzam Ling Chi Sang - Fire puja.",
+        "ru_name": "Дзам Линг Чи Санг - Огненная пуджа",
+        "ru_text": "Всемирный день молитв с воскуриванием благовоний."
+        ' "День местных божеств" или "день всеобщей молитвы"'
+        " отмечается многочисленными подношениями, особенно санг,"
+        " местным божествам и духам земли, которые часто совершаются на вершине холма"
+        " и сочетаются с пикниками и празднествами.",
+        "en_text": "Universal prayers day with incense burning. "
+        "'Local deities' day' or 'universal prayer day' is marked by extensive offerings,"
+        " especially of sang, made to local deities and earth spirits,"
+        " often performed on the top of a hill, and combined with picnics and celebrations.",
+    },
+    {
+        "name": "Ngenpa gu dzom",
+        "moon_day": "",
+        "en_name": "Ngenpa gu dzom - the incidental occurence of nine bad omens.",
+        "ru_name": "Нгенпа гу дзом - случайное возникновение девяти плохих предзнаменований.",
+        "ru_text": "Неблагоприятный день для большинства видов деятельности (но хороший день для пикника)."
+        " Это самая неблагоприятная дата в году. Не о чем беспокоиться.",
+        "en_text": "An inauspicious day for most activities (but a good day for a picnic)."
+        " This is the most inauspicious date of the year. Nothing to worry about.",
+    },
+    # ежемесячные специальные дни
+    {
+        "name": "Buddha Shakyamuni Day",
+        "moon_day": "30",
+        "en_name": "Buddha Shakyamuni Day",
+        "ru_name": "День Будды Шакьямуни",
+        "ru_text": "30 день лунного месяца."
+        " Эффекты всех действий умножаются в 💥100 раз💥, особенно в практике."
+        " Это также новолуние. Защита жизни находится под напряжением."
+        " Покаяние Сангхи (Соджонг)",
+        "en_text": "30th day of the Lunar months."
+        "The effects of all actions are multiplied by 💥100 times💥, especially in practice."
+        "It is also a new moon. Protection of life is stressed. Confession by the Sangha (Sojong)",
+    },
+    {
+        "name": "Buddha Amitābha Day",
+        "moon_day": "15",
+        "en_name": "Buddha Amitābha Day",
+        "ru_name": "День Будды Амитабхи",
+        "ru_text": "15 день лунного месяца."
+        " Эффекты всех действий умножаются в 💥100 раз💥, особенно практика."
+        " Это так же полнолуние. Защита жизни. Практика Cоджонг.",
+        "en_text": "15th day of the Lunar months."
+        " Effects of all actions are multiplied 💥100 times💥 and practice is emphasized."
+        " This is Full moon also. Protection of life is stressed. Confession by the Sangha (Sojong).",
+    },
+    {
+        "name": "Dakini and Vajrayogini Day",
+        "moon_day": "25",
+        "en_name": "Dakini and Vajrayogini Day",
+        "ru_name": "День Дакини и Ваджрайогини",
+        "ru_text": "25 день лунного месяца. Празднования и подношения Цог."
+        "Воспринимается так же, как и день Гуру Ринпоче.",
+        "en_text": "25th day of the Lunar months. Tsok offering and celebration."
+        " To be observed in the same way as the Guru Rinpoche Day",
+    },
+    {
+        "name": "Dharmapala (Dharma Protectors') Day",
+        "moon_day": "29",
+        "en_name": "Dharmapala (Dharma Protectors') Day",
+        "ru_name": "День Дхармапалы (защитника Дхармы)",
+        "ru_text": "29-й день лунного месяца."
+        " Очищения и пост. Покаяние в нарушении обетов и другие подобные практики."
+        " Подношение цога и празднования.",
+        "en_text": "29th day of the Lunar months."
+        " Purification and fasting. Confession of the transgression of vows and other similar practices."
+        " Tsok offerings and celebrations.",
+    },
+    {
+        "name": "Green Tara and Medicine Buddha Day",
+        "moon_day": "8",
+        "en_name": "Green Tara and Medicine Buddha Day",
+        "ru_name": "День Зелёной Тары и Будды Медицины",
+        "ru_text": "8-й день лунного месяца."
+        " Все позитивные и негативные действия усиливаются в 💥100 раз💥!",
+        "en_text": "8th day of the Lunar months."
+        " Every positive and negative actions multiplied 💥100 times💥!",
+    },
+    {
+        "name": "Guru Rinpoche (Padmasambhava) Day",
+        "moon_day": "10",
+        "en_name": "Guru Rinpoche (Padmasambhava) Day",
+        "ru_name": "День Гуру Ринпоче (Падмасабхавы)",
+        "ru_text": "10-й день лунного месяца."
+        " День празднований и подношений цога Чакрасамваре и Йидамам."
+        " Делают дополнительные подношения, и даётся повышенное внимание к тому, что происходит.",
+        "en_text": "10th day of the Lunar months."
+        " Chakrasamvara and Yidam offering day of Tsok offerings and celebration."
+        " Extra offerings are made and increased attention is given to what is happening.",
+    },
+    {
+        "name": "White Tara Day",
+        "moon_day": "3",
+        "en_name": "White Tara Day",
+        "ru_name": "День Белой Тары",
+        "ru_text": "3-й день лунного месяца."
+        " Посвящён практикам Белой Тары, связанным со здоровьем, продлением жизни и мудростью.",
+        "en_text": "3rd day of the Lunar months."
+        " Dedicated to the White Tara practice connected to health, longevity and wisdom.",
+    },
+    # специальные дни
+    {
+        "name": "Paden",
+        "moon_day": "",
+        "en_name": "Paden",
+        "ru_name": "Паден",
+        "ru_text": "Неблагоприятный день для установки Лунгхта и вывешивания молитвенных флагов."
+        "\n*Паден сэнпо — демон класса нага стихийных духов.",
+        "en_text": "Unfavourable day for putting up Lungta or prayer flag."
+        "\n*A paden senpo is a demon of the naga class of elemental spirits.",
+    },
+    {
+        "name": "Luthep ",
+        "moon_day": "",
+        "en_name": "Luthep - Favourable day.",
+        "ru_name": "Лютеп - Благоприятный день.",
+        "ru_text": "В этот день делают пуджу для Нагов.",
+        "en_text": "On this day, pujas for the Naga are done.",
+    },
+    {
+        "name": "Nyinak",
+        "moon_day": "",
+        "en_name": "Nyinak - Black Day.",
+        "ru_name": "Ньинак - Чёрный день.",
+        "ru_text": "Не инициируйте никаких новых проектов, таких как свадьба, инаугурация,"
+        " начало строительства, ретрита, не давайте поучений (буддийских, религиозных),"
+        " не отправляйтесь в долгие поездки... Не организуйте никаких важных мероприятий (похороны и прочее).",
+        "en_text": "Do not undertake any important new project such as marriage, inauguration,"
+        " starting construction, retreat, teaching (Buddhist, religious), long trips...;"
+        " do not hold any important events (funerals etc.).",
+    },
+    {
+        "name": "Yenkong",
+        "moon_day": "",
+        "en_name": "Yenkong - Negative day.",
+        "ru_name": "Йеконг - Негативный день.",
+        "ru_text": " Неблагоприятный день для тордока (практика предотвращения негативных влияний путём выбрасывания торма)."
+        " Не предпринимайте никаких важных действих, таких как свадьба, инаугурация, долгие путешествия..."
+        " Не организуйте важных мероприятий (похороны и прочее). Хороший день для пикника.",
+        "en_text": " Unfavourable day for tordok—practice for averting negative influences by throwing away tormas—,"
+        " do not undertake any important new project such as marriage, inauguration, long trips...,"
+        " do not hold important events (funeral etc.).",
+    },
+    {
+        "name": "Sangen",
+        "moon_day": "",
+        "en_name": "Sangen",
+        "ru_name": "Санген: неблагоприятный день для добрых дел.",
+        "text": "Санген: неблагоприятный день для добрых и благородных дел. Во время появления такого духа рекомендуется избегать"
+        " проведения свадебных церемоний, строительных работ, вывешивания флага, кремационных работ и т. д.",
+    },
+    {
+        "name": "Sabdun Purpa",
+        "moon_day": "",
+        "en_name": "Sabdun Purpa",
+        "ru_name": "Сабдун Пурпа",
+        "ru_text": "Практика подношений Гаясамадза в 8 главах и Танцы Ламы."
+        " (На 10-й и 11-й дни 4-го лунного месяца.)",
+        "en_text": "Практика подношений Гаясамадза в 8 главах и Танцы Ламы."
+        " (На 10-й и 11-й дни 4-го лунного месяца.)",
+    },
+]
