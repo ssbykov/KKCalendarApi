@@ -5,9 +5,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 
 from .base import Base
 from .init_data import ELEMENTS, LA, ARCHES, YELAM, HAIRCUTTING_DAYS
+from .mixines import ToDictMixin
 
 
-class DayInfo(Base):
+class DayInfo(Base, ToDictMixin):
     __tablename__ = "day_info"
 
     date: Mapped[str] = mapped_column(String(10), nullable=False, unique=True)
@@ -35,9 +36,6 @@ class DayInfo(Base):
     descriptions: Mapped[list["Description"]] = relationship(
         "Description", back_populates="day_info", cascade="all, delete-orphan"
     )
-
-    def to_dict(self) -> dict[str, Any]:
-        return to_dict(self, ["id", "_sa_instance_state"])
 
 
 class Elements(Base):
@@ -86,16 +84,8 @@ class HaircuttingDay(Base):
     is_inauspicious: Mapped[bool] = mapped_column(nullable=False)
 
 
-class SpecialDay(Base):
-    __tablename__ = "specialdays"
-    moon_days: Mapped[str] = mapped_column(String(10), nullable=True)
-    en_name: Mapped[str] = mapped_column(nullable=False)
-    ru_name: Mapped[str] = mapped_column(nullable=True)
-    ru_text: Mapped[str] = mapped_column(Text, nullable=True)
-    en_text: Mapped[str] = mapped_column(Text, nullable=True)
-
-
-class Description(Base):
+class Description(Base, ToDictMixin):
+    ToDictMixin._exclude_params.append("day_info_id")
     __tablename__ = "descriptions"
 
     en_name: Mapped[str] = mapped_column(nullable=False)
@@ -107,11 +97,3 @@ class Description(Base):
         ForeignKey("day_info.id", ondelete="CASCADE"), nullable=False
     )
     day_info: Mapped[DayInfo] = relationship("DayInfo", back_populates="descriptions")
-
-    def to_dict(self) -> dict[str, str]:
-        return to_dict(self, ["id", "day_info_id", "_sa_instance_state"])
-
-
-def to_dict(obj: Base, exclude_params: list[str]) -> dict[str, Any]:
-    data_dict = {k: v for k, v in obj.__dict__.items() if k not in exclude_params}
-    return data_dict
