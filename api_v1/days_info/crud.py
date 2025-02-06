@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Sequence, Optional
+from typing import Sequence, Optional, Any
 
 from fastapi import HTTPException
 from sqlalchemy import select, delete
@@ -21,6 +21,7 @@ from database.schemas import DayInfoSchemaCreate
 
 class DayInfoRepository:
     _instance: Optional["DayInfoRepository"] = None
+    session: AsyncSession
 
     def __new__(cls, session: AsyncSession) -> "DayInfoRepository":
         if cls._instance is None:
@@ -40,7 +41,7 @@ class DayInfoRepository:
         )
 
     @staticmethod
-    async def _get_id(session: AsyncSession, model: type[Base], condition) -> int:
+    async def _get_id(session: AsyncSession, model: type[Base], condition: Any) -> int:
         """Общий метод для получения ID объекта по условию."""
         stmt = select(model).where(condition)
         result = await session.scalar(stmt)
@@ -113,7 +114,7 @@ class DayInfoRepository:
         for day in result.scalars():
             day_to_dict = day.to_dict()
             day_to_dict[desc_key] = [
-                desc.to_dict() for desc in day_to_dict.get(desc_key)  # type: ignore
+                desc.to_dict() for desc in day_to_dict.get(desc_key, [])
             ]
             days_dict_in_base[day.date] = day_to_dict
             days_info_in_base[day.date] = day
