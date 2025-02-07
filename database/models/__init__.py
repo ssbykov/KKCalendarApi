@@ -1,3 +1,4 @@
+from .base import Base
 from .day_info import (
     DayInfo,
     Yelam,
@@ -7,8 +8,8 @@ from .day_info import (
     SkylightArch,
     Description,
 )
+from .events import Events, DayInfoEvent
 from .user import User
-from .base import Base
 
 __all__ = [
     "Base",
@@ -19,5 +20,7 @@ __all__ = [
     "Elements",
     "SkylightArch",
     "Description",
+    "Events",
+    "DayInfoEvent",
     "User",
 ]

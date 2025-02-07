@@ -1,4 +1,4 @@
-from typing import Any
+from typing import TYPE_CHECKING
 
 from sqlalchemy import String, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
@@ -6,6 +6,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 from .base import Base
 from .init_data import ELEMENTS, LA, ARCHES, YELAM, HAIRCUTTING_DAYS
 from .mixines import ToDictMixin
+
+if TYPE_CHECKING:
+    from .events import Events, DayInfoEvent
 
 
 class DayInfo(Base, ToDictMixin):
@@ -33,8 +36,14 @@ class DayInfo(Base, ToDictMixin):
     haircutting = relationship(
         "HaircuttingDay", backref=backref("haircutting", lazy="dynamic")
     )
-    descriptions: Mapped[list["Description"]] = relationship(
-        "Description", back_populates="day_info", cascade="all, delete-orphan"
+    # Связь через промежуточную модель
+    dayinfo_links: Mapped[list["DayInfoEvent"]] = relationship(
+        "DayInfoEvent", back_populates="day_info"
+    )
+    events: Mapped[list["Events"]] = relationship(
+        "Events",
+        secondary="dayinfo_events",  # Используем название таблицы
+        back_populates="days",
     )
 
 
