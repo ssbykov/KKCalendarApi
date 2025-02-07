@@ -8,7 +8,7 @@ from .day_info import (
     SkylightArch,
     Description,
 )
-from .events import Events, DayInfoEvent
+from .event import Event, DayInfoEvent
 from .user import User
 
 __all__ = [
@@ -20,7 +20,7 @@ __all__ = [
     "Elements",
     "SkylightArch",
     "Description",
-    "Events",
+    "Event",
     "DayInfoEvent",
     "User",
 ]

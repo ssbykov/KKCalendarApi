@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from .day_info import DayInfo
 
 
-class Events(Base, ToDictMixin):
+class Event(Base, ToDictMixin):
     ToDictMixin._exclude_params.append("day_info_id")
     __tablename__ = "events"
 
@@ -33,7 +33,7 @@ class Events(Base, ToDictMixin):
 
 
 class DayInfoEvent(Base):
-    """Промежуточная таблица для связи многие ко многим между DayInfo и Events."""
+    """Промежуточная таблица для связи многие ко многим между DayInfo и Event."""
 
     __tablename__ = "dayinfo_events"
 
@@ -45,4 +45,4 @@ class DayInfoEvent(Base):
     day_info: Mapped["DayInfo"] = relationship(
         "DayInfo", back_populates="dayinfo_links"
     )
-    event: Mapped["Events"] = relationship("Events", back_populates="event_links")
+    event: Mapped["Event"] = relationship("Event", back_populates="event_links")

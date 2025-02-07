@@ -8,7 +8,7 @@ from .init_data import ELEMENTS, LA, ARCHES, YELAM, HAIRCUTTING_DAYS
 from .mixines import ToDictMixin
 
 if TYPE_CHECKING:
-    from .events import Events, DayInfoEvent
+    from .event import Event, DayInfoEvent
 
 
 class DayInfo(Base, ToDictMixin):
@@ -40,8 +40,8 @@ class DayInfo(Base, ToDictMixin):
     dayinfo_links: Mapped[list["DayInfoEvent"]] = relationship(
         "DayInfoEvent", back_populates="day_info"
     )
-    events: Mapped[list["Events"]] = relationship(
-        "Events",
+    events: Mapped[list["Event"]] = relationship(
+        "Event",
         secondary="dayinfo_events",  # Используем название таблицы
         back_populates="days",
     )
