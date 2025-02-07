@@ -6,7 +6,6 @@ from .day_info import (
     LaPosition,
     Elements,
     SkylightArch,
-    Description,
 )
 from .event import Event, DayInfoEvent
 from .user import User
@@ -19,7 +18,6 @@ __all__ = [
     "LaPosition",
     "Elements",
     "SkylightArch",
-    "Description",
     "Event",
     "DayInfoEvent",
     "User",

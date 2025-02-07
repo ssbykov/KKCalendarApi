@@ -6,7 +6,7 @@ from .models import (
     Elements,
     SkylightArch,
     Base,
-    Description,
+    Event,
 )
 from .db import db_helper, init_data, SessionDep
 
@@ -21,5 +21,5 @@ __all__ = [
     "LaPosition",
     "Elements",
     "SkylightArch",
-    "Description",
+    "Event",
 ]

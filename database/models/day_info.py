@@ -91,18 +91,3 @@ class HaircuttingDay(Base):
     en_name: Mapped[str] = mapped_column(String(100), nullable=False)
     ru_name: Mapped[str] = mapped_column(String(100), nullable=False)
     is_inauspicious: Mapped[bool] = mapped_column(nullable=False)
-
-
-class Description(Base, ToDictMixin):
-    ToDictMixin._exclude_params.append("day_info_id")
-    __tablename__ = "descriptions"
-
-    en_name: Mapped[str] = mapped_column(nullable=False)
-    ru_name: Mapped[str] = mapped_column(nullable=True)
-    ru_text: Mapped[str] = mapped_column(Text, nullable=True)
-    en_text: Mapped[str] = mapped_column(Text, nullable=True)
-    link: Mapped[str] = mapped_column(nullable=True)
-    day_info_id: Mapped[int] = mapped_column(
-        ForeignKey("day_info.id", ondelete="CASCADE"), nullable=False
-    )
-    day_info: Mapped[DayInfo] = relationship("DayInfo", back_populates="descriptions")
