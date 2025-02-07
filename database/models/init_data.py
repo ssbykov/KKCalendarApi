@@ -437,7 +437,7 @@ YELAM = [
     {"month": 12, "en_name": "North-East", "ru_name": "Северо-Восток"},
 ]
 
-DAYS_LIST = [
+EVENTS = [
     {
         "name": "Chötrül Düchen",
         "moon_day": "15.1",
@@ -456,6 +456,7 @@ DAYS_LIST = [
         " in order to increase the merit and the devotion of future disciples,"
         " Buddha displayed a different miracles. On Chötrül Düchen as all Düchen the effects of"
         " positive and negative actions are multiplied 💥10 million💥 times",
+        "link": "https://www.karmakagyucalendar.org/Duchen/Chotrul-Duchen",
     },
     {
         "name": "Saga Dawa Düchen",
@@ -479,6 +480,7 @@ DAYS_LIST = [
         " “The chain is broken, the emotions stilled, suffering is ended”."
         " This day also marks the anniversary of his parinirvana at Kushinagara, India."
         " Effects of all actions are multiplied 10 million times!",
+        "link": "https://www.karmakagyucalendar.org/Duchen/Saga-Dawa-Duchen",
     },
     {
         "name": "Chökhor Düchen",
@@ -490,7 +492,9 @@ DAYS_LIST = [
         " Эффект от всех позитивных и негативных действий умножается в 💥10 миллионов💥 раз!",
         "en_text": "The 4th day of the 6th Tibetan Lunar month."
         " The Buddha turned the Wheel of Dharma for the first time, at Sarnath, India,"
-        " by teaching the 'Four Noble Truths'. Effects of all positive and negative actions are multiplied 💥10 million💥 times!",
+        " by teaching the 'Four Noble Truths'. Effects of all positive"
+        " and negative actions are multiplied 💥10 million💥 times!",
+        "link": "https://www.karmakagyucalendar.org/Duchen/Chokhor-Duechen",
     },
     {
         "name": "Lha Bab Düchen",
@@ -518,45 +522,50 @@ DAYS_LIST = [
         " which is located in modern Uttar Pradesh, and which is counted among the eight holy places."
         " It is a Dharmachakra day, one of the four 10 million times days of the year:"
         " all positive and negative actions are multiplied by 10 million!",
+        "link": "https://www.karmakagyucalendar.org/Duchen/Lhabab-Duchen",
     },
     # Ежегодные специальные лунные дни
     {
         "name": "Kutampa",
-        "moon_day": "",
+        "moon_day": "#",
         "en_name": "Kutampa - Birthday of Shakyamuni Buddha.",
         "ru_name": "Кутампа - День рождения Будды Шакьямуни.",
         "ru_text": "Это 7-й день 4-го лунного месяца."
         " Эффект от всех позитивных и негативных действий умножается в 💥100 000💥 (сто тысяч) раз!",
         "en_text": "It is the 7th day of the 4th lunar month."
         " The effect of all positive and negative actions is multiplied by 💥100,000💥 (one hundred thousand) times!",
+        "link": "https://www.karmakagyucalendar.org/LunarYearly-SpecialDays/Kutampa",
     },
     {
         "name": "Losar",
-        "moon_day": "",
+        "moon_day": "#",
         "en_name": "Losar - Tibetan New Year.",
         "ru_name": "Лосар - Тибетский новый год.",
         "ru_text": "С {tibetan_year}-м годом всех живых существ!",
         "en_text": "",
+        "link": "https://www.karmakagyucalendar.org/LunarYearly-SpecialDays/Losar",
     },
     {
         "name": "Demonstration of Miracles",
-        "moon_day": "",
+        "moon_day": "#",
         "en_name": "Demonstration of Miracles",
         "ru_name": "Демонстрация чудес",
         "ru_text": "С 1-го по 15-й день первого лунного месяца."
         " В эти дни все положительные и отрицательные действия умножаются в 💥100 000💥 раз.",
         "en_text": "From the 1st to the 15th day of the first lunar month."
         " On these days, all positive and negative actions are multiplied by 💥100,000💥 times.",
+        "link": "https://www.karmakagyucalendar.org/LunarYearly-SpecialDays/demonstration-of-miracles",
     },
     {
         "name": "Gutor དགུ་གཏོར་",
-        "moon_day": "",
+        "moon_day": "#",
         "en_name": "Gutor དགུ་གཏོར་ - The practice of the great Mahakala puja.",
         "ru_name": "Гутор (тиб. དགུ་གཏོར) - практика великой пуджи Махакалы.",
         "ru_text": "Начинается за несколько дней до нового лунного года,"
         " заканчивается танцами Махакалы и подношениями тормы на 29-й день 12-го лунного месяца (Гутор).",
         "en_text": "Begun in the monasteries a few days before, "
         " ends with Mahakala dances and torma offerings on the 29th day of the 12th lunar month (Gutor).",
+        "link": "https://www.karmakagyucalendar.org/LunarYearly-SpecialDays/Gutor",
     },
     {
         "name": "Dzam Ling Chi Sang",
@@ -572,16 +581,18 @@ DAYS_LIST = [
         "'Local deities' day' or 'universal prayer day' is marked by extensive offerings,"
         " especially of sang, made to local deities and earth spirits,"
         " often performed on the top of a hill, and combined with picnics and celebrations.",
+        "link": "https://www.karmakagyucalendar.org/LunarYearly-SpecialDays/dzam-ling-chi-sang",
     },
     {
         "name": "Ngenpa gu dzom",
-        "moon_day": "",
+        "moon_day": "#",
         "en_name": "Ngenpa gu dzom - the incidental occurence of nine bad omens.",
         "ru_name": "Нгенпа гу дзом - случайное возникновение девяти плохих предзнаменований.",
         "ru_text": "Неблагоприятный день для большинства видов деятельности (но хороший день для пикника)."
         " Это самая неблагоприятная дата в году. Не о чем беспокоиться.",
         "en_text": "An inauspicious day for most activities (but a good day for a picnic)."
         " This is the most inauspicious date of the year. Nothing to worry about.",
+        "link": "https://www.karmakagyucalendar.org/LunarYearly-SpecialDays/ngenpa-gu-dzom",
     },
     # ежемесячные специальные дни
     {
@@ -596,6 +607,7 @@ DAYS_LIST = [
         "en_text": "30th day of the Lunar months."
         "The effects of all actions are multiplied by 💥100 times💥, especially in practice."
         "It is also a new moon. Protection of life is stressed. Confession by the Sangha (Sojong)",
+        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/Shakyamuni-Buddha-Day",
     },
     {
         "name": "Buddha Amitābha Day",
@@ -608,6 +620,7 @@ DAYS_LIST = [
         "en_text": "15th day of the Lunar months."
         " Effects of all actions are multiplied 💥100 times💥 and practice is emphasized."
         " This is Full moon also. Protection of life is stressed. Confession by the Sangha (Sojong).",
+        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/AmitabhaBuddha-Day",
     },
     {
         "name": "Dakini and Vajrayogini Day",
@@ -618,6 +631,7 @@ DAYS_LIST = [
         "Воспринимается так же, как и день Гуру Ринпоче.",
         "en_text": "25th day of the Lunar months. Tsok offering and celebration."
         " To be observed in the same way as the Guru Rinpoche Day",
+        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/Dakini-Vajrayogini-Day",
     },
     {
         "name": "Dharmapala (Dharma Protectors') Day",
@@ -630,6 +644,7 @@ DAYS_LIST = [
         "en_text": "29th day of the Lunar months."
         " Purification and fasting. Confession of the transgression of vows and other similar practices."
         " Tsok offerings and celebrations.",
+        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/Dharmapala-Day",
     },
     {
         "name": "Green Tara and Medicine Buddha Day",
@@ -640,6 +655,7 @@ DAYS_LIST = [
         " Все позитивные и негативные действия усиливаются в 💥100 раз💥!",
         "en_text": "8th day of the Lunar months."
         " Every positive and negative actions multiplied 💥100 times💥!",
+        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/GreenTara-MedicineBuddha-Day",
     },
     {
         "name": "Guru Rinpoche (Padmasambhava) Day",
@@ -652,6 +668,7 @@ DAYS_LIST = [
         "en_text": "10th day of the Lunar months."
         " Chakrasamvara and Yidam offering day of Tsok offerings and celebration."
         " Extra offerings are made and increased attention is given to what is happening.",
+        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/GuruRinpoche-Day",
     },
     {
         "name": "White Tara Day",
@@ -662,29 +679,32 @@ DAYS_LIST = [
         " Посвящён практикам Белой Тары, связанным со здоровьем, продлением жизни и мудростью.",
         "en_text": "3rd day of the Lunar months."
         " Dedicated to the White Tara practice connected to health, longevity and wisdom.",
+        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/White-Tara-day",
     },
     # специальные дни
     {
         "name": "Paden",
-        "moon_day": "",
+        "moon_day": "#",
         "en_name": "Paden",
         "ru_name": "Паден",
         "ru_text": "Неблагоприятный день для установки Лунгхта и вывешивания молитвенных флагов."
         "\n*Паден сэнпо — демон класса нага стихийных духов.",
         "en_text": "Unfavourable day for putting up Lungta or prayer flag."
         "\n*A paden senpo is a demon of the naga class of elemental spirits.",
+        "link": "https://www.karmakagyucalendar.org/special-days/Paden",
     },
     {
         "name": "Luthep ",
-        "moon_day": "",
+        "moon_day": "#",
         "en_name": "Luthep - Favourable day.",
         "ru_name": "Лютеп - Благоприятный день.",
         "ru_text": "В этот день делают пуджу для Нагов.",
         "en_text": "On this day, pujas for the Naga are done.",
+        "link": "https://www.karmakagyucalendar.org/special-days/Luthep",
     },
     {
         "name": "Nyinak",
-        "moon_day": "",
+        "moon_day": "#",
         "en_name": "Nyinak - Black Day.",
         "ru_name": "Ньинак - Чёрный день.",
         "ru_text": "Не инициируйте никаких новых проектов, таких как свадьба, инаугурация,"
@@ -693,10 +713,11 @@ DAYS_LIST = [
         "en_text": "Do not undertake any important new project such as marriage, inauguration,"
         " starting construction, retreat, teaching (Buddhist, religious), long trips...;"
         " do not hold any important events (funerals etc.).",
+        "link": "https://www.karmakagyucalendar.org/special-days/Nyinak",
     },
     {
         "name": "Yenkong",
-        "moon_day": "",
+        "moon_day": "#",
         "en_name": "Yenkong - Negative day.",
         "ru_name": "Йеконг - Негативный день.",
         "ru_text": " Неблагоприятный день для тордока (практика предотвращения негативных влияний путём выбрасывания торма)."
@@ -705,10 +726,11 @@ DAYS_LIST = [
         "en_text": " Unfavourable day for tordok—practice for averting negative influences by throwing away tormas—,"
         " do not undertake any important new project such as marriage, inauguration, long trips...,"
         " do not hold important events (funeral etc.).",
+        "link": "https://www.karmakagyucalendar.org/special-days/Yenkong",
     },
     {
         "name": "Sangen",
-        "moon_day": "",
+        "moon_day": "#",
         "en_name": "Sangen",
         "ru_name": "Санген: неблагоприятный день для добрых дел.",
         "text": "Санген: неблагоприятный день для добрых и благородных дел. Во время появления такого духа рекомендуется избегать"
@@ -716,7 +738,7 @@ DAYS_LIST = [
     },
     {
         "name": "Sabdun Purpa",
-        "moon_day": "",
+        "moon_day": "#",
         "en_name": "Sabdun Purpa",
         "ru_name": "Сабдун Пурпа",
         "ru_text": "Практика подношений Гаясамадза в 8 главах и Танцы Ламы."
