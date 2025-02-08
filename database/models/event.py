@@ -5,12 +5,15 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.models.mixines import ToDictMixin
 from . import Base
+from .init_data import EVENTS
 
 if TYPE_CHECKING:
     from .day_info import DayInfo
 
 
 class Event(Base, ToDictMixin):
+    init_data = EVENTS
+
     ToDictMixin._exclude_params.append("day_info_id")
     __tablename__ = "events"
 
@@ -18,9 +21,12 @@ class Event(Base, ToDictMixin):
     moon_day: Mapped[str] = mapped_column(String(10), nullable=True)
     en_name: Mapped[str] = mapped_column(nullable=False)
     ru_name: Mapped[str] = mapped_column(nullable=True)
-    ru_text: Mapped[str] = mapped_column(Text, nullable=True)
     en_text: Mapped[str] = mapped_column(Text, nullable=True)
+    ru_text: Mapped[str] = mapped_column(Text, nullable=True)
     link: Mapped[str] = mapped_column(nullable=True)
+    is_mutable: Mapped[bool] = mapped_column(
+        nullable=False, server_default="1", default=False
+    )
     # Связь через промежуточную модель
     event_links: Mapped[list["DayInfoEvent"]] = relationship(
         "DayInfoEvent", back_populates="event"
