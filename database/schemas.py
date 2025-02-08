@@ -7,7 +7,7 @@ from sqlalchemy.orm import class_mapper
 
 from database import (
     Base,
-    Description,
+    Event,
     Elements,
     SkylightArch,
     LaPosition,
@@ -86,23 +86,25 @@ class ElementsSchema(DayDataSchema):
     model_config = {"from_attributes": True}
 
 
-class DescriptionSchemaBase(DayDataSchema):
+class EventSchemaBase(DayDataSchema):
+    name: str
+    moon_day: str | None = None
     en_name: str
     ru_name: str | None = None
     en_text: str | None = None
     ru_text: str | None = None
     link: str | None = None
+    is_mutable: bool
 
 
-class DescriptionSchema(DescriptionSchemaBase):
+class EventSchema(EventSchemaBase):
     id: int
-    day_info_id: int
 
     model_config = {"from_attributes": True}
 
 
-class DescriptionSchemaCreate(DescriptionSchemaBase):
-    base_class: Type[Base] = Field(default=Description, exclude=True)
+class EventSchemaCreate(EventSchemaBase):
+    base_class: Type[Base] = Field(default=Event, exclude=True)
 
     model_config = {"from_attributes": True}
 
@@ -116,7 +118,6 @@ class DayInfoSchema(BaseModel):
     la: LaSchema
     yelam: YelamSchema
     haircutting: HaircuttingSchema
-    descriptions: List[DescriptionSchema]
 
     model_config = {"from_attributes": True}
 
@@ -129,7 +130,7 @@ class DayInfoSchemaCreate(DayDataSchema):
     la_id: int
     yelam_id: int
     haircutting_id: int
-    descriptions: Optional[List[DescriptionSchemaCreate]]
+    events: Optional[List[EventSchemaCreate]]
     base_class: Type[Base] = Field(default=DayInfo, exclude=True)
 
     def to_orm(self) -> Base:

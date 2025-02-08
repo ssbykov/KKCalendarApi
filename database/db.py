@@ -13,6 +13,7 @@ from database.schemas import (
     HaircuttingSchema,
     LaSchema,
     YelamSchema,
+    EventSchemaCreate,
 )
 
 
@@ -61,4 +62,5 @@ init_data: list[dict[str, Any]] = [
     {"model_class": LaPosition, "schema_class": LaSchema},
     {"model_class": Elements, "schema_class": ElementsSchema},
     {"model_class": SkylightArch, "schema_class": ArchSchema},
+    {"model_class": Event, "schema_class": EventSchemaCreate},
 ]
