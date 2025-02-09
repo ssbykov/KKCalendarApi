@@ -8,7 +8,7 @@ Base = declarative_base()
 
 
 class ToDictMixin:
-    _exclude_params = ["id", "_sa_instance_state"]
+    _exclude_params = ["_sa_instance_state"]
 
     def to_dict(self) -> dict[str, Any]:
 
