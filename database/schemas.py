@@ -94,7 +94,7 @@ class EventSchemaBase(DayDataSchema):
     en_text: str | None = None
     ru_text: str | None = None
     link: str | None = None
-    is_mutable: bool
+    is_mutable: bool = False
 
 
 class EventSchema(EventSchemaBase):
@@ -130,7 +130,7 @@ class DayInfoSchemaCreate(DayDataSchema):
     la_id: int
     yelam_id: int
     haircutting_id: int
-    events: Optional[List[EventSchemaCreate]]
+    events: Optional[List[int]]
     base_class: Type[Base] = Field(default=DayInfo, exclude=True)
 
     def to_orm(self) -> Base:
@@ -142,18 +142,10 @@ class DayInfoSchemaCreate(DayDataSchema):
             if column.uselist
         ]
         dump = self.model_dump()
-        if column_names + relationships == list(dump.keys()):
+        if set(list(dump.keys())).issubset(set(column_names + relationships)):
             model = self.base_class(
                 **{k: v for k, v in dump.items() if k not in relationships}
             )
-            for relationship in relationships:
-                attribute = getattr(self, relationship)
-                if attribute:
-                    relationship_class = attribute[0].base_class
-                    for relationship_dump in dump.get(relationship, []):
-                        getattr(model, relationship).append(
-                            relationship_class(**relationship_dump)
-                        )
             return model
         raise ValueError(
             "Параметры model_class не соответствуют параметрам базового класса."
