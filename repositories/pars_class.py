@@ -6,7 +6,8 @@ from fake_headers import Headers  # type: ignore
 
 from database import SessionDep
 from api_v1.days_info.crud import DayInfoRepository
-from database.schemas import DayInfoSchemaCreate, DescriptionSchemaCreate
+from database.schemas import DayInfoSchemaCreate, EventSchemaCreate
+from utils.translator import translate
 
 
 class CalendarDayPars:
@@ -17,7 +18,6 @@ class CalendarDayPars:
     def __init__(self, session: SessionDep):
         self.headers = Headers(browser="chrome", os="win").generate()
         self.repo = DayInfoRepository(session)
-        self._descriptions: list[str] = []
 
     async def get_days_info(self) -> None:
         # Получаем HTML документ
@@ -39,6 +39,7 @@ class CalendarDayPars:
 
         # Обработка блоков с днями
         days_info: list[DayInfoSchemaCreate] = []
+        events_for_translate = {}
         for index, block in enumerate(doc.find_all(class_=self.DAY_TAG)):
             for day in block.find_all(class_="zfr3Q CDt4Ke"):
                 day_list = day.get_text().split(" ⋅ ")
@@ -66,7 +67,7 @@ class CalendarDayPars:
                     "100 000 times day",
                     "10 000 times day",
                 ]
-                description_list = [
+                parsed_events = [
                     (
                         next(
                             (link for link in links if link[0] == item.strip()),
@@ -76,13 +77,25 @@ class CalendarDayPars:
                     for item in day_list[1:elements_index]
                     if item not in filter_words
                 ]
-                descriptions = list(
-                    DescriptionSchemaCreate(
-                        en_name=description[0],
-                        link=description[1],
+                events_schema = list(
+                    EventSchemaCreate(
+                        name=event[0],
+                        en_name=event[0],
+                        link=event[1],
+                        is_mutable=False,
                     )
-                    for description in description_list
+                    for event in parsed_events
                 )
+                events = []
+                for event in events_schema:
+                    event_in_base = await self.repo.get_event_id(event)
+                    if event_in_base:
+                        events.append(event_in_base)
+                    else:
+                        new_event_id = await self.repo.add_event(event)
+                        events_for_translate[new_event_id] = event.en_name
+                        events.append(new_event_id)
+
                 day_info = DayInfoSchemaCreate(
                     date=str(pars_date),
                     moon_day=moon_data,
@@ -91,9 +104,15 @@ class CalendarDayPars:
                     la_id=la_id,
                     yelam_id=yelam_id,
                     haircutting_id=haircutting_id,
-                    descriptions=descriptions,
+                    events=events,
                 )
                 days_info.append(day_info)
+        translated_events = translate("|".join(events_for_translate.values())).split(
+            "|"
+        )
+        for event_id, ru_name in zip(events_for_translate.keys(), translated_events):
+            await self.repo.ru_name_event_update(event_id, ru_name)
+
         await self.repo.add_days(days_info)
 
     async def _find_elements(
