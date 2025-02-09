@@ -1,8 +1,8 @@
 from datetime import date
-from typing import Sequence, Optional, Any
+from typing import Sequence, Optional, Any, Dict
 
 from fastapi import HTTPException
-from sqlalchemy import select, delete
+from sqlalchemy import select, update, insert, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -13,10 +13,11 @@ from database import (
     LaPosition,
     Yelam,
     SkylightArch,
-    Description,
+    Event,
     Base,
 )
-from database.schemas import DayInfoSchemaCreate
+from database.models import DayInfoEvent
+from database.schemas import DayInfoSchemaCreate, EventSchemaCreate
 
 
 class DayInfoRepository:
@@ -37,7 +38,7 @@ class DayInfoRepository:
             selectinload(DayInfo.la),
             selectinload(DayInfo.yelam),
             selectinload(DayInfo.haircutting),
-            selectinload(DayInfo.descriptions),
+            selectinload(DayInfo.events),
         )
 
     @staticmethod
@@ -88,6 +89,29 @@ class DayInfoRepository:
             self.session, SkylightArch, SkylightArch.moon_day == day
         )
 
+    async def get_event_id(self, event: EventSchemaCreate) -> int | None:
+        try:
+            return await self._get_id(
+                self.session,
+                Event,
+                Event.name == event.name and Event.link == event.link,
+            )
+        except ValueError:
+            return None
+
+    async def add_event(self, event: EventSchemaCreate) -> int:
+        orm_event = event.to_orm()
+        self.session.add(orm_event)
+        await self.session.flush()
+        event_id = orm_event.id
+        await self.session.commit()
+        return event_id
+
+    async def ru_name_event_update(self, event_id: int, ru_name: str):
+        update_stmt = update(Event).where(Event.id == event_id).values(ru_name=ru_name)
+        await self.session.execute(update_stmt)
+        await self.session.commit()
+
     async def add_days(self, days_info: list[DayInfoSchemaCreate]) -> None:
         """
         Добавляет новые записи в таблицу `day_info` и обновляет существующие, если данные отличаются.
@@ -99,22 +123,22 @@ class DayInfoRepository:
         end_date = max(days_info, key=lambda d: d.date).date
 
         # Запрос к БД: загружаем существующие записи в указанном диапазоне с descriptions
-        query = (
+        stmt = (
             select(DayInfo)
-            .options(selectinload(DayInfo.descriptions))
+            .options(selectinload(DayInfo.events))
             .filter(DayInfo.date.between(start_date, end_date))
         )
-        result = await self.session.execute(query)
+        result = await self.session.execute(stmt)
 
         # Создаем словари для быстрого доступа к существующим данным
-        days_dict_in_base = {}  # Данные в виде словаря (date -> dict)
-        days_info_in_base = {}  # Объекты DayInfo из базы (date -> объект DayInfo)
+        days_dict_in_base: Dict[str, Any] = {}
+        days_info_in_base: Dict[str, DayInfo] = {}
 
-        desc_key = "descriptions"
+        event_key = "events"
         for day in result.scalars():
             day_to_dict = day.to_dict()
-            day_to_dict[desc_key] = [
-                desc.to_dict() for desc in day_to_dict.get(desc_key, [])
+            day_to_dict[event_key] = [
+                event.id for event in day_to_dict.get(event_key, [])
             ]
             days_dict_in_base[day.date] = day_to_dict
             days_info_in_base[day.date] = day
@@ -124,29 +148,43 @@ class DayInfoRepository:
             # Преобразуем объект `DayInfoSchemaCreate` в словарь
             day_dump = day_info.model_dump()
             day_date = day_dump["date"]
+            event_ids_new = set(day_dump[event_key])
 
             if day_date not in days_info_in_base:
                 # Если даты нет в базе — создаем новую запись
                 new_day = DayInfoSchemaCreate(**day_dump).to_orm()
                 self.session.add(new_day)
+                await self.session.flush()
+                for event_id in event_ids_new:
+                    stmt = insert(DayInfoEvent).values(
+                        day_info_id=new_day.id, event_id=event_id
+                    )
+                    await self.session.execute(stmt)
+
             else:
                 # Если дата есть, проверяем, изменились ли данные
                 db_day = days_info_in_base[day_date]
+                event_ids_in_base = set(days_dict_in_base[day_date][event_key])
                 if day_dump != days_dict_in_base[day_date]:
                     for key, value in day_dump.items():
-                        if key != desc_key:
+                        if key != event_key:
                             setattr(db_day, key, value)
 
-                    # Обновляем descriptions только если они изменились
-                    if day_dump[desc_key] != days_dict_in_base[day_date][desc_key]:
-                        await self.session.execute(
-                            delete(Description).where(
-                                Description.day_info_id == db_day.id
-                            )
+                    # Обновляем events только если они изменились
+                    events_to_add = event_ids_new - event_ids_in_base
+                    events_to_remove = event_ids_in_base - event_ids_new
+
+                    for event_id in events_to_add:
+                        stmt = insert(DayInfoEvent).values(
+                            day_info_id=db_day.id, event_id=event_id
                         )
-                        # Добавляем новые descriptions
-                        db_day.descriptions = [
-                            Description(**desc) for desc in day_dump[desc_key]
-                        ]
+                        await self.session.execute(stmt)
+
+                    for event_id in events_to_remove:
+                        stmt = delete(DayInfoEvent).where(
+                            DayInfoEvent.day_info_id == db_day.id,
+                            DayInfoEvent.event_id == event_id,
+                        )
+                        await self.session.execute(stmt)
 
         await self.session.commit()
