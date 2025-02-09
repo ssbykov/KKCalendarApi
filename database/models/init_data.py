@@ -694,7 +694,7 @@ EVENTS = [
         "link": "https://www.karmakagyucalendar.org/special-days/Paden",
     },
     {
-        "name": "Luthep ",
+        "name": "Luthep",
         "moon_day": "#",
         "en_name": "Luthep - Favourable day.",
         "ru_name": "Лютеп - Благоприятный день.",
@@ -745,5 +745,41 @@ EVENTS = [
         " (На 10-й и 11-й дни 4-го лунного месяца.)",
         "en_text": "Практика подношений Гаясамадза в 8 главах и Танцы Ламы."
         " (На 10-й и 11-й дни 4-го лунного месяца.)",
+    },
+    # дни учителей
+    {
+        "name": "Milarepa Day",
+        "moon_day": "14.1",
+        "en_name": "Milarepa Day (1052–1135)",
+        "ru_name": "День Миларепы (1052–1135)",
+        "ru_text": "У Миларепы из провинции Гунгтанг в Западном Тибете, недалеко от Непала, было трудное детство и темная юность."
+        " Ему было всего семь лет, когда умер его отец. Родственники завладели имуществом его отца"
+        " и жестоко обращались с семьей покойного. Его мать, озлобленная с горечью,"
+        " отправила Миларепу учиться черной магии, чтобы отомстить тем, кто испортил ей жизнь."
+        " Ее желание исполнилось – Миларепа оказался искусным в практиках, которым его научили,"
+        " и вызвал волну разрушения, убив многих.\n"
+        "Но он начал сожалеть о своих действиях и искал помощи, чтобы избавиться от плохой кармы,"
+        " которую он приобрел в своей мстительной юности. Сначала он примкнул к Ламе Ньингмапы Ронгтону,"
+        " который, заметив, что Миларепа испытывает симпатию к Марпе, послал его ждать возвращения Марпы"
+        " из своих странствий.\n"
+        "Наградой Миларепы стали годы испытаний от своего учителя. Среди прочих испытаний он голыми руками построил"
+        " башни из камней по указаниям Марпы, только чтобы получить приказ снести их."
+        " Но в конце концов Марпа дал Миларепе полную передачу всего, чему научился у Наропы и других индийских мастеров.",
+        "en_text": "From the Gungthang province of Western Tibet, close to Nepal,"
+        " Milarepa had a hard childhood and a dark youth. He was only seven when his father died."
+        " Relatives had taken over his father’s property and maltreated the bereaved family."
+        " His mother, bitter, sent Milarepa to train in black magic,"
+        " to wreak revenge on those who had blighted her life."
+        " She was given her wish – Milarepa proved adept at the practices he was taught,"
+        " and unleashed a tide of destruction, killing many. But he came to regret his actions,"
+        " and looked for help in shedding the bad karma he had acquired during his vengeful adolescence."
+        " He first attached himself to a Nyingmapa Lama Rongton, who,"
+        " observing that Milarepa had an affinity for Marpa, sent him to await Marpa’s return from his travels."
+        " Milarepa’s reward was to suffer years of testing at his master’s hands."
+        " Among other trials, he built towers out of rocks to Marpa’s specifications with his bare hands,"
+        " only to be ordered to tear them down. But finally, Marpa gave Milarepa full transmission"
+        " of all he had learnt from Naropa and other Indian masters. Practicing these teachings for many years,"
+        " Milarepa attained enlightenment. He gained fame for his spontaneous songs of realisation."
+        " Of his own students, Gampopa became his lineage-holder.",
     },
 ]
