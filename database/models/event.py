@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class Event(Base, ToDictMixin):
     init_data = EVENTS
 
-    ToDictMixin._exclude_params.append("day_info_id")
+    # ToDictMixin._exclude_params.append("day_info_id")
     __tablename__ = "events"
 
     name: Mapped[str] = mapped_column(nullable=False)
@@ -25,16 +25,18 @@ class Event(Base, ToDictMixin):
     ru_text: Mapped[str] = mapped_column(Text, nullable=True)
     link: Mapped[str] = mapped_column(nullable=True)
     is_mutable: Mapped[bool] = mapped_column(
-        nullable=False, server_default="1", default=False
+        nullable=False, server_default="0", default=False
     )
     # Связь через промежуточную модель
     event_links: Mapped[list["DayInfoEvent"]] = relationship(
-        "DayInfoEvent", back_populates="event"
+        "DayInfoEvent",
+        back_populates="event",
     )
     days: Mapped[list["DayInfo"]] = relationship(
         "DayInfo",
-        secondary="dayinfo_events",  # Используем название таблицы
+        secondary="dayinfo_events",
         back_populates="events",
+        overlaps="event_links",  # Убираем конфликт с промежуточной таблицей
     )
 
 
@@ -49,6 +51,12 @@ class DayInfoEvent(Base):
 
     # Опциональные связи для удобства
     day_info: Mapped["DayInfo"] = relationship(
-        "DayInfo", back_populates="dayinfo_links"
+        "DayInfo",
+        back_populates="dayinfo_links",
+        overlaps="days,events",  # Убираем конфликт
     )
-    event: Mapped["Event"] = relationship("Event", back_populates="event_links")
+    event: Mapped["Event"] = relationship(
+        "Event",
+        back_populates="event_links",
+        overlaps="days,events",  # Убираем конфликт
+    )

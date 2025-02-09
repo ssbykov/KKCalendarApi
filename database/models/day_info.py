@@ -12,6 +12,8 @@ if TYPE_CHECKING:
 
 
 class DayInfo(Base, ToDictMixin):
+    ToDictMixin._exclude_params.append("id")
+
     __tablename__ = "day_info"
 
     date: Mapped[str] = mapped_column(String(10), nullable=False, unique=True)
@@ -38,12 +40,14 @@ class DayInfo(Base, ToDictMixin):
     )
     # Связь через промежуточную модель
     dayinfo_links: Mapped[list["DayInfoEvent"]] = relationship(
-        "DayInfoEvent", back_populates="day_info"
+        "DayInfoEvent",
+        back_populates="day_info",
     )
     events: Mapped[list["Event"]] = relationship(
         "Event",
-        secondary="dayinfo_events",  # Используем название таблицы
+        secondary="dayinfo_events",
         back_populates="days",
+        overlaps="dayinfo_links",  # Убираем конфликт
     )
 
 
