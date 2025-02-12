@@ -44,6 +44,9 @@ class DayInfo(Base, ToDictMixin):
         back_populates="days",
     )
 
+    def __str__(self):
+        return f"Дата: {self.date}, лунный день {self.moon_day}, id: {self.id}"
+
 
 class Elements(Base):
     init_data = ELEMENTS
@@ -54,6 +57,9 @@ class Elements(Base):
     en_text: Mapped[str] = mapped_column(Text, nullable=True)
     is_positive: Mapped[bool] = mapped_column(nullable=False)
 
+    def __str__(self):
+        return self.ru_name
+
 
 class LaPosition(Base):
     init_data = LA
@@ -62,6 +68,9 @@ class LaPosition(Base):
     moon_day: Mapped[int] = mapped_column(nullable=False, unique=True)
     en_name: Mapped[str] = mapped_column(String(100), nullable=False)
     ru_name: Mapped[str] = mapped_column(String(100), nullable=False)
+
+    def __str__(self):
+        return self.ru_name
 
 
 class SkylightArch(Base):
@@ -73,6 +82,9 @@ class SkylightArch(Base):
     en_desc: Mapped[str] = mapped_column(String(100), nullable=False)
     ru_desc: Mapped[str] = mapped_column(String(100), nullable=False)
 
+    def __str__(self):
+        return self.ru_desc
+
 
 class Yelam(Base):
     init_data = YELAM
@@ -80,6 +92,9 @@ class Yelam(Base):
     month: Mapped[int] = mapped_column(nullable=False, unique=True)
     en_name: Mapped[str] = mapped_column(String(30), nullable=False)
     ru_name: Mapped[str] = mapped_column(String(30), nullable=False)
+
+    def __str__(self):
+        return self.ru_name
 
 
 class HaircuttingDay(Base):
@@ -89,3 +104,6 @@ class HaircuttingDay(Base):
     en_name: Mapped[str] = mapped_column(String(100), nullable=False)
     ru_name: Mapped[str] = mapped_column(String(100), nullable=False)
     is_inauspicious: Mapped[bool] = mapped_column(nullable=False)
+
+    def __str__(self):
+        return self.ru_name

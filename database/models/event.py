@@ -32,6 +32,9 @@ class Event(Base, ToDictMixin):
         back_populates="events",
     )
 
+    def __str__(self):
+        return self.ru_name
+
 
 class DayInfoEvent(Base):
     """Промежуточная таблица для связи многие ко многим между DayInfo и Event."""
