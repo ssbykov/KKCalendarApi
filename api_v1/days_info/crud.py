@@ -107,7 +107,7 @@ class DayInfoRepository:
         await self.session.commit()
         return event_id
 
-    async def ru_name_event_update(self, event_id: int, ru_name: str):
+    async def ru_name_event_update(self, event_id: int, ru_name: str) -> None:
         update_stmt = update(Event).where(Event.id == event_id).values(ru_name=ru_name)
         await self.session.execute(update_stmt)
         await self.session.commit()
@@ -156,10 +156,11 @@ class DayInfoRepository:
                 self.session.add(new_day)
                 await self.session.flush()
                 for event_id in event_ids_new:
-                    stmt = insert(DayInfoEvent).values(
-                        day_info_id=new_day.id, event_id=event_id
+                    await self.session.execute(
+                        insert(DayInfoEvent).values(
+                            day_info_id=new_day.id, event_id=event_id
+                        )
                     )
-                    await self.session.execute(stmt)
 
             else:
                 # Если дата есть, проверяем, изменились ли данные
@@ -175,16 +176,18 @@ class DayInfoRepository:
                     events_to_remove = event_ids_in_base - event_ids_new
 
                     for event_id in events_to_add:
-                        stmt = insert(DayInfoEvent).values(
-                            day_info_id=db_day.id, event_id=event_id
+                        await self.session.execute(
+                            insert(DayInfoEvent).values(
+                                day_info_id=db_day.id, event_id=event_id
+                            )
                         )
-                        await self.session.execute(stmt)
 
                     for event_id in events_to_remove:
-                        stmt = delete(DayInfoEvent).where(
-                            DayInfoEvent.day_info_id == db_day.id,
-                            DayInfoEvent.event_id == event_id,
+                        await self.session.execute(
+                            delete(DayInfoEvent).where(
+                                DayInfoEvent.day_info_id == db_day.id,
+                                DayInfoEvent.event_id == event_id,
+                            )
                         )
-                        await self.session.execute(stmt)
 
         await self.session.commit()
