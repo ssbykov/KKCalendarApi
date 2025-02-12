@@ -86,7 +86,7 @@ class ElementsSchema(DayDataSchema):
     model_config = {"from_attributes": True}
 
 
-class EventSchemaBase(DayDataSchema):
+class EventSchema(DayDataSchema):
     name: str
     moon_day: str | None = None
     en_name: str
@@ -94,17 +94,11 @@ class EventSchemaBase(DayDataSchema):
     en_text: str | None = None
     ru_text: str | None = None
     link: str | None = None
-    is_mutable: bool = False
 
 
-class EventSchema(EventSchemaBase):
-    id: int
-
-    model_config = {"from_attributes": True}
-
-
-class EventSchemaCreate(EventSchemaBase):
+class EventSchemaCreate(EventSchema):
     base_class: Type[Base] = Field(default=Event, exclude=True)
+    is_mutable: bool = False
 
     model_config = {"from_attributes": True}
 
@@ -118,6 +112,7 @@ class DayInfoSchema(BaseModel):
     la: LaSchema
     yelam: YelamSchema
     haircutting: HaircuttingSchema
+    events: Optional[List[EventSchema]]
 
     model_config = {"from_attributes": True}
 
