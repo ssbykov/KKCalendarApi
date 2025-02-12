@@ -19,7 +19,8 @@ dependencies = [
     "fake-headers (>=1.0.2,<2.0.0)",
     "asyncpg (>=0.30.0,<0.31.0)",
     "alembic (>=1.14.1,<2.0.0)",
-    "translators (>=5.9.5,<6.0.0)"
+    "translators (>=5.9.5,<6.0.0)",
+    "sqladmin (>=0.20.1,<0.21.0)"
 ]
 
 
