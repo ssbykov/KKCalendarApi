@@ -38,16 +38,10 @@ class DayInfo(Base, ToDictMixin):
     haircutting = relationship(
         "HaircuttingDay", backref=backref("haircutting", lazy="dynamic")
     )
-    # Связь через промежуточную модель
-    dayinfo_links: Mapped[list["DayInfoEvent"]] = relationship(
-        "DayInfoEvent",
-        back_populates="day_info",
-    )
     events: Mapped[list["Event"]] = relationship(
         "Event",
         secondary="dayinfo_events",
         back_populates="days",
-        overlaps="dayinfo_links",  # Убираем конфликт
     )
 
 
