@@ -13,13 +13,16 @@ class EventAdmin(ModelView, model=Event):
         Event.ru_name,
     ]
     column_searchable_list = [Event.en_name, Event.ru_name]
-
+    details_template = "details.html"
     column_formatters_detail = {
         Event.ru_text: lambda model, attribute: Markup(
             formater(getattr(model, "ru_text", ""))
         ),
         Event.en_text: lambda model, attribute: Markup(
             formater(getattr(model, "en_text", ""))
+        ),
+        Event.link: lambda model, attribute: Markup(
+            f'<a href="{getattr(model, "link", "#")}" target="_blank">{getattr(model, "link", "No URL")}</a>'
         ),
     }
 
