@@ -7,6 +7,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+class SqlAdminSettings(BaseModel):
+    templates_dir: str = "admin/templates/"
+
+
 class DbSettings(BaseModel):
     url: str = (
         f"postgresql+asyncpg://"
@@ -22,6 +26,7 @@ class DbSettings(BaseModel):
 class Settings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
     db: DbSettings = DbSettings()
+    sql_admin: SqlAdminSettings = SqlAdminSettings()
 
 
 settings = Settings()
