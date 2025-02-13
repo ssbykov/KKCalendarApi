@@ -32,7 +32,7 @@ class Event(Base, ToDictMixin):
         back_populates="events",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.ru_name
 
 

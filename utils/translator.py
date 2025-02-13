@@ -1,7 +1,5 @@
-import random
-
 import translators as ts  # type: ignore
-from fake_headers import Headers
+from fake_headers import Headers  # type: ignore
 
 
 # Текст для перевода
