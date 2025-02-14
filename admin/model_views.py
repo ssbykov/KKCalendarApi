@@ -1,10 +1,14 @@
 from markupsafe import Markup
 from sqladmin import ModelView
 
+from admin.mixines import ActionNextBackMixin
+from api_v1.days_info.crud import DayInfoRepository
+from api_v1.event.crud import EventRepository
 from database import Event, DayInfo
 
 
-class EventAdmin(ModelView, model=Event):
+class EventAdmin(ActionNextBackMixin, ModelView, model=Event):
+    repo_type = EventRepository
     name_plural = "События"
     name = "Информация по событию"
     column_list = [
@@ -35,9 +39,11 @@ def formater(column: str) -> str:
     return f'<div style="white-space: pre-wrap; word-wrap: break-word; max-width: 500px;">{column}</div>'
 
 
-class DayInfoAdmin(ModelView, model=DayInfo):
+class DayInfoAdmin(ActionNextBackMixin, ModelView, model=DayInfo):
+    repo_type = DayInfoRepository
     name_plural = "Дни календаря"
     name = "Информация по дню"
+    details_template = "details.html"
     column_list = [DayInfo.id, DayInfo.date, DayInfo.moon_day]
     column_searchable_list = [DayInfo.date, DayInfo.moon_day]
     column_details_list = [
