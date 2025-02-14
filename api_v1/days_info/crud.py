@@ -1,11 +1,12 @@
 from datetime import date
-from typing import Sequence, Optional, Any, Dict
+from typing import Sequence, Any, Dict
 
 from fastapi import HTTPException
 from sqlalchemy import select, update, insert, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from api_v1.mixines import GetBackNextIdMixin
 from database import (
     DayInfo,
     Elements,
@@ -15,23 +16,23 @@ from database import (
     SkylightArch,
     Event,
     Base,
+    SessionDep,
 )
 from database.models import DayInfoEvent
 from database.schemas import DayInfoSchemaCreate, EventSchemaCreate
 
 
-class DayInfoRepository:
-    _instance: Optional["DayInfoRepository"] = None
+def get_day_info_repository(session: SessionDep) -> "DayInfoRepository":
+    return DayInfoRepository(session)
+
+
+class DayInfoRepository(GetBackNextIdMixin):
     session: AsyncSession
+    model = DayInfo
 
-    def __new__(cls, session: AsyncSession) -> "DayInfoRepository":
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance.session = session
-            cls._instance._init_main_query()
-        return cls._instance
-
-    def _init_main_query(self) -> None:
+    def __init__(self, session: AsyncSession):
+        super().__init__(session)
+        self.session = session
         self.main_stmt = select(DayInfo).options(
             selectinload(DayInfo.elements),
             selectinload(DayInfo.arch),
