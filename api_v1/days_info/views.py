@@ -1,20 +1,21 @@
 from datetime import date
 from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from typing_extensions import Sequence
 
-from api_v1.days_info.crud import DayInfoRepository
-from database import SessionDep, DayInfo
+from api_v1.days_info.crud import DayInfoRepository, get_day_info_repository
+from database import DayInfo
 from database.schemas import DayInfoSchema
 
 router = APIRouter(tags=["Days info"])
 
 
 @router.get("/all", response_model=List[DayInfoSchema] | str)
-async def get_all_days(session: SessionDep) -> Sequence[DayInfo] | str:
+async def get_all_days(
+    repo: DayInfoRepository = Depends(get_day_info_repository),
+) -> Sequence[DayInfo] | str:
     try:
-        repo = DayInfoRepository(session)
         all_days = await repo.get_all_days()
         return all_days
     except Exception as e:
@@ -22,6 +23,7 @@ async def get_all_days(session: SessionDep) -> Sequence[DayInfo] | str:
 
 
 @router.get("/", response_model=DayInfoSchema | str)
-async def get_day_info(day: date, session: SessionDep) -> DayInfo | str:
-    repo = DayInfoRepository(session)
+async def get_day_info(
+    day: date, repo: DayInfoRepository = Depends(get_day_info_repository)
+) -> DayInfo | str:
     return await repo.get_day_by_day(day=day)
