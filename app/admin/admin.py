@@ -2,9 +2,9 @@ from typing import Any
 
 from sqladmin import Admin
 
-from admin.model_views import EventAdmin, DayInfoAdmin
-from core.config import settings
-from database import db_helper
+from .model_views import EventAdmin, DayInfoAdmin
+from app.core.config import settings
+from app.database import db_helper
 
 
 def init_admin(app: Any) -> None:

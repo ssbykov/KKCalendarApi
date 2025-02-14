@@ -1,5 +1,5 @@
-from api_v1.mixines import GetBackNextIdMixin
-from database import SessionDep, Event
+from app.api_v1.mixines import GetBackNextIdMixin
+from app.database import SessionDep, Event
 
 
 def get_event_repository(session: SessionDep) -> "EventRepository":

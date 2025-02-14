@@ -4,9 +4,9 @@ from typing import List, Annotated
 from fastapi import APIRouter, Depends
 from typing_extensions import Sequence
 
-from api_v1.days_info.crud import DayInfoRepository, get_day_info_repository
-from database import DayInfo
-from database.schemas import DayInfoSchema
+from app.api_v1.days_info.crud import DayInfoRepository, get_day_info_repository
+from app.database import DayInfo
+from app.database.schemas import DayInfoSchema
 
 router = APIRouter(tags=["Days info"])
 

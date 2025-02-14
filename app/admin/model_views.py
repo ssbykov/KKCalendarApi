@@ -1,10 +1,10 @@
 from markupsafe import Markup
 from sqladmin import ModelView
 
-from admin.mixines import ActionNextBackMixin
-from api_v1.days_info.crud import DayInfoRepository
-from api_v1.event.crud import EventRepository
-from database import Event, DayInfo
+from app.admin.mixines import ActionNextBackMixin
+from app.api_v1.days_info.crud import DayInfoRepository
+from app.api_v1.event.crud import EventRepository
+from app.database import Event, DayInfo
 
 
 class EventAdmin(ActionNextBackMixin, ModelView, model=Event):

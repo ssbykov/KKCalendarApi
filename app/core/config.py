@@ -8,7 +8,7 @@ load_dotenv()
 
 
 class SqlAdminSettings(BaseModel):
-    templates_dir: str = "admin/templates/"
+    templates_dir: str = "app/admin/templates/"
 
 
 class RunConfig(BaseModel):

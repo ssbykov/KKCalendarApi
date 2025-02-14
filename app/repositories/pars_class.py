@@ -4,10 +4,10 @@ import requests
 from bs4 import BeautifulSoup as bs
 from fake_headers import Headers  # type: ignore
 
-from database import SessionDep
-from api_v1.days_info.crud import DayInfoRepository
-from database.schemas import DayInfoSchemaCreate, EventSchemaCreate
-from utils.translator import translate
+from app.database import SessionDep
+from app.api_v1.days_info.crud import DayInfoRepository
+from app.database.schemas import DayInfoSchemaCreate, EventSchemaCreate
+from app.utils.translator import translate
 
 
 class CalendarDayPars:

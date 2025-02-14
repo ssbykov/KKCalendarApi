@@ -4,9 +4,9 @@ from fastapi import Depends
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
-from core.config import settings
-from database.models import *
-from database.schemas import (
+from app.core.config import settings
+from .models import *
+from .schemas import (
     DayDataSchema,
     ArchSchema,
     ElementsSchema,

@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.models import User
+from app.database.models import User
 
 
 class UserRepository:

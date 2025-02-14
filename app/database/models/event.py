@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, Text, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database.models.mixines import ToDictMixin
+from app.database.models.mixines import ToDictMixin
 from . import Base
 from .init_data import EVENTS
 

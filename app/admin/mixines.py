@@ -4,8 +4,8 @@ from sqladmin import action
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from api_v1.mixines import GetBackNextIdMixin
-from database import db_helper
+from app.api_v1.mixines import GetBackNextIdMixin
+from app.database import db_helper
 
 
 class ActionNextBackMixin:

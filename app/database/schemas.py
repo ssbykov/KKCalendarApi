@@ -5,7 +5,7 @@ from pydantic import BaseModel, field_validator
 from pydantic import Field
 from sqlalchemy.orm import class_mapper
 
-from database import (
+from app.database import (
     Base,
     Event,
     Elements,
