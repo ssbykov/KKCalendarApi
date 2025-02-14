@@ -1,6 +1,6 @@
 import os
 
-from pydantic import BaseModel
+from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
@@ -17,7 +17,7 @@ class RunConfig(BaseModel):
 
 
 class DbSettings(BaseModel):
-    url: str = (
+    url: PostgresDsn = (
         f"postgresql+asyncpg://"
         f"{os.getenv('DB_USER')}"
         f":{os.getenv('DB_PASS')}"
