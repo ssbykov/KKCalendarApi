@@ -1,5 +1,5 @@
 from datetime import date
-from typing import List
+from typing import List, Annotated
 
 from fastapi import APIRouter, Depends
 from typing_extensions import Sequence
@@ -13,7 +13,7 @@ router = APIRouter(tags=["Days info"])
 
 @router.get("/all", response_model=List[DayInfoSchema] | str)
 async def get_all_days(
-    repo: DayInfoRepository = Depends(get_day_info_repository),
+    repo: Annotated[DayInfoRepository, Depends(get_day_info_repository)],
 ) -> Sequence[DayInfo] | str:
     try:
         all_days = await repo.get_all_days()
@@ -24,6 +24,6 @@ async def get_all_days(
 
 @router.get("/", response_model=DayInfoSchema | str)
 async def get_day_info(
-    day: date, repo: DayInfoRepository = Depends(get_day_info_repository)
+    day: date, repo: Annotated[DayInfoRepository, Depends(get_day_info_repository)]
 ) -> DayInfo | str:
     return await repo.get_day_by_day(day=day)
