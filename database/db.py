@@ -29,6 +29,9 @@ class DbHelper:
             expire_on_commit=False,
         )
 
+    async def dispose(self) -> None:
+        await self.engine.dispose()
+
     async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
         async with self.async_session() as session:
             yield session

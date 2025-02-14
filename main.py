@@ -18,6 +18,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     #     parser = CalendarDayPars(session)
     #     await parser.get_days_info()
     yield
+    await db_helper.dispose()
 
 
 app = FastAPI(lifespan=lifespan)
