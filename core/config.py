@@ -11,6 +11,11 @@ class SqlAdminSettings(BaseModel):
     templates_dir: str = "admin/templates/"
 
 
+class RunConfig(BaseModel):
+    host: str = "0.0.0.0"
+    port: int = 8000
+
+
 class DbSettings(BaseModel):
     url: str = (
         f"postgresql+asyncpg://"
@@ -24,6 +29,7 @@ class DbSettings(BaseModel):
 
 
 class Settings(BaseSettings):
+    run: RunConfig = RunConfig()
     api_v1_prefix: str = "/api/v1"
     db: DbSettings = DbSettings()
     sql_admin: SqlAdminSettings = SqlAdminSettings()
