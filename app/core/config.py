@@ -46,12 +46,12 @@ class DbSettings(BaseModel):
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        case_sensitive=False,
-        env_nested_delimiter="__",
-        env_prefix="APP_CONFIG__",
-    )
+    # model_config = SettingsConfigDict(
+    #     env_file=".env",
+    #     case_sensitive=False,
+    #     env_nested_delimiter="__",
+    #     env_prefix="APP_CONFIG__",
+    # )
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     sql_admin: SqlAdminSettings = SqlAdminSettings()
