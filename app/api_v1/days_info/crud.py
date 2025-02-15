@@ -61,7 +61,7 @@ class DayInfoRepository(GetBackNextIdMixin):
         day_info = await self.session.scalar(stmt)
         if day_info:
             return day_info
-        raise HTTPException(status_code=404, detail=f"День с датой {date} не найден")
+        raise HTTPException(status_code=404, detail=f"День с датой {day} не найден")
 
     async def get_elements(self) -> Sequence[Elements]:
         result = await self.session.execute(select(Elements))
