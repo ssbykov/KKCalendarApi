@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 
-from .days_info import days_info_router
+from core import settings
+from .days_info import router as router_api_v1
 
-router = APIRouter()
-router.include_router(router=days_info_router, prefix="/days")
+router = APIRouter(prefix=settings.api.prefix)
+
+router.include_router(router=router_api_v1)

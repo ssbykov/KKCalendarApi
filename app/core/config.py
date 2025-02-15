@@ -16,6 +16,16 @@ class RunConfig(BaseModel):
     port: int = 8000
 
 
+class ApiV1Prefix(BaseModel):
+    prefix: str = "/v1"
+    days: str = "/days"
+
+
+class ApiPrefix(BaseModel):
+    prefix: str = "/api"
+    v1: ApiV1Prefix = ApiV1Prefix()
+
+
 class DbSettings(BaseModel):
     url: PostgresDsn = (
         f"postgresql+asyncpg://"
@@ -40,11 +50,12 @@ class Settings(BaseSettings):
         env_file=".env",
         case_sensitive=False,
         env_nested_delimiter="__",
+        env_prefix="APP_CONFIG__",
     )
     run: RunConfig = RunConfig()
-    api_v1_prefix: str = "/api/v1"
-    db: DbSettings = DbSettings()
+    api: ApiPrefix = ApiPrefix()
     sql_admin: SqlAdminSettings = SqlAdminSettings()
+    db: DbSettings = DbSettings()
 
 
 settings = Settings()
