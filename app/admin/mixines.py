@@ -4,7 +4,7 @@ from sqladmin import action
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from app.api_v1.mixines import GetBackNextIdMixin
+from crud.mixines import GetBackNextIdMixin
 from app.database import db_helper
 
 

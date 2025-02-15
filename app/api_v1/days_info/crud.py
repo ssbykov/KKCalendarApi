@@ -6,7 +6,7 @@ from sqlalchemy import select, update, insert, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.api_v1.mixines import GetBackNextIdMixin
+from crud.mixines import GetBackNextIdMixin
 from app.database import (
     DayInfo,
     Elements,
