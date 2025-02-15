@@ -3,7 +3,7 @@ from typing import Any
 from sqladmin import Admin
 
 from .model_views import EventAdmin, DayInfoAdmin
-from app.core.config import settings
+from app.core import settings
 from app.database import db_helper
 
 

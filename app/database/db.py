@@ -1,10 +1,15 @@
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 from typing import Annotated, AsyncGenerator, Type, Any
 
 from fastapi import Depends
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
-from app.core.config import settings
+from app.core import settings
 from .models import *
 from .schemas import (
     DayDataSchema,
