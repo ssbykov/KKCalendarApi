@@ -35,7 +35,7 @@ class DbSettings(BaseModel):
         f":{os.getenv('DB_PORT')}"
         f"/{os.getenv('DB_BASE')}"
     )
-    echo: bool = True
+    echo: bool = False
     naming_convention: dict[str, str] = {
         "ix": "ix_%(column_0_label)s",
         "uq": "uq_%(table_name)s_%(column_0_N_name)s",
