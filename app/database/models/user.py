@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
 
 if TYPE_CHECKING:
-    from .. import SessionDep
+    from database.db import SessionDep
 
 
 class User(Base, SQLAlchemyBaseUserTable[int]):
@@ -22,5 +22,5 @@ class User(Base, SQLAlchemyBaseUserTable[int]):
     )
 
     @classmethod
-    def get_db(cls, session: SessionDep):
-        return SQLAlchemyUserDatabase(session, User)
+    def get_db(cls, session: "SessionDep"):
+        return SQLAlchemyUserDatabase(session, cls)
