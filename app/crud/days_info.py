@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from crud.mixines import GetBackNextIdMixin
-from app.database import (
+from database import (
     DayInfo,
     Elements,
     HaircuttingDay,
@@ -18,8 +18,8 @@ from app.database import (
     Base,
     SessionDep,
 )
-from app.database.models import DayInfoEvent
-from app.database.schemas import DayInfoSchemaCreate, EventSchemaCreate
+from database.models import DayInfoEvent
+from database.schemas import DayInfoSchemaCreate, EventSchemaCreate
 
 
 def get_day_info_repository(session: SessionDep) -> "DayInfoRepository":

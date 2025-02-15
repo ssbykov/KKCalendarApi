@@ -9,7 +9,7 @@ from fastapi import Depends
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
-from app.core import settings
+from core import settings
 from .models import *
 from .schemas import (
     DayDataSchema,

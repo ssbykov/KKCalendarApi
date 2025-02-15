@@ -1,5 +1,5 @@
 from crud.mixines import GetBackNextIdMixin
-from app.database import SessionDep, Event
+from database import SessionDep, Event
 
 
 def get_event_repository(session: SessionDep) -> "EventRepository":

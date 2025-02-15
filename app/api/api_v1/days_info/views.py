@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends
 from typing_extensions import Sequence
 
 from crud.days_info import DayInfoRepository, get_day_info_repository
-from app.database import DayInfo
-from app.database.schemas import DayInfoSchema
+from database import DayInfo
+from database.schemas import DayInfoSchema
 
 router = APIRouter()
 

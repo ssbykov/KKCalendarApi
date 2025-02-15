@@ -27,7 +27,7 @@ class ApiPrefix(BaseModel):
 
 
 class DbSettings(BaseModel):
-    url: PostgresDsn = (
+    url: str = (
         f"postgresql+asyncpg://"
         f"{os.getenv('DB_USER')}"
         f":{os.getenv('DB_PASS')}"

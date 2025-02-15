@@ -3,8 +3,8 @@ from typing import Any
 from sqladmin import Admin
 
 from .model_views import EventAdmin, DayInfoAdmin
-from app.core import settings
-from app.database import db_helper
+from core import settings
+from database import db_helper
 
 
 def init_admin(app: Any) -> None:
