@@ -4,7 +4,7 @@ from typing import List, Annotated
 from fastapi import APIRouter, Depends
 from typing_extensions import Sequence
 
-from app.api_v1.days_info.crud import DayInfoRepository, get_day_info_repository
+from crud.days_info import DayInfoRepository, get_day_info_repository
 from app.database import DayInfo
 from app.database.schemas import DayInfoSchema
 

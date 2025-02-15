@@ -2,7 +2,7 @@ from markupsafe import Markup
 from sqladmin import ModelView
 
 from app.admin.mixines import ActionNextBackMixin
-from app.api_v1.days_info.crud import DayInfoRepository
+from crud.days_info import DayInfoRepository
 from crud.events import EventRepository
 from app.database import Event, DayInfo
 
