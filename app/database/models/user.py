@@ -1,10 +1,14 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
-from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
+from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
 from sqlalchemy import DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .. import SessionDep
 
 
 class User(Base, SQLAlchemyBaseUserTable[int]):
@@ -16,3 +20,7 @@ class User(Base, SQLAlchemyBaseUserTable[int]):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), onupdate=func.now()
     )
+
+    @classmethod
+    def get_db(cls, session: SessionDep):
+        return SQLAlchemyUserDatabase(session, User)
