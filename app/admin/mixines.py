@@ -34,6 +34,7 @@ class ActionNextBackMixin:
                 url_id = await repo.get_back_id(int(current_id))
 
             if url_id:
-                redirect_url = referer.replace(current_id, str(url_id))
+                last_slash_index = referer.rfind("/")
+                redirect_url = referer[: last_slash_index + 1] + str(url_id)
                 return redirect_url
         return referer
