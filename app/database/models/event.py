@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, Text, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from . import Base
+from . import BaseWithId
 from .init_data import EVENTS
 from .mixines import ToDictMixin
 
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from .day_info import DayInfo
 
 
-class Event(Base, ToDictMixin):
+class Event(BaseWithId, ToDictMixin):
     init_data = EVENTS
 
     __tablename__ = "events"
@@ -36,7 +36,7 @@ class Event(Base, ToDictMixin):
         return self.ru_name
 
 
-class DayInfoEvent(Base):
+class DayInfoEvent(BaseWithId):
     """Промежуточная таблица для связи многие ко многим между DayInfo и Event."""
 
     __tablename__ = "dayinfo_events"

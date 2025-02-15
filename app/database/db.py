@@ -44,7 +44,7 @@ class DbHelper:
     @staticmethod
     async def _init_model(
         session: AsyncSession,
-        model_class: Type[Base],
+        model_class: Type[BaseWithId],
         schema_class: Type[DayDataSchema],
     ) -> None:
         result = await session.execute(select(func.count()).select_from(model_class))

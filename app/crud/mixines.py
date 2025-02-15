@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
 
-from database import Base
+from database import BaseWithId
 
 
 class GetBackNextIdMixin(ABC):
@@ -13,7 +13,7 @@ class GetBackNextIdMixin(ABC):
 
     @property
     @abstractmethod
-    def model(self) -> Type[Base]:
+    def model(self) -> Type[BaseWithId]:
         pass
 
     def __init__(self, session: AsyncSession):

@@ -15,7 +15,7 @@ from database import (
     Yelam,
     SkylightArch,
     Event,
-    Base,
+    BaseWithId,
     SessionDep,
 )
 from database.models import DayInfoEvent
@@ -43,7 +43,9 @@ class DayInfoRepository(GetBackNextIdMixin):
         )
 
     @staticmethod
-    async def _get_id(session: AsyncSession, model: type[Base], condition: Any) -> int:
+    async def _get_id(
+        session: AsyncSession, model: type[BaseWithId], condition: Any
+    ) -> int:
         """Общий метод для получения ID объекта по условию."""
         stmt = select(model).where(condition)
         result = await session.scalar(stmt)

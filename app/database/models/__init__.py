@@ -1,4 +1,4 @@
-from .base import Base
+from .base import BaseWithId, Base
 from .day_info import (
     DayInfo,
     Yelam,
@@ -9,9 +9,10 @@ from .day_info import (
 )
 from .event import Event, DayInfoEvent
 from .user import User
+from .access_token import AccessToken
 
 __all__ = [
-    "Base",
+    "BaseWithId",
     "DayInfo",
     "Yelam",
     "HaircuttingDay",
@@ -21,4 +22,6 @@ __all__ = [
     "Event",
     "DayInfoEvent",
     "User",
+    "AccessToken",
+    "Base",
 ]

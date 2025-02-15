@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import String, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 
-from .base import Base
+from .base import BaseWithId
 from .init_data import ELEMENTS, LA, ARCHES, YELAM, HAIRCUTTING_DAYS
 from .mixines import ToDictMixin
 
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from .event import Event, DayInfoEvent
 
 
-class DayInfo(Base, ToDictMixin):
+class DayInfo(BaseWithId, ToDictMixin):
     ToDictMixin._exclude_params.append("id")
 
     __tablename__ = "day_info"
@@ -48,7 +48,7 @@ class DayInfo(Base, ToDictMixin):
         return f"Дата: {self.date}, лунный день {self.moon_day}, id: {self.id}"
 
 
-class Elements(Base):
+class Elements(BaseWithId):
     init_data = ELEMENTS
     __tablename__ = "elements"
     en_name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
@@ -61,7 +61,7 @@ class Elements(Base):
         return self.ru_name
 
 
-class LaPosition(Base):
+class LaPosition(BaseWithId):
     init_data = LA
 
     __tablename__ = "la_positions"
@@ -73,7 +73,7 @@ class LaPosition(Base):
         return self.ru_name
 
 
-class SkylightArch(Base):
+class SkylightArch(BaseWithId):
     init_data = ARCHES
 
     __tablename__ = "skylight_arches"
@@ -86,7 +86,7 @@ class SkylightArch(Base):
         return self.ru_desc
 
 
-class Yelam(Base):
+class Yelam(BaseWithId):
     init_data = YELAM
     __tablename__ = "yelam"
     month: Mapped[int] = mapped_column(nullable=False, unique=True)
@@ -97,7 +97,7 @@ class Yelam(Base):
         return self.ru_name
 
 
-class HaircuttingDay(Base):
+class HaircuttingDay(BaseWithId):
     init_data = HAIRCUTTING_DAYS
     __tablename__ = "haircutting_days"
     moon_day: Mapped[int] = mapped_column(nullable=False, unique=True)

@@ -5,13 +5,13 @@ from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable, SQLAlchemyUserD
 from sqlalchemy import DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from .base import Base
+from .base import BaseWithId
 
 if TYPE_CHECKING:
     from database.db import SessionDep
 
 
-class User(Base, SQLAlchemyBaseUserTable[int]):
+class User(BaseWithId, SQLAlchemyBaseUserTable[int]):
     __tablename__ = "users"
 
     created_at: Mapped[datetime] = mapped_column(
@@ -22,5 +22,5 @@ class User(Base, SQLAlchemyBaseUserTable[int]):
     )
 
     @classmethod
-    def get_db(cls, session: "SessionDep"):
+    def get_db(cls, session: "SessionDep"):  # type: ignore
         return SQLAlchemyUserDatabase(session, cls)

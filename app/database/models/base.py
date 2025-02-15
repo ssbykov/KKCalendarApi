@@ -11,5 +11,9 @@ class Base(DeclarativeBase):
 
     metadata = MetaData(naming_convention=settings.db.naming_convention)
 
+
+class BaseWithId(Base):
+    __abstract__ = True
+
     init_data: list[dict[str, Any]] = []
     id: Mapped[int] = mapped_column(primary_key=True, index=True, unique=True)
