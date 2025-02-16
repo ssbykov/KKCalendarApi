@@ -16,6 +16,10 @@ class RunConfig(BaseModel):
     port: int = 8000
 
 
+class AccessToken(BaseModel):
+    lifetime_seconds: int = 3600
+
+
 class ApiV1Prefix(BaseModel):
     prefix: str = "/v1"
     days: str = "/days"
@@ -55,6 +59,7 @@ class Settings(BaseSettings):
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     sql_admin: SqlAdminSettings = SqlAdminSettings()
+    access_token: AccessToken = AccessToken()
     db: DbSettings = DbSettings()
 
 
