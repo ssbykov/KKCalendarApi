@@ -1,8 +1,8 @@
 from fastapi import Depends
 
+from api.dependencies.users import get_user_db
 from core.auth.user_manager import UserManager
-from database.models import User
 
 
-async def get_user_manager(user_db=Depends(User.get_db)):
+async def get_user_manager(user_db=Depends(get_user_db)):
     yield UserManager(user_db)
