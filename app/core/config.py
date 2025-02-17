@@ -1,8 +1,9 @@
 import os
+from typing import Optional
 
+from dotenv import load_dotenv
 from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -18,6 +19,8 @@ class RunConfig(BaseModel):
 
 class AccessToken(BaseModel):
     lifetime_seconds: int = 3600
+    reset_password_token_secret: str
+    verification_token_secret: str
 
 
 class ApiV1Prefix(BaseModel):
@@ -30,15 +33,19 @@ class ApiPrefix(BaseModel):
     v1: ApiV1Prefix = ApiV1Prefix()
 
 
-class DbSettings(BaseModel):
-    url: str = (
-        f"postgresql+asyncpg://"
-        f"{os.getenv('DB_USER')}"
-        f":{os.getenv('DB_PASS')}"
-        f"@{os.getenv('DB_HOST')}"
-        f":{os.getenv('DB_PORT')}"
-        f"/{os.getenv('DB_BASE')}"
-    )
+class DbSettings(BaseSettings):
+    user: Optional[str] = None
+    password: Optional[str] = None
+    host: Optional[str] = None
+    port: Optional[int] = None
+    database: Optional[str] = None
+
+    @property
+    def url(self) -> PostgresDsn:
+        return PostgresDsn(
+            f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
+        )
+
     echo: bool = False
     naming_convention: dict[str, str] = {
         "ix": "ix_%(column_0_label)s",
@@ -47,20 +54,21 @@ class DbSettings(BaseModel):
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
         "pk": "pk_%(table_name)s",
     }
+    # model_config = SettingsConfigDict(env_prefix="APP_CONFIG__DB__")
 
 
 class Settings(BaseSettings):
-    # model_config = SettingsConfigDict(
-    #     env_file=".env",
-    #     case_sensitive=False,
-    #     env_nested_delimiter="__",
-    #     env_prefix="APP_CONFIG__",
-    # )
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+        env_nested_delimiter="__",
+        env_prefix="APP_CONFIG__",
+    )
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     sql_admin: SqlAdminSettings = SqlAdminSettings()
-    access_token: AccessToken = AccessToken()
-    db: DbSettings = DbSettings()
+    access_token: Optional[AccessToken] = None
+    db: Optional[DbSettings] = None
 
 
 settings = Settings()
