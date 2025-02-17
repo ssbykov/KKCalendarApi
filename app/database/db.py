@@ -61,7 +61,7 @@ class DbHelper:
             await session.commit()
 
 
-db_helper = DbHelper(url=settings.db.url, echo=settings.db.echo)
+db_helper = DbHelper(url=str(settings.db.url), echo=settings.db.echo)
 SessionDep = Annotated[AsyncSession, Depends(db_helper.get_session)]
 
 init_data: list[dict[str, Any]] = [
