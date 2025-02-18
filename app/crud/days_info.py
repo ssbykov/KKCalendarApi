@@ -18,8 +18,7 @@ from database import (
     BaseWithId,
     SessionDep,
 )
-from database.models import DayInfoEvent
-from database.schemas import DayInfoSchemaCreate, EventSchemaCreate
+from database import DayInfoEvent, DayInfoSchemaCreate, EventSchemaCreate
 
 
 def get_day_info_repository(session: SessionDep) -> "DayInfoRepository":

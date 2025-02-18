@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type, List, Optional
+from typing import Type, List, Optional, TYPE_CHECKING
 
 from pydantic import BaseModel, field_validator
 from pydantic import Field
@@ -7,7 +7,6 @@ from sqlalchemy.orm import class_mapper
 
 from database import (
     BaseWithId,
-    Event,
     Elements,
     SkylightArch,
     LaPosition,
@@ -15,6 +14,9 @@ from database import (
     Yelam,
     DayInfo,
 )
+
+if TYPE_CHECKING:
+    from .event import EventSchema
 
 
 class DayDataSchema(BaseModel):
@@ -86,23 +88,6 @@ class ElementsSchema(DayDataSchema):
     model_config = {"from_attributes": True}
 
 
-class EventSchema(DayDataSchema):
-    name: str
-    moon_day: str | None = None
-    en_name: str
-    ru_name: str | None = None
-    en_text: str | None = None
-    ru_text: str | None = None
-    link: str | None = None
-
-
-class EventSchemaCreate(EventSchema):
-    base_class: Type[BaseWithId] = Field(default=Event, exclude=True)
-    is_mutable: bool = False
-
-    model_config = {"from_attributes": True}
-
-
 class DayInfoSchema(BaseModel):
     id: int
     date: str
@@ -112,7 +97,7 @@ class DayInfoSchema(BaseModel):
     la: LaSchema
     yelam: YelamSchema
     haircutting: HaircuttingSchema
-    events: Optional[List[EventSchema]]
+    events: Optional[List["EventSchema"]]
 
     model_config = {"from_attributes": True}
 
