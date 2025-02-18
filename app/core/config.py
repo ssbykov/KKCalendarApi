@@ -26,6 +26,7 @@ class AccessToken(BaseModel):
 class ApiV1Prefix(BaseModel):
     prefix: str = "/v1"
     days: str = "/days"
+    auth: str = "/auth"
 
 
 class ApiPrefix(BaseModel):
