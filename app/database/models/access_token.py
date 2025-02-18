@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
 
 if TYPE_CHECKING:
-    from database.db import SessionDep
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class AccessToken(Base, SQLAlchemyBaseAccessTokenTable[int]):
@@ -21,5 +21,5 @@ class AccessToken(Base, SQLAlchemyBaseAccessTokenTable[int]):
     )  # type: ignore
 
     @classmethod
-    def get_db(cls, session: "SessionDep"):  # type: ignore
+    def get_db(cls, session: "AsyncSession"):  # type: ignore
         yield SQLAlchemyAccessTokenDatabase(session, cls)
