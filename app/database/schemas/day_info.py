@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type, List, Optional, TYPE_CHECKING
+from typing import Type, List, Optional
 
 from pydantic import BaseModel, field_validator
 from pydantic import Field
@@ -13,10 +13,8 @@ from database import (
     HaircuttingDay,
     Yelam,
     DayInfo,
+    Event,
 )
-
-if TYPE_CHECKING:
-    from .event import EventSchema
 
 
 class DayDataSchema(BaseModel):
@@ -138,3 +136,20 @@ class DayInfoSchemaCreate(DayDataSchema):
         except ValueError:
             raise ValueError("Дата должна быть в формате YYYY-MM-DD")
         return value
+
+
+class EventSchema(DayDataSchema):
+    name: str
+    moon_day: str | None = None
+    en_name: str
+    ru_name: str | None = None
+    en_text: str | None = None
+    ru_text: str | None = None
+    link: str | None = None
+
+
+class EventSchemaCreate(EventSchema):
+    base_class: Type["BaseWithId"] = Field(default=Event, exclude=True)
+    is_mutable: bool = False
+
+    model_config = {"from_attributes": True}

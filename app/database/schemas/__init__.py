@@ -8,9 +8,10 @@ from .day_info import (
     DayDataSchema,
     DayInfoSchema,
     DayInfoSchemaCreate,
+    EventSchema,
+    EventSchemaCreate,
 )
 
-from .event import EventSchema, EventSchemaCreate
 
 __all__ = [
     "DayInfo",
