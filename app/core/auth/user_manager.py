@@ -1,9 +1,12 @@
+import logging
 from typing import Optional, TYPE_CHECKING
 
 from fastapi_users import BaseUserManager, IntegerIDMixin
 
 from core import settings
 from database.models import User
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from fastapi import Request
@@ -18,7 +21,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         user: User,
         request: Optional["Request"] = None,
     ):
-        print(f"User {user.id} has registered.")
+        logger.warning("User %r has registered.", user.id)
 
     async def on_after_forgot_password(
         self,
@@ -26,7 +29,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         token: str,
         request: Optional["Request"] = None,
     ):
-        print(f"User {user.id} has forgot their password. Reset token: {token}")
+        logger.warning(
+            "User %r has forgot their password. Reset token: %r", user.id, token
+        )
 
     async def on_after_request_verify(
         self,
@@ -34,4 +39,6 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         token: str,
         request: Optional["Request"] = None,
     ):
-        print(f"Verification requested for user {user.id}. Verification token: {token}")
+        logger.warning(
+            "Verification requested for user %r. Verification token: %r", user.id, token
+        )
