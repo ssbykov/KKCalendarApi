@@ -1,5 +1,3 @@
-from typing import Annotated
-
 from fastapi import Depends
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 
