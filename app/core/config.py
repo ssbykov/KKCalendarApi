@@ -33,6 +33,11 @@ class ApiPrefix(BaseModel):
     prefix: str = "/api"
     v1: ApiV1Prefix = ApiV1Prefix()
 
+    @property
+    def token_url(self) -> str:
+        parts = (self.prefix[1:], self.v1.prefix, self.v1.auth, "/login")
+        return "".join(parts)
+
 
 class DbSettings(BaseSettings):
     user: Optional[str] = None
