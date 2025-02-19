@@ -1,4 +1,3 @@
-import os
 from typing import Optional
 
 from dotenv import load_dotenv
@@ -15,6 +14,11 @@ class SqlAdminSettings(BaseModel):
 class RunConfig(BaseModel):
     host: str = "0.0.0.0"
     port: int = 8000
+
+
+class SuperUser(BaseModel):
+    email: str
+    password: str
 
 
 class AccessToken(BaseModel):
@@ -41,11 +45,11 @@ class ApiPrefix(BaseModel):
 
 
 class DbSettings(BaseSettings):
-    user: Optional[str] = None
-    password: Optional[str] = None
-    host: Optional[str] = None
-    port: Optional[int] = None
-    database: Optional[str] = None
+    user: str
+    password: str
+    host: str
+    port: int
+    database: str
 
     @property
     def url(self) -> PostgresDsn:
@@ -61,7 +65,6 @@ class DbSettings(BaseSettings):
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
         "pk": "pk_%(table_name)s",
     }
-    # model_config = SettingsConfigDict(env_prefix="APP_CONFIG__DB__")
 
 
 class Settings(BaseSettings):
@@ -76,6 +79,7 @@ class Settings(BaseSettings):
     sql_admin: SqlAdminSettings = SqlAdminSettings()
     access_token: Optional[AccessToken] = None
     db: Optional[DbSettings] = None
+    super_user: Optional[SuperUser] = None
 
 
 settings = Settings()
