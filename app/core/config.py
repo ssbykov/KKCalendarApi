@@ -1,5 +1,3 @@
-from typing import Optional
-
 from dotenv import load_dotenv
 from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -77,9 +75,10 @@ class Settings(BaseSettings):
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     sql_admin: SqlAdminSettings = SqlAdminSettings()
-    access_token: Optional[AccessToken] = None
-    db: Optional[DbSettings] = None
-    super_user: Optional[SuperUser] = None
+    access_token: AccessToken
+    db: DbSettings
+    super_user: SuperUser
 
 
+# noinspection PyArgumentList
 settings = Settings()
