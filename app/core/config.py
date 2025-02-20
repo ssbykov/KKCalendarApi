@@ -42,6 +42,15 @@ class ApiPrefix(BaseModel):
         return "".join(parts)
 
 
+class EmailSettings(BaseModel):
+    host: str
+    port: int
+    username: str
+    password: str
+    from_email: str
+    to_email: str
+
+
 class DbSettings(BaseSettings):
     user: str
     password: str
@@ -78,6 +87,7 @@ class Settings(BaseSettings):
     access_token: AccessToken
     db: DbSettings
     super_user: SuperUser
+    email: EmailSettings
 
 
 # noinspection PyArgumentList
