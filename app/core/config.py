@@ -5,8 +5,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 load_dotenv()
 
 
-class SqlAdminSettings(BaseModel):
-    templates_dir: str = "app/admin/templates/"
+class SqlAdmin(BaseModel):
+    templates: str = "app/admin/templates/"
+    secret: str
 
 
 class RunConfig(BaseModel):
@@ -83,7 +84,7 @@ class Settings(BaseSettings):
     )
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
-    sql_admin: SqlAdminSettings = SqlAdminSettings()
+    sql_admin: SqlAdmin
     access_token: AccessToken
     db: DbSettings
     super_user: SuperUser
