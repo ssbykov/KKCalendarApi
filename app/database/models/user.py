@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class User(BaseWithId, SQLAlchemyBaseUserTable[int]):
+class User(BaseWithId, SQLAlchemyBaseUserTable[int]):  # type: ignore[misc]
     __tablename__ = "users"
 
     created_at: Mapped[datetime] = mapped_column(
