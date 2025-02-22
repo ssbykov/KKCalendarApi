@@ -1,0 +1,66 @@
+{% extends "sqladmin/base.html" %}
+{% block body %}
+<div class="d-flex align-items-center justify-content-center vh-100">
+    <form class="col-lg-6 col-md-6 card card-md" action="{{ url_for('admin:login') }}" method="POST"
+          autocomplete="off">
+        <div class="card-body">
+            <h2 class="card-title text-center mb-4">Login to {{ admin.title }}</h2>
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                {% if error %}
+                    <input name="username" type="text" class="form-control is-invalid" placeholder="Enter username"
+                           autocomplete="off">
+                    <div class="invalid-feedback">{{ error }}</div>
+                {% else %}
+                    <input name="username" type="text" class="form-control" placeholder="Enter username"
+                           autocomplete="off">
+                {% endif %}
+            </div>
+            <div class="mb-2">
+                <label class="form-label">
+                    Password
+                </label>
+                <div class="input-group input-group-flat">
+                    {% if error %}
+                        <input name="password" type="password" class="form-control is-invalid" placeholder="Password"
+                               autocomplete="off">
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% else %}
+                        <input name="password" type="password" class="form-control" placeholder="Password"
+                               autocomplete="off">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-footer">
+                <button type="submit" class="btn btn-primary w-100">Войти</button>
+            </div>
+
+            <!-- Зависимые чекбоксы -->
+            <div class="mt-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="checkbox1" name="new_user">
+                    <label class="form-check-label" for="checkbox1">Новый пользователь</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="checkbox2" name="reset_password">
+                    <label class="form-check-label" for="checkbox2">Сброс пароля</label>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Получаем ссылки на чекбоксы
+    const checkbox1 = document.getElementById('checkbox1');
+    const checkbox2 = document.getElementById('checkbox2');
+
+    // Добавляем обработчик события для первого чекбокса
+    checkbox1.addEventListener('change', function () {
+        checkbox2.disabled = this.checked;
+    });
+    checkbox2.addEventListener('change', function () {
+        checkbox1.disabled = this.checked;
+    });
+</script>
+{% endblock %}
