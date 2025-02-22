@@ -5,6 +5,7 @@ from api.dependencies.backend import authentication_backend
 from api.dependencies.user_manager_helper import user_manager_helper
 from core.config import settings
 from database.schemas.user import UserRead, UserCreate
+from utils.email_sender import send_verification_email
 from .fastapi_users import fastapi_users
 
 router = APIRouter(
@@ -17,12 +18,15 @@ router = APIRouter(
 async def verify_user(token: str):
     try:
         user = await user_manager_helper.verify(token=token)
+        await send_verification_email(
+            user_email=user.email,
+            token=token,
+            action="verify_confirmation",
+        )
         return f"Пользователь {user.email} верифицирован."
     except InvalidVerifyToken as e:
-        print(e)
         return "Невалидный токен"
     except UserAlreadyVerified as e:
-        print(e)
         return "Пользователь уже верифицирован"
 
 
