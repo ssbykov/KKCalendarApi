@@ -90,8 +90,19 @@ class UserManagerHelper:
         )
         await self.create_user(user_create=user_create)
 
+    @staticmethod
+    @user_manager_decorator
+    async def request_verify(
+        user_manager: "UserManager",
+        user: User,
+    ) -> None:
+        await user_manager.request_verify(user=user)
 
-user_manager_helper = UserManagerHelper(
-    default_email=settings.super_user.email,
-    default_password=settings.super_user.email,
-)
+    @staticmethod
+    @user_manager_decorator
+    async def verify(
+        user_manager: "UserManager",
+        token: str,
+    ) -> User:
+        user = await user_manager.verify(token=token)
+        return user
