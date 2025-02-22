@@ -1,5 +1,5 @@
 import contextlib
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, Any
 
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_users.authentication import JWTStrategy
@@ -20,8 +20,8 @@ if TYPE_CHECKING:
     from pydantic import EmailStr
 
 
-def user_manager_decorator(func):
-    async def wrapper(*args, **kwargs):
+def user_manager_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+    async def wrapper(*args: Any, **kwargs: Any) -> Any:
         # Создаем контексты для session и user_manager
         async with get_async_session_context() as session:
             async with get_user_db_context(session) as user_db:
@@ -38,9 +38,9 @@ class UserManagerHelper:
         self,
         default_email: "EmailStr",
         default_password: str,
-        default_is_active=True,
-        default_is_superuser=True,
-        default_is_verified=True,
+        default_is_active: bool = True,
+        default_is_superuser: bool = True,
+        default_is_verified: bool = True,
     ):
         self.default_is_active = default_is_active
         self.default_is_superuser = default_is_superuser
@@ -69,18 +69,18 @@ class UserManagerHelper:
         if is_authenticated := await user_manager.authenticate(credentials):
             if is_authenticated.is_active and is_authenticated.is_verified:
                 user = await user_manager.get_by_email(credentials.username)
-                jwt_strategy = JWTStrategy(
+                jwt_strategy: JWTStrategy[User, str] = JWTStrategy(
                     secret=settings.sql_admin.jwt_secret,
                     lifetime_seconds=settings.access_token.lifetime_seconds,
                 )
                 access_token = await jwt_strategy.write_token(user)
                 return access_token
-            else:
-                print("негодный юзер")
-        else:
-            print("неверный логин или пароль")
+            print("негодный юзер")
+            return None
+        print("неверный логин или пароль")
+        return None
 
-    async def create_superuser(self):
+    async def create_superuser(self) -> None:
         user_create = UserCreate(
             email=self.default_email,
             password=self.default_password,

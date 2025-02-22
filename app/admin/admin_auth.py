@@ -22,7 +22,7 @@ class AdminAuth(AuthenticationBackend):
     ) -> bool:
         form = await request.form()
         is_new_user = form.get("new_user")
-        username, password = form["username"], form["password"]
+        username, password = str(form["username"]), str(form["password"])
 
         if is_new_user:
             user_create = UserCreate(
