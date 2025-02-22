@@ -6,8 +6,9 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi_users.exceptions import UserAlreadyExists
 
-from actions.create_superuser import create_superuser
+
 from admin.admin import init_admin
+from admin.user_manager_helper import user_manager_helper
 from api import router as api_router
 from core.config import settings
 from database import db_helper
@@ -18,7 +19,7 @@ from utils.pars_class import CalendarDayPars
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # await db_helper.init_db()
     try:
-        await create_superuser()
+        await user_manager_helper.create_superuser()
     except UserAlreadyExists as e:
         print("SuperUser already exists")
     # async for session in db_helper.get_session():
