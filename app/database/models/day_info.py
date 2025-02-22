@@ -8,7 +8,7 @@ from .init_data import ELEMENTS, LA, ARCHES, YELAM, HAIRCUTTING_DAYS
 from .mixines import ToDictMixin
 
 if TYPE_CHECKING:
-    from .event import Event, DayInfoEvent
+    from .event import Event
 
 
 class DayInfo(BaseWithId, ToDictMixin):

@@ -1,5 +1,4 @@
 from .day_info import (
-    DayInfo,
     YelamSchema,
     HaircuttingSchema,
     LaSchema,
@@ -14,7 +13,6 @@ from .day_info import (
 
 
 __all__ = [
-    "DayInfo",
     "YelamSchema",
     "HaircuttingSchema",
     "LaSchema",
