@@ -6,7 +6,8 @@ load_dotenv()
 
 
 class SqlAdmin(BaseModel):
-    templates: str = "app/admin/templates/"
+    templates: str
+    jwt_secret: str
     secret: str
 
 
