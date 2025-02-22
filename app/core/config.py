@@ -12,7 +12,7 @@ class SqlAdmin(BaseModel):
 
 
 class RunConfig(BaseModel):
-    host: str = "0.0.0.0"
+    host: str = "127.0.0.1"
     port: int = 8000
 
 
@@ -39,9 +39,13 @@ class ApiPrefix(BaseModel):
     v1: ApiV1Prefix = ApiV1Prefix()
 
     @property
-    def token_url(self) -> str:
-        parts = (self.prefix[1:], self.v1.prefix, self.v1.auth, "/login")
+    def auth_url(self) -> str:
+        parts = (self.prefix[1:], self.v1.prefix, self.v1.auth)
         return "".join(parts)
+
+    @property
+    def token_url(self) -> str:
+        return self.auth_url + "/login"
 
 
 class EmailSettings(BaseModel):
@@ -49,8 +53,7 @@ class EmailSettings(BaseModel):
     port: int
     username: str
     password: str
-    from_email: str
-    to_email: str
+    admin_email: str
 
 
 class DbSettings(BaseSettings):
