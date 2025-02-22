@@ -20,7 +20,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         self,
         user: User,
         request: Optional["Request"] = None,
-    ):
+    ) -> None:
         logger.warning("User %r has registered.", user.id)
 
     async def on_after_forgot_password(
@@ -28,7 +28,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         user: User,
         token: str,
         request: Optional["Request"] = None,
-    ):
+    ) -> None:
         logger.warning(
             "User %r has forgot their password. Reset token: %r", user.id, token
         )
@@ -38,7 +38,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         user: User,
         token: str,
         request: Optional["Request"] = None,
-    ):
+    ) -> None:
+        # verification_url = f"http://{config.settings.run.host}/verify?token={token}"
+        # await send_verification_email(user.email, verification_url)
         logger.warning(
             "Verification requested for user %r. Verification token: %r", user.id, token
         )
