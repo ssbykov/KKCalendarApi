@@ -3,8 +3,9 @@ from typing import Optional, TYPE_CHECKING
 
 from fastapi_users import BaseUserManager, IntegerIDMixin
 
-from core import settings
+from core import settings, config
 from database.models import User
+from utils.email_sender import send_verification_email
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +40,18 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         token: str,
         request: Optional["Request"] = None,
     ) -> None:
-        # verification_url = f"http://{config.settings.run.host}/verify?token={token}"
-        # await send_verification_email(user.email, verification_url)
+        verification_url = (
+            f"http://{config.settings.run.host}"
+            f":{config.settings.run.port}"
+            f"/{config.settings.api.auth_url}"
+            f"/verify/?token={token}"
+        )
+        await send_verification_email(
+            user_email=user.email,
+            url_verification=verification_url,
+            token=token,
+            action="verification",
+        )
         logger.warning(
             "Verification requested for user %r. Verification token: %r", user.id, token
         )
