@@ -2,8 +2,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 
-from .user_manager_helper import UserManagerHelper, user_manager_helper
+from api.dependencies.user_manager_helper import user_manager_helper
 from core import settings
+from core.auth.user_manager_helper import UserManagerHelper
 from database.schemas.user import UserCreate
 
 
@@ -32,7 +33,8 @@ class AdminAuth(AuthenticationBackend):
                 is_superuser=False,
                 is_verified=False,
             )
-            await self.user_manager_helper.create_user(user_create=user_create)
+            user = await self.user_manager_helper.create_user(user_create=user_create)
+            await self.user_manager_helper.request_verify(user=user)
 
         else:
             credentials = OAuth2PasswordRequestForm(
