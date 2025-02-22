@@ -54,6 +54,7 @@ class EmailSettings(BaseModel):
     username: str
     password: str
     admin_email: str
+    templates_dir: str
 
 
 class DbSettings(BaseSettings):
