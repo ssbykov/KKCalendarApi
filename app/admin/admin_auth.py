@@ -1,49 +1,53 @@
-import contextlib
-
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi_users.authentication import JWTStrategy
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 
-from api.dependencies.user_manager import get_user_manager
-from api.dependencies.users import get_user_db
-from core import config, settings
-from database import db_helper
-
-get_async_session_context = contextlib.asynccontextmanager(db_helper.get_session)
-get_user_db_context = contextlib.asynccontextmanager(get_user_db)
-get_user_manager_context = contextlib.asynccontextmanager(get_user_manager)
+from .user_manager_helper import UserManagerHelper, user_manager_helper
+from core import settings
+from database.schemas.user import UserCreate
 
 
 class AdminAuth(AuthenticationBackend):
+    def __init__(
+        self,
+        user_manager: UserManagerHelper,
+        secret_key: str = settings.sql_admin.secret,
+    ):
+        super().__init__(secret_key=secret_key)
+        self.user_manager_helper = user_manager
+
     async def login(
         self,
         request: Request,
     ) -> bool:
         form = await request.form()
+        is_new_user = form.get("new_user")
         username, password = form["username"], form["password"]
-        credentials = OAuth2PasswordRequestForm(
-            username=username,
-            password=password,
-        )
-        async with get_async_session_context() as session:
-            async with get_user_db_context(session) as user_db:
-                async with get_user_manager_context(user_db) as user_manager:
-                    if is_authenticated := await user_manager.authenticate(credentials):
-                        if is_authenticated.is_active and is_authenticated.is_verified:
-                            user = await user_manager.get_by_email(username)
-                            jwt_strategy = JWTStrategy(
-                                secret=settings.sql_admin.secret,
-                                lifetime_seconds=config.settings.access_token.lifetime_seconds,
-                            )
-                            access_token = await jwt_strategy.write_token(user)
-                            request.session.update({"token": access_token})
-                        else:
-                            print("негодный юзер")
-                    else:
-                        print("неверный логин или пароль")
 
-        return True
+        if is_new_user:
+            user_create = UserCreate(
+                email=username,
+                password=password,
+                is_active=True,
+                is_superuser=False,
+                is_verified=False,
+            )
+            await self.user_manager_helper.create_user(user_create=user_create)
+
+        else:
+            credentials = OAuth2PasswordRequestForm(
+                username=username,
+                password=password,
+            )
+
+            access_token = await self.user_manager_helper.get_access_token(
+                credentials=credentials
+            )
+
+            if access_token:
+                request.session.update({"token": access_token})
+                return True
+        return False
 
     async def logout(self, request: Request) -> bool:
         # Usually you'd want to just clear the session
@@ -60,4 +64,4 @@ class AdminAuth(AuthenticationBackend):
         return True
 
 
-sql_admin_authentication_backend = AdminAuth(secret_key=settings.sql_admin.secret)
+sql_admin_authentication_backend = AdminAuth(user_manager=user_manager_helper)
