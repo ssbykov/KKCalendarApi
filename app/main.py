@@ -1,38 +1,10 @@
-from contextlib import asynccontextmanager
-from typing import AsyncGenerator
-
 import uvicorn
-from fastapi import FastAPI
-from fastapi.responses import ORJSONResponse
-from fastapi_users.exceptions import UserAlreadyExists
-
 
 from admin.admin import init_admin
-from admin.user_manager_helper import user_manager_helper
 from api import router as api_router
 from core.config import settings
-from database import db_helper
-from utils.pars_class import CalendarDayPars
+from main_app import main_app
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    # await db_helper.init_db()
-    try:
-        await user_manager_helper.create_superuser()
-    except UserAlreadyExists as e:
-        print("SuperUser already exists")
-    # async for session in db_helper.get_session():
-    #     parser = CalendarDayPars(session)
-    #     await parser.get_days_info()
-    yield
-    await db_helper.dispose()
-
-
-main_app = FastAPI(
-    lifespan=lifespan,
-    default_response_class=ORJSONResponse,
-)
 main_app.include_router(router=api_router)
 init_admin(main_app)
 
