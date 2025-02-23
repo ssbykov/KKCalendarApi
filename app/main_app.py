@@ -5,7 +5,8 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi_users.exceptions import UserAlreadyExists
 
-from api.dependencies.user_manager_helper import user_manager_helper
+from actions.create_super_user import create_superuser
+from core import settings
 from database import db_helper
 
 
@@ -13,7 +14,9 @@ from database import db_helper
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # await db_helper.init_db()
     try:
-        await user_manager_helper.create_superuser()
+        await create_superuser(
+            email=settings.super_user.email, password=settings.super_user.password
+        )
     except UserAlreadyExists:
         print("SuperUser already exists")
     # async for session in db_helper.get_session():
