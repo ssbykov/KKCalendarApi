@@ -24,16 +24,17 @@ async def verify_user(token: str):
             action="verify_confirmation",
         )
         return f"Пользователь {user.email} верифицирован."
-    except InvalidVerifyToken as e:
+    except InvalidVerifyToken:
         return "Невалидный токен"
-    except UserAlreadyVerified as e:
+    except UserAlreadyVerified:
         return "Пользователь уже верифицирован"
 
 
 # login, logout
 router.include_router(
     router=fastapi_users.get_auth_router(
-        authentication_backend, requires_verification=True
+        authentication_backend,
+        requires_verification=True,
     ),
 )
 
@@ -43,6 +44,4 @@ router.include_router(
 )
 
 # verify
-router.include_router(
-    router=fastapi_users.get_verify_router(UserRead),
-)
+router.include_router(router=fastapi_users.get_verify_router(UserRead))
