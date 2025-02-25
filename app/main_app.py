@@ -6,8 +6,10 @@ from fastapi.responses import ORJSONResponse
 from fastapi_users.exceptions import UserAlreadyExists
 
 from actions.create_super_user import create_superuser
+from admin.admin_auth import request_var
 from core import settings
 from database import db_helper
+from starlette.requests import Request
 
 
 @asynccontextmanager
@@ -30,3 +32,14 @@ main_app = FastAPI(
     lifespan=lifespan,
     default_response_class=ORJSONResponse,
 )
+
+
+@main_app.middleware("http")
+async def reset_request_var(request: Request, call_next):
+    try:
+        response = await call_next(request)
+        request_var.set({})  # Сброс после запроса
+        return response
+    except Exception as e:
+        request_var.set({})  # Сброс при ошибке
+        raise e
