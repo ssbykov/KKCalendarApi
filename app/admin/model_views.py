@@ -1,6 +1,7 @@
 from markupsafe import Markup
 from sqladmin import ModelView
 
+from admin.admin_auth import request_var
 from admin.mixines import ActionNextBackMixin
 from crud.days_info import DayInfoRepository
 from crud.events import EventRepository
@@ -56,3 +57,8 @@ class DayInfoAdmin(ActionNextBackMixin, ModelView, model=DayInfo):
         DayInfo.yelam,
         DayInfo.events,
     ]
+
+    @property
+    def can_edit(self) -> bool:
+        user = request_var.get("user")
+        return user.get("is_superuser")
