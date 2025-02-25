@@ -1,21 +1,18 @@
+from contextvars import ContextVar
+
 from fastapi.security import OAuth2PasswordRequestForm
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 
+from api.dependencies.access_tokens_helper import access_tokens_helper
 from api.dependencies.user_manager_helper import user_manager_helper
 from core import settings
-from core.auth.user_manager_helper import UserManagerHelper
 from database.schemas.user import UserCreate
+
+request_var: ContextVar[dict] = ContextVar("user", default={})
 
 
 class AdminAuth(AuthenticationBackend):
-    def __init__(
-        self,
-        user_manager: UserManagerHelper,
-        secret_key: str = settings.sql_admin.secret,
-    ):
-        super().__init__(secret_key=secret_key)
-        self.user_manager_helper = user_manager
 
     async def login(
         self,
@@ -33,16 +30,16 @@ class AdminAuth(AuthenticationBackend):
                 is_superuser=False,
                 is_verified=False,
             )
-            user = await self.user_manager_helper.create_user(user_create=user_create)
-            await self.user_manager_helper.request_verify(user=user)
-
+            user = await user_manager_helper.create_user(user_create=user_create)
+            await user_manager_helper.request_verify(user=user)
+            return True
         else:
             credentials = OAuth2PasswordRequestForm(
                 username=username,
                 password=password,
             )
 
-            access_token = await self.user_manager_helper.get_access_token(
+            access_token = await user_manager_helper.get_access_token(
                 credentials=credentials
             )
 
@@ -52,18 +49,42 @@ class AdminAuth(AuthenticationBackend):
         return False
 
     async def logout(self, request: Request) -> bool:
-        # Usually you'd want to just clear the session
+        # if token := request.session.get("token"):
+        #     if access_token := await access_tokens_helper.get_access_token(token=token):
+        #         await access_tokens_helper.delete_access_token(token=access_token)
         request.session.clear()
         return True
 
     async def authenticate(self, request: Request) -> bool:
         token = request.session.get("token")
-
         if not token:
             return False
 
-        # Check the token in depth
+        is_valid = await access_tokens_helper.check_access_token(token=token)
+        if not is_valid:
+            await self.logout(request)
+            return False
+
+        access_token = await access_tokens_helper.get_access_token(token=token)
+        if not access_token:
+            return False
+
+        user_data = await user_manager_helper.get_user_by_id(
+            user_id=access_token.user_id
+        )
+        if not user_data:
+            return False
+        request_var.set(
+            {
+                "email": user_data.email,
+                "id": user_data.id,
+                "is_active": user_data.is_active,
+                "is_superuser": user_data.is_superuser,
+                "is_verified": user_data.is_verified,
+            },
+        )
+
         return True
 
 
-sql_admin_authentication_backend = AdminAuth(user_manager=user_manager_helper)
+sql_admin_authentication_backend = AdminAuth(secret_key=settings.sql_admin.secret)
