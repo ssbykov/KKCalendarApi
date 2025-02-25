@@ -1,5 +1,4 @@
 import contextlib
-from functools import wraps
 from typing import TYPE_CHECKING, Callable, Any
 
 from fastapi.security import OAuth2PasswordRequestForm
@@ -56,6 +55,14 @@ class UserManagerHelper:
 
     @staticmethod
     @with_user_manager
+    async def get_user_by_id(
+        user_manager: "UserManager",
+        user_id: int,
+    ) -> User:
+        return await user_manager.get(id=user_id)
+
+    @staticmethod
+    @with_user_manager
     async def get_access_token(
         user_manager: "UserManager",
         credentials: OAuth2PasswordRequestForm,
@@ -71,7 +78,6 @@ class UserManagerHelper:
                 async with get_access_token_db_context(session) as token_db:
                     strategy = authentication_backend.get_strategy(token_db)
                     return await strategy.write_token(user)
-        # user = await token_db.get_by_token(token)
         print("неверный логин или пароль или пользователь не активен/не подтвержден")
         return None
 
