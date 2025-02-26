@@ -6,6 +6,7 @@ from admin.mixines import ActionNextBackMixin
 from crud.days_info import DayInfoRepository
 from crud.events import EventRepository
 from database import Event, DayInfo
+from database.schemas.user import UserRead
 
 
 class EventAdmin(ActionNextBackMixin, ModelView, model=Event):
@@ -61,4 +62,10 @@ class DayInfoAdmin(ActionNextBackMixin, ModelView, model=DayInfo):
     @property
     def can_edit(self) -> bool:
         user = request_var.get("user")
-        return user.get("is_superuser")
+        if isinstance(user, UserRead):
+            return user.is_superuser
+        return False
+
+    @can_edit.setter
+    def can_edit(self, value: bool) -> None:
+        pass

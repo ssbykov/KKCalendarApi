@@ -1,9 +1,10 @@
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Any
 
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi_users.exceptions import UserAlreadyExists
+from starlette.responses import Response
 
 from actions.create_super_user import create_superuser
 from admin.admin_auth import request_var
@@ -35,11 +36,11 @@ main_app = FastAPI(
 
 
 @main_app.middleware("http")
-async def reset_request_var(request: Request, call_next):
+async def reset_request_var(request: Request, call_next: Any) -> Any:
     try:
         response = await call_next(request)
-        request_var.set({})  # Сброс после запроса
+        request_var.set(None)  # Сброс после запроса
         return response
     except Exception as e:
-        request_var.set({})  # Сброс при ошибке
+        request_var.set(None)  # Сброс при ошибке
         raise e
