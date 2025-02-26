@@ -1,7 +1,7 @@
 from contextvars import ContextVar
 
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi_users.exceptions import UserNotExists
+from fastapi_users import InvalidPasswordException
 from pydantic import ValidationError
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
@@ -34,18 +34,17 @@ class AdminAuth(AuthenticationBackend):
                     is_superuser=False,
                     is_verified=False,
                 )
-            except ValidationError as e:
+            except ValidationError:
                 return AdminAuthResponse(
                     is_ok=False,
-                    error=str(e),
+                    error="Проверьте правильность email",
+                )
+            if await user_manager_helper.get_user_by_email(user_email=username):
+                return AdminAuthResponse(
+                    is_ok=False,
+                    error="Пользователь с таким email уже существует",
                 )
             try:
-                if await user_manager_helper.get_user_by_email(user_email=username):
-                    return AdminAuthResponse(
-                        is_ok=False,
-                        error="Пользователь с таким email уже существует",
-                    )
-            except UserNotExists:
                 user = await user_manager_helper.create_user(user_create=user_create)
                 await user_manager_helper.request_verify(user=user)
                 return AdminAuthResponse(
@@ -53,10 +52,16 @@ class AdminAuth(AuthenticationBackend):
                     message="Пользователь успешно зарегистрирован. "
                     "Дождитесь Уведомление о верификации на почту.",
                 )
-            return AdminAuthResponse(
-                is_ok=False,
-                error="Неизвестная ошибка",
-            )
+            except InvalidPasswordException as e:
+                return AdminAuthResponse(
+                    is_ok=False,
+                    error=e.reason,
+                )
+            except Exception as e:
+                return AdminAuthResponse(
+                    is_ok=False,
+                    error=str(e),
+                )
 
         else:
             credentials = OAuth2PasswordRequestForm(

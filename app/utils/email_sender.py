@@ -6,7 +6,7 @@ from jinja2 import Template
 
 from core import settings
 
-template_dict = {
+TEMPLATE_DICT = {
     "verification": {
         "template": "verification_template.html",
         "subject": "Запрос на верификацию",
@@ -24,7 +24,7 @@ async def send_verification_email(
     action: str,
     url_verification: str = "",
 ) -> None:
-    if not (action_dict := template_dict.get(action)):
+    if not (action_dict := TEMPLATE_DICT.get(action)):
         return
     # Создаем объект сообщения
     mail_params = settings.email

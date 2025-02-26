@@ -2,6 +2,7 @@ import contextlib
 from typing import TYPE_CHECKING, Callable, Any
 
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi_users.exceptions import UserNotExists
 
 from api.dependencies.access_tokens import get_access_token_db
 from api.dependencies.user_manager import get_user_manager
@@ -49,8 +50,11 @@ class UserManagerHelper:
     async def get_user_by_email(
         user_manager: "UserManager",
         user_email: str,
-    ) -> User:
-        return await user_manager.get_by_email(user_email)
+    ) -> User | None:
+        try:
+            return await user_manager.get_by_email(user_email)
+        except UserNotExists:
+            return None
 
     @staticmethod
     @with_user_manager

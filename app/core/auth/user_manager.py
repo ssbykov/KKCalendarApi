@@ -1,10 +1,12 @@
 import logging
-from typing import Optional, TYPE_CHECKING
+import re
+from typing import Optional, TYPE_CHECKING, Union
 
-from fastapi_users import BaseUserManager, IntegerIDMixin
+from fastapi_users import BaseUserManager, IntegerIDMixin, InvalidPasswordException
 
 from core import settings, config
 from database.models import User
+from database.schemas.user import UserCreate
 from utils.email_sender import send_verification_email
 
 logger = logging.getLogger(__name__)
@@ -55,3 +57,29 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         logger.warning(
             "Verification requested for user %r. Verification token: %r", user.id, token
         )
+
+    async def validate_password(
+        self,
+        password: str,
+        user: Union[UserCreate, User],
+    ) -> None:
+
+        if len(password) < 4:
+            raise InvalidPasswordException(
+                reason="Пароль должен быть не менее 8 символов"
+            )
+        if not re.search(r"\d", password):
+            raise InvalidPasswordException(reason="Пароль должен содержать цифры")
+
+        if not re.search(r"[A-Z]", password):
+            raise InvalidPasswordException(
+                reason="Пароль должен содержать заглавные буквы"
+            )
+
+        if not re.search(r"[a-z]", password):
+            raise InvalidPasswordException(
+                reason="Пароль должен содержать строчные буквы"
+            )
+
+        if user.email in password:
+            raise InvalidPasswordException(reason="Пароль не должен содержать e-mail")
