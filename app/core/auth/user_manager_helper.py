@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Callable, Any
 from fastapi.security import OAuth2PasswordRequestForm
 
 from api.dependencies.access_tokens import get_access_token_db
-from api.dependencies.backend import authentication_backend
 from api.dependencies.user_manager import get_user_manager
 from api.dependencies.users import get_user_db
 from database import db_helper
@@ -63,22 +62,13 @@ class UserManagerHelper:
 
     @staticmethod
     @with_user_manager
-    async def get_access_token(
+    async def get_user(
         user_manager: "UserManager",
         credentials: OAuth2PasswordRequestForm,
-    ) -> str | None:
-        is_authenticated = await user_manager.authenticate(credentials)
-        if (
-            is_authenticated
-            and is_authenticated.is_active
-            and is_authenticated.is_verified
-        ):
-            user = await user_manager.get_by_email(credentials.username)
-            async with get_async_session_context() as session:
-                async with get_access_token_db_context(session) as token_db:
-                    strategy = authentication_backend.get_strategy(token_db)
-                    return await strategy.write_token(user)
-        print("неверный логин или пароль или пользователь не активен/не подтвержден")
+    ) -> User | None:
+        user = await user_manager.authenticate(credentials)
+        if user and user.is_active and user.is_verified:
+            return user
         return None
 
     @staticmethod
