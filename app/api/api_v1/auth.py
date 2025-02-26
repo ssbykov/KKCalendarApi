@@ -15,7 +15,7 @@ router = APIRouter(
 
 
 @router.get("/verify/")
-async def verify_user(token: str):
+async def verify_user(token: str) -> str:
     try:
         user = await user_manager_helper.verify(token=token)
         await send_verification_email(
