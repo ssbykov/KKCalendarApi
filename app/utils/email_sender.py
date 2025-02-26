@@ -23,16 +23,18 @@ async def send_verification_email(
     token: str,
     action: str,
     url_verification: str = "",
-):
+) -> None:
+    if not (action_dict := template_dict.get(action)):
+        return
     # Создаем объект сообщения
     mail_params = settings.email
     msg = EmailMessage()
     msg["From"] = mail_params.admin_email
     msg["To"] = mail_params.admin_email if action == "verification" else user_email
-    msg["Subject"] = template_dict.get(action).get("subject")
+    msg["Subject"] = action_dict.get("subject", "")
 
     with open(
-        settings.email.templates_dir + template_dict.get(action).get("template"), "r"
+        settings.email.templates_dir + action_dict.get("template", ""), "r"
     ) as file:
         template_content = file.read()
 
