@@ -1,10 +1,14 @@
 import contextlib
 from datetime import datetime, timedelta, timezone
-from typing import Callable, Any
+from typing import Callable, Any, TYPE_CHECKING
 
 from api.dependencies.access_tokens import get_access_token_db
+from api.dependencies.backend import authentication_backend
 from core import settings
 from database import db_helper
+
+if TYPE_CHECKING:
+    from database.models import User
 
 get_async_session_context = contextlib.asynccontextmanager(db_helper.get_session)
 get_access_token_db_context = contextlib.asynccontextmanager(get_access_token_db)
@@ -21,21 +25,46 @@ def with_token_db(func: Callable[..., Any]) -> Callable[..., Any]:
 
 
 class AccessTokensHelper:
+    def __init__(self) -> None:
+        self.authentication_backend = authentication_backend
+
     async def check_access_token(
         self,
         token: str,
     ) -> bool:
         token = await self.get_access_token(token=token)
-        if token.created_at + timedelta(
-            seconds=settings.access_token.lifetime_seconds
-        ) > datetime.now(tz=timezone.utc):
+        if hasattr(token, "created_at") and (
+            token.created_at + timedelta(seconds=settings.access_token.lifetime_seconds)
+            > datetime.now(tz=timezone.utc)
+        ):
             return True
-        return False
+        raise TypeError("Token does not have a 'created_at'.")
 
     @staticmethod
     @with_token_db
     async def get_access_token(
         token: str,
         token_db: Any,
-    ) -> str | None:
+    ) -> Any:
         return await token_db.get_by_token(token=token)
+
+    @with_token_db
+    async def destroy_token(
+        self,
+        token: str,
+        user: "User",
+        token_db: Any,
+    ) -> None:
+        strategy = self.authentication_backend.get_strategy(token_db)
+        await strategy.destroy_token(token=token, user=user)  # type: ignore
+
+    @with_token_db
+    async def write_token(
+        self,
+        user: "User",
+        token_db: Any,
+    ) -> str | None:
+        strategy = self.authentication_backend.get_strategy(token_db)
+        if hasattr(strategy, "write_token"):
+            return await strategy.write_token(user)
+        raise TypeError("Returned strategy does not have a write_token method.")
