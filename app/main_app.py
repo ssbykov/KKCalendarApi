@@ -4,13 +4,13 @@ from typing import AsyncGenerator, Any
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi_users.exceptions import UserAlreadyExists
-from starlette.responses import Response
+from starlette.requests import Request
 
 from actions.create_super_user import create_superuser
 from admin.admin_auth import request_var
+from api import router as api_router
 from core import settings
 from database import db_helper
-from starlette.requests import Request
 
 
 @asynccontextmanager
@@ -33,6 +33,8 @@ main_app = FastAPI(
     lifespan=lifespan,
     default_response_class=ORJSONResponse,
 )
+
+main_app.include_router(router=api_router)
 
 
 @main_app.middleware("http")
