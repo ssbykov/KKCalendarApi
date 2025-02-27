@@ -7,8 +7,8 @@ from pydantic import ValidationError, EmailStr
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 
-from api.dependencies.access_tokens_helper import access_tokens_helper
 from core import settings
+from core.auth.access_tokens_helper import AccessTokensHelper
 from core.auth.user_manager_helper import UserManagerHelper
 from database.schemas.admin_auth_response import AdminAuthResponse
 from database.schemas.user import UserCreate, UserRead
@@ -20,6 +20,7 @@ class AdminAuth(AuthenticationBackend):
     def __init__(self, secret_key: str = settings.sql_admin.secret) -> None:
         super().__init__(secret_key=secret_key)
         self.user_manager_helper = UserManagerHelper()
+        self.access_tokens_helper = AccessTokensHelper()
 
     async def login_with_info(
         self,
@@ -83,7 +84,7 @@ class AdminAuth(AuthenticationBackend):
                     error="неверный логин/пароль или пользователь не подтвержден.,",
                 )
 
-            if access_token := await access_tokens_helper.write_token(user=user):
+            if access_token := await self.access_tokens_helper.write_token(user=user):
                 request.session.update({"token": access_token})
                 return AdminAuthResponse(is_ok=True)
         return AdminAuthResponse(
@@ -93,11 +94,11 @@ class AdminAuth(AuthenticationBackend):
 
     async def logout(self, request: Request) -> bool:
         if token := request.session.get("token"):
-            access_token = await access_tokens_helper.get_access_token(token=token)
+            access_token = await self.access_tokens_helper.get_access_token(token=token)
             user_data = await self.user_manager_helper.get_user_by_id(
                 user_id=access_token.user_id
             )
-            await access_tokens_helper.destroy_token(token=token, user=user_data)
+            await self.access_tokens_helper.destroy_token(token=token, user=user_data)
         request.session.clear()
         return True
 
@@ -106,12 +107,14 @@ class AdminAuth(AuthenticationBackend):
         if not token:
             return False
 
-        if not await access_tokens_helper.check_access_token(token=token):
+        if not await self.access_tokens_helper.check_access_token(token=token):
             await self.logout(request)
             return False
 
         if not (
-            access_token := await access_tokens_helper.get_access_token(token=token)
+            access_token := await self.access_tokens_helper.get_access_token(
+                token=token
+            )
         ):
             return False
 
@@ -148,6 +151,3 @@ class AdminAuth(AuthenticationBackend):
             await self.user_manager_helper.create_user(user_create=user_create)
         except UserAlreadyExists:
             print("SuperUser already exists")
-
-
-# sql_admin_authentication_backend = AdminAuth(secret_key=settings.sql_admin.secret)
