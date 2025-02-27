@@ -23,20 +23,22 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     await db_helper.dispose()
 
 
-main_app = FastAPI(
-    lifespan=lifespan,
-    default_response_class=ORJSONResponse,
-)
+def init_main_app() -> FastAPI:
+    main_app = FastAPI(
+        lifespan=lifespan,
+        default_response_class=ORJSONResponse,
+    )
 
-main_app.include_router(router=api_router)
+    main_app.include_router(router=api_router)
 
+    @main_app.middleware("http")
+    async def reset_request_var(request: Request, call_next: Any) -> Any:
+        try:
+            response = await call_next(request)
+            request_var.set(None)  # Сброс после запроса
+            return response
+        except Exception as e:
+            request_var.set(None)  # Сброс при ошибке
+            raise e
 
-@main_app.middleware("http")
-async def reset_request_var(request: Request, call_next: Any) -> Any:
-    try:
-        response = await call_next(request)
-        request_var.set(None)  # Сброс после запроса
-        return response
-    except Exception as e:
-        request_var.set(None)  # Сброс при ошибке
-        raise e
+    return main_app
