@@ -6,19 +6,21 @@ from starlette.responses import Response, RedirectResponse
 
 from core import settings
 from database import db_helper
-from .admin_auth import sql_admin_authentication_backend, AdminAuth
+from .admin_auth import AdminAuth
 from .model_views import EventAdmin, DayInfoAdmin
 
 
-def init_admin(app: Any) -> None:
+async def init_admin(app: Any) -> None:
     admin = NewAdmin(
         app,
         db_helper.engine,
         templates_dir=settings.sql_admin.templates,
-        authentication_backend=sql_admin_authentication_backend,
+        authentication_backend=AdminAuth(secret_key=settings.sql_admin.secret),
     )
     admin.add_view(DayInfoAdmin)
     admin.add_view(EventAdmin)
+    assert isinstance(admin.authentication_backend, AdminAuth)
+    await admin.authentication_backend.create_superuser()
 
 
 class NewAdmin(Admin):
