@@ -3,10 +3,10 @@ import re
 from typing import Optional, TYPE_CHECKING, Union
 
 from fastapi_users import BaseUserManager, IntegerIDMixin, InvalidPasswordException
+from fastapi_users.schemas import UC
 
 from core import settings, config
 from database.models import User
-from database.schemas.user import UserCreate
 from utils.email_sender import send_verification_email
 
 logger = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     async def validate_password(
         self,
         password: str,
-        user: Union[UserCreate, User],
+        user: Union[UC, User],
     ) -> None:
 
         if len(password) < 4:

@@ -1,23 +1,30 @@
-from fastapi import APIRouter
+from typing import TYPE_CHECKING
+
+from fastapi import APIRouter, Depends
 from fastapi_users.exceptions import InvalidVerifyToken, UserAlreadyVerified
 
 from api.dependencies.backend import authentication_backend
-from api.dependencies.user_manager_helper import user_manager_helper
 from core.config import settings
 from database.schemas.user import UserRead, UserCreate
 from utils.email_sender import send_verification_email
 from .fastapi_users import fastapi_users
+from ..dependencies.user_manager import get_user_manager
 
 router = APIRouter(
     prefix=settings.api.v1.auth,
     tags=["Auth"],
 )
 
+if TYPE_CHECKING:
+    from core.auth.user_manager import UserManager
+
 
 @router.get("/verify/")
-async def verify_user(token: str) -> str:
+async def verify_user(
+    token: str, user_manager: "UserManager" = Depends(get_user_manager)
+) -> str:
     try:
-        user = await user_manager_helper.verify(token=token)
+        user = await user_manager.verify(token=token)
         await send_verification_email(
             user_email=user.email,
             token=token,
