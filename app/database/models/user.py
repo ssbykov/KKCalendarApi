@@ -29,3 +29,6 @@ class User(BaseWithId, SQLAlchemyBaseUserTable[int]):  # type: ignore[misc]
     @classmethod
     def get_db(cls, session: "AsyncSession"):  # type: ignore
         return SQLAlchemyUserDatabase(session, cls)
+
+    def __str__(self) -> str:
+        return self.email
