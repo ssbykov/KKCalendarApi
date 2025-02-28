@@ -1,5 +1,3 @@
-from contextvars import ContextVar
-
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_users import InvalidPasswordException
 from fastapi_users.exceptions import UserAlreadyExists
@@ -10,10 +8,9 @@ from starlette.requests import Request
 from core import settings
 from core.auth.access_tokens_helper import AccessTokensHelper
 from core.auth.user_manager_helper import UserManagerHelper
+from core.context_vars import request_var, super_user_id
 from database.schemas.admin_auth_response import AdminAuthResponse
 from database.schemas.user import UserCreate, UserRead
-
-request_var: ContextVar[UserRead | None] = ContextVar("user", default=None)
 
 
 class AdminAuth(AuthenticationBackend):
@@ -148,6 +145,11 @@ class AdminAuth(AuthenticationBackend):
             is_verified=is_verified,
         )
         try:
-            await self.user_manager_helper.create_user(user_create=user_create)
+            super_user = await self.user_manager_helper.create_user(
+                user_create=user_create
+            )
         except UserAlreadyExists:
-            print("SuperUser already exists")
+            super_user = await self.user_manager_helper.get_user_by_email(
+                user_email=email
+            )
+        super_user_id.set(super_user.id)

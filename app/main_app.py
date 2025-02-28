@@ -6,8 +6,8 @@ from fastapi.responses import ORJSONResponse
 from starlette.requests import Request
 
 from admin.admin import init_admin
-from admin.admin_auth import request_var
 from api import router as api_router
+from core.context_vars import request_var
 from database import db_helper
 
 
