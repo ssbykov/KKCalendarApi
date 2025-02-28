@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, Text, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 
+from core.context_vars import super_user_id
 from . import BaseWithId
 from .init_data import EVENTS
 from .mixines import ToDictMixin
@@ -19,7 +20,7 @@ class Event(BaseWithId, ToDictMixin):
     name: Mapped[str] = mapped_column(nullable=False)
     moon_day: Mapped[str] = mapped_column(String(10), nullable=True)
     en_name: Mapped[str] = mapped_column(nullable=False)
-    ru_name: Mapped[str] = mapped_column(nullable=True)
+    ru_name: Mapped[str] = mapped_column(nullable=False)
     en_text: Mapped[str] = mapped_column(Text, nullable=True)
     ru_text: Mapped[str] = mapped_column(Text, nullable=True)
     link: Mapped[str] = mapped_column(nullable=True)
@@ -31,6 +32,12 @@ class Event(BaseWithId, ToDictMixin):
         secondary="dayinfo_events",
         back_populates="events",
     )
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"),
+        nullable=True,
+        default=super_user_id.get("super_user_id"),
+    )
+    user = relationship("User", backref=backref("user", lazy="dynamic"))
 
     def __str__(self) -> str:
         return self.ru_name
