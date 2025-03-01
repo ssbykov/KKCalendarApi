@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 
 from sqladmin import Admin
 from starlette.requests import Request
@@ -6,7 +6,7 @@ from starlette.responses import Response, RedirectResponse
 
 from core import settings
 from database import db_helper
-from .admin_auth import AdminAuth
+from .admin_auth import AdminAuth, owner_required
 from .model_views import EventAdmin, DayInfoAdmin
 
 
@@ -40,3 +40,18 @@ class NewAdmin(Admin):
             )
 
         return RedirectResponse(request.url_for("admin:index"), status_code=302)
+
+    @owner_required
+    async def details(self, request: Request) -> Response:
+        result = await super().details(request)
+        return cast(Response, result)
+
+    @owner_required
+    async def edit(self, request: Request) -> Response:
+        result = await super().edit(request)
+        return cast(Response, result)
+
+    @owner_required
+    async def delete(self, request: Request) -> Response:
+        result = await super().delete(request)
+        return cast(Response, result)

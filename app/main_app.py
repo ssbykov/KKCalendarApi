@@ -1,13 +1,11 @@
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Any
+from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
-from starlette.requests import Request
 
 from admin.admin import init_admin
 from api import router as api_router
-from core.context_vars import request_var
 from database import db_helper
 
 
@@ -30,15 +28,5 @@ def init_main_app() -> FastAPI:
     )
 
     main_app.include_router(router=api_router)
-
-    @main_app.middleware("http")
-    async def reset_request_var(request: Request, call_next: Any) -> Any:
-        try:
-            response = await call_next(request)
-            request_var.set(None)  # Сброс после запроса
-            return response
-        except Exception as e:
-            request_var.set(None)  # Сброс при ошибке
-            raise e
 
     return main_app

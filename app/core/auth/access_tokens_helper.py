@@ -34,11 +34,12 @@ class AccessTokensHelper:
     ) -> bool:
         token = await self.get_access_token(token=token)
         if hasattr(token, "created_at"):
-            return token.created_at + timedelta(
-                seconds=settings.access_token.lifetime_seconds
-            ) > datetime.now(tz=timezone.utc)
-
-        raise TypeError("Token does not have a 'created_at'.")
+            return bool(
+                token.created_at
+                + timedelta(seconds=settings.access_token.lifetime_seconds)
+                > datetime.now(tz=timezone.utc)
+            )
+        return False
 
     @staticmethod
     @with_token_db

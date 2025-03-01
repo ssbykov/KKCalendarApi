@@ -1,12 +1,14 @@
+from typing import Any
+
 from markupsafe import Markup
 from sqladmin import ModelView
+from sqlalchemy import Select, select
+from starlette.requests import Request
 
-from admin.admin_auth import request_var
 from admin.mixines import ActionNextBackMixin
 from crud.days_info import DayInfoRepository
 from crud.events import EventRepository
 from database import Event, DayInfo
-from database.schemas.user import UserRead
 
 
 class EventAdmin(ActionNextBackMixin, ModelView, model=Event):
@@ -32,9 +34,15 @@ class EventAdmin(ActionNextBackMixin, ModelView, model=Event):
         ),
     }
 
-    column_details_exclude_list = [
-        Event.id,
-    ]
+    column_details_exclude_list = [Event.id, Event.user_id, Event.is_mutable]
+
+    def list_query(self, request: Request) -> Select[Any]:
+        user = request.session.get("user")
+        stmt: Select[Any] = select(self.model)
+        if isinstance(user, dict) and not user.get("is_superuser"):
+            stmt = stmt.filter(Event.user_id == user.get("id"))
+
+        return stmt
 
 
 def formater(column: str) -> str:
@@ -58,14 +66,9 @@ class DayInfoAdmin(ActionNextBackMixin, ModelView, model=DayInfo):
         DayInfo.yelam,
         DayInfo.events,
     ]
+    can_create = False
+    can_delete = False
 
-    @property
-    def can_edit(self) -> bool:
-        user = request_var.get("user")
-        if isinstance(user, UserRead):
-            return user.is_superuser
-        return False
-
-    @can_edit.setter
-    def can_edit(self, value: bool) -> None:
-        pass
+    def is_visible(self, request: Request) -> bool:
+        user = request.session.get("user")
+        return isinstance(user, dict) and bool(user.get("is_superuser"))

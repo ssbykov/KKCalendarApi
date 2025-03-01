@@ -1,14 +1,20 @@
+import functools
+import inspect
+from typing import Callable, Any
+
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_users import InvalidPasswordException
 from fastapi_users.exceptions import UserAlreadyExists
 from pydantic import ValidationError, EmailStr
 from sqladmin.authentication import AuthenticationBackend
+from starlette.exceptions import HTTPException
 from starlette.requests import Request
+from starlette.responses import Response, RedirectResponse
 
 from core import settings
 from core.auth.access_tokens_helper import AccessTokensHelper
 from core.auth.user_manager_helper import UserManagerHelper
-from core.context_vars import request_var, super_user_id
+from core.context_vars import super_user_id
 from database.schemas.admin_auth_response import AdminAuthResponse
 from database.schemas.user import UserCreate, UserRead
 
@@ -83,6 +89,7 @@ class AdminAuth(AuthenticationBackend):
 
             if access_token := await self.access_tokens_helper.write_token(user=user):
                 request.session.update({"token": access_token})
+                request.session.update({"user": user.model_dump()})
                 return AdminAuthResponse(is_ok=True)
         return AdminAuthResponse(
             is_ok=False,
@@ -91,11 +98,15 @@ class AdminAuth(AuthenticationBackend):
 
     async def logout(self, request: Request) -> bool:
         if token := request.session.get("token"):
-            access_token = await self.access_tokens_helper.get_access_token(token=token)
-            user_data = await self.user_manager_helper.get_user_by_id(
-                user_id=access_token.user_id
-            )
-            await self.access_tokens_helper.destroy_token(token=token, user=user_data)
+            if access_token := await self.access_tokens_helper.get_access_token(
+                token=token
+            ):
+                user_data = await self.user_manager_helper.get_user_by_id(
+                    user_id=access_token.user_id
+                )
+                await self.access_tokens_helper.destroy_token(
+                    token=token, user=user_data
+                )
         request.session.clear()
         return True
 
@@ -125,7 +136,6 @@ class AdminAuth(AuthenticationBackend):
                 is_superuser=user_data.is_superuser,
                 is_verified=user_data.is_verified,
             )
-            request_var.set(user_read)
             return True
         return False
 
@@ -153,3 +163,39 @@ class AdminAuth(AuthenticationBackend):
                 user_email=email
             )
         super_user_id.set(super_user.id)
+
+
+def owner_required(func: Callable[..., Any]) -> Callable[..., Any]:
+    @functools.wraps(func)
+    async def wrapper_decorator(*args: Any, **kwargs: Any) -> Any:
+        view, request = args[0], args[1]
+        admin = getattr(view, "_admin_ref", view)
+        auth_backend = getattr(admin, "authentication_backend", None)
+        if auth_backend is not None:
+            response = await auth_backend.authenticate(request)
+            if isinstance(response, Response):
+                return response
+            if not bool(response):
+                return RedirectResponse(request.url_for("admin:login"), status_code=302)
+
+        is_owner = await check_owner(view=view, request=request)
+        if not is_owner and not request.session.get("user").get("is_superuser"):
+            raise HTTPException(status_code=404)
+
+        if inspect.iscoroutinefunction(func):
+            return await func(*args, **kwargs)
+        return func(*args, **kwargs)
+
+    return wrapper_decorator
+
+
+async def check_owner(view: Any, request: Request) -> bool:
+    identity = request.path_params.get("identity")
+    if not (object_id := request.path_params.get("pk")):
+        object_id = request.query_params.get("pks")
+    model_view = [v for v in view.views if v.identity == identity][0]
+    obj = await model_view.get_object_for_details(object_id)
+    user = request.session.get("user", {})
+    if hasattr(obj, "user_id"):
+        return bool(obj.user_id == user.get("id"))
+    return False
