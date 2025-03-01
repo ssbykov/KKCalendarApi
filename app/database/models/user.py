@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
 from sqlalchemy import DateTime, func
@@ -32,3 +32,12 @@ class User(BaseWithId, SQLAlchemyBaseUserTable[int]):  # type: ignore[misc]
 
     def __str__(self) -> str:
         return self.email
+
+    def model_dump(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "email": self.email,
+            "is_active": self.is_active,
+            "is_superuser": self.is_superuser,
+            "is_verified": self.is_verified,
+        }
