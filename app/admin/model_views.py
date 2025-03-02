@@ -2,7 +2,7 @@ from typing import Any
 
 from markupsafe import Markup
 from sqladmin import ModelView
-from sqlalchemy import Select, select
+from sqlalchemy import Select, select, func
 from starlette.requests import Request
 
 from admin.mixines import ActionNextBackMixin
@@ -37,11 +37,18 @@ class EventAdmin(ActionNextBackMixin, ModelView, model=Event):
     column_details_exclude_list = [Event.id, Event.user_id, Event.is_mutable]
 
     def list_query(self, request: Request) -> Select[Any]:
-        user = request.session.get("user")
         stmt: Select[Any] = select(self.model)
+        return self.get_query(request, stmt)
+
+    def count_query(self, request: Request) -> Select[Any]:
+        stmt: Select[Any] = select(func.count(self.pk_columns[0]))
+        return self.get_query(request, stmt)
+
+    @staticmethod
+    def get_query(request: Request, stmt: Select[Any]) -> Select[Any]:
+        user = request.session.get("user")
         if isinstance(user, dict) and not user.get("is_superuser"):
             stmt = stmt.filter(Event.user_id == user.get("id"))
-
         return stmt
 
 
@@ -70,5 +77,12 @@ class DayInfoAdmin(ActionNextBackMixin, ModelView, model=DayInfo):
     can_delete = False
 
     def is_visible(self, request: Request) -> bool:
+        return self.is_superuser(request)
+
+    def is_accessible(self, request: Request) -> bool:
+        return self.is_superuser(request)
+
+    @staticmethod
+    def is_superuser(request: Request) -> bool:
         user = request.session.get("user")
         return isinstance(user, dict) and bool(user.get("is_superuser"))
