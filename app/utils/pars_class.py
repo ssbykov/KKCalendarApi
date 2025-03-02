@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup as bs
 from fake_headers import Headers  # type: ignore
 
+from core.context_vars import super_user_id
 from database import SessionDep
 from crud.days_info import DayInfoRepository
 from database.schemas import DayInfoSchemaCreate, EventSchemaCreate
@@ -66,6 +67,8 @@ class CalendarDayPars:
                     "10 000 000 times day",
                     "100 000 times day",
                     "10 000 times day",
+                    "10 000 times day",
+                    "1 000 times day",
                 ]
                 parsed_events = [
                     (
@@ -77,12 +80,15 @@ class CalendarDayPars:
                     for item in day_list[1:elements_index]
                     if item not in filter_words
                 ]
+                user_id = super_user_id.get("super_user_id")
                 events_schema = list(
                     EventSchemaCreate(
                         name=event[0],
                         en_name=event[0],
+                        ru_name=event[0],
                         link=event[1],
                         is_mutable=False,
+                        user_id=int(user_id) if user_id else None,
                     )
                     for event in parsed_events
                 )
