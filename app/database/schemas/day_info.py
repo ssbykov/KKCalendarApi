@@ -30,7 +30,7 @@ class DayDataSchema(BaseModel):
         """
         column_names = list(self.base_class.__table__.columns.keys())
         column_names.remove("id")
-        if column_names == list(self.model_dump().keys()):
+        if sorted(column_names) == sorted(list(self.model_dump().keys())):
             return self.base_class(**self.model_dump())
         raise ValueError(
             "Параметры model_class не соответствуют параметрам базового класса."
@@ -142,10 +142,11 @@ class EventSchema(DayDataSchema):
     name: str
     moon_day: str | None = None
     en_name: str
-    ru_name: str | None = None
+    ru_name: str
     en_text: str | None = None
     ru_text: str | None = None
     link: str | None = None
+    user_id: int | None
 
 
 class EventSchemaCreate(EventSchema):
