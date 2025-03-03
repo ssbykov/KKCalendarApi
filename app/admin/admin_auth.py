@@ -1,11 +1,12 @@
 import functools
 import inspect
-from typing import Callable, Any
+from typing import Callable, Any, cast
 
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_users import InvalidPasswordException
 from fastapi_users.exceptions import UserAlreadyExists
 from pydantic import ValidationError, EmailStr
+from sqladmin import ModelView
 from sqladmin.authentication import AuthenticationBackend
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
@@ -184,7 +185,10 @@ async def check_owner(view: Any, request: Request) -> bool:
     identity = request.path_params.get("identity")
     if not (object_id := request.path_params.get("pk")):
         object_id = request.query_params.get("pks")
-    model_view = [v for v in view.views if v.identity == identity][0]
+    if model_views := [v for v in view.views if v.identity == identity]:
+        model_view = cast(ModelView, model_views[0])
+    else:
+        return False
     obj = await model_view.get_object_for_details(object_id)
     user = request.session.get("user", {})
     if hasattr(obj, "user_id"):
