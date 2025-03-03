@@ -55,19 +55,19 @@
             <a href="#" data-name="{{ model_view.name }}" data-pk="{{ get_object_identifier(model) }}"
               data-url="{{ model_view._url_for_delete(request, model) }}" data-bs-toggle="modal"
               data-bs-target="#modal-delete" class="btn btn-danger">
-              Delete
+              Удалить
             </a>
           </div>
           {% endif %}
           {% if model_view.can_edit %}
-          <div class="col-md-1">
+          <div class="col-md-1" >
             <a href="{{ model_view._build_url_for('admin:edit', request, model) }}" class="btn btn-primary">
-              Edit
+              Изменить
             </a>
           </div>
           {% endif %}
           {% for custom_action,label in model_view._custom_actions_in_detail|dictsort %}
-          <div class="col-md-1">
+          <div class="col-md-1" style="margin-left: 20px;">
             {% if custom_action in model_view._custom_actions_confirmation %}
             <a href="#" class="btn btn-secondary" data-bs-toggle="modal"
               data-bs-target="#modal-confirmation-{{ custom_action }}">
