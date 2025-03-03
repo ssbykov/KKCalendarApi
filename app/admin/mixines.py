@@ -11,12 +11,12 @@ from database import db_helper
 class ActionNextBackMixin:
     repo_type: Type[GetBackNextIdMixin]
 
-    @action(name="back", label="< Back", add_in_detail=True)
+    @action(name="back", label="< Back", add_in_detail=True, add_in_list=False)
     async def back_record(self, request: Request) -> RedirectResponse:
         redirect_url = await self._get_redirect_url(request, is_next=False)
         return RedirectResponse(redirect_url, status_code=303)
 
-    @action(name="next", label="Next >", add_in_detail=True)
+    @action(name="next", label="Next >", add_in_detail=True, add_in_list=False)
     async def next_record(self, request: Request) -> RedirectResponse:
         redirect_url = await self._get_redirect_url(request)
         return RedirectResponse(redirect_url, status_code=303)
