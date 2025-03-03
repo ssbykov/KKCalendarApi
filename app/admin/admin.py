@@ -14,6 +14,7 @@ async def init_admin(app: Any) -> None:
     admin = NewAdmin(
         app,
         db_helper.engine,
+        title="Календарь событий",
         templates_dir=settings.sql_admin.templates,
         authentication_backend=AdminAuth(secret_key=settings.sql_admin.secret),
     )
