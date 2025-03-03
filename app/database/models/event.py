@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, Text, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 
-from core.context_vars import super_user_id
 from . import BaseWithId
 from .init_data import EVENTS
 from .mixines import ToDictMixin
@@ -35,7 +34,6 @@ class Event(BaseWithId, ToDictMixin):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"),
         nullable=True,
-        default=super_user_id.get("super_user_id"),
     )
     user = relationship("User", backref=backref("user", lazy="dynamic"))
 
