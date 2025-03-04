@@ -6,7 +6,7 @@ from starlette.responses import Response, RedirectResponse
 
 from core import settings
 from database import db_helper
-from .admin_auth import AdminAuth, owner_required
+from .backend import AdminAuth, owner_required
 from .model_views import EventAdmin, DayInfoAdmin
 
 
