@@ -10,14 +10,13 @@ from sqladmin import ModelView
 from sqladmin.authentication import AuthenticationBackend
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
-from starlette.responses import Response, RedirectResponse
 
 from core import settings
 from core.auth.access_tokens_helper import AccessTokensHelper
 from core.auth.user_manager_helper import UserManagerHelper
 from core.context_vars import super_user_id
 from database.schemas.admin_auth_response import AdminAuthResponse
-from database.schemas.user import UserCreate, UserRead
+from database.schemas.user import UserCreate
 
 
 class AdminAuth(AuthenticationBackend):
@@ -116,29 +115,16 @@ class AdminAuth(AuthenticationBackend):
         if not token:
             return False
 
-        if not await self.access_tokens_helper.check_access_token(token=token):
+        access_token = await self.access_tokens_helper.get_access_token(token=token)
+        if not access_token or not await self.access_tokens_helper.check_access_token(
+            token=access_token
+        ):
             await self.logout(request)
             return False
 
-        if not (
-            access_token := await self.access_tokens_helper.get_access_token(
-                token=token
-            )
-        ):
-            return False
-
-        if user_data := await self.user_manager_helper.get_user_by_id(
-            user_id=access_token.user_id
-        ):
-            user_read = UserRead(
-                email=user_data.email,
-                id=user_data.id,
-                is_active=user_data.is_active,
-                is_superuser=user_data.is_superuser,
-                is_verified=user_data.is_verified,
-            )
-            return True
-        return False
+        return bool(
+            await self.user_manager_helper.get_user_by_id(user_id=access_token.user_id)
+        )
 
     async def create_superuser(
         self,
