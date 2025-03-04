@@ -28,11 +28,10 @@ class AccessTokensHelper:
     def __init__(self) -> None:
         self.authentication_backend = authentication_backend
 
+    @staticmethod
     async def check_access_token(
-        self,
-        token: str,
+        token: Any,
     ) -> bool:
-        token = await self.get_access_token(token=token)
         if hasattr(token, "created_at"):
             return bool(
                 token.created_at
