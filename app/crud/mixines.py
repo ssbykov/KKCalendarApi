@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Any, Optional, Type
+from typing import Callable, Any, Optional, Type, Sequence, TypeVar
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -60,3 +60,20 @@ class GetBackNextIdMixin(ABC):
         return await self._get_adjacent_id(
             current_id, lambda id_attr, cid: id_attr < cid, self.model.id.desc()
         )
+
+
+T = TypeVar("T", bound="BaseWithId")
+
+
+class CommonMixin(ABC):
+    session: AsyncSession
+    model: Type[T]
+
+    def __init__(self, session: AsyncSession):
+        self.session = session
+        self.main_stmt = select(self.model)
+
+    async def get_all(self) -> Sequence[T]:
+        result = await self.session.execute(self.main_stmt)
+        obj_list = result.scalars().all()
+        return obj_list

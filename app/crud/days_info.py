@@ -6,7 +6,7 @@ from sqlalchemy import select, update, insert, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from crud.mixines import GetBackNextIdMixin
+from crud.mixines import GetBackNextIdMixin, CommonMixin
 from database import (
     DayInfo,
     Elements,
@@ -25,7 +25,7 @@ def get_day_info_repository(session: SessionDep) -> "DayInfoRepository":
     return DayInfoRepository(session)
 
 
-class DayInfoRepository(GetBackNextIdMixin):
+class DayInfoRepository(GetBackNextIdMixin, CommonMixin):
     session: AsyncSession
     model = DayInfo
 
@@ -51,11 +51,6 @@ class DayInfoRepository(GetBackNextIdMixin):
         if not result:
             raise ValueError("Параметр не найден!")
         return result.id
-
-    async def get_all_days(self) -> Sequence[DayInfo]:
-        result = await self.session.execute(self.main_stmt)
-        day_info_list = result.scalars().all()
-        return day_info_list
 
     async def get_day_by_day(self, day: date) -> DayInfo:
         stmt = self.main_stmt.where(DayInfo.date == str(day))

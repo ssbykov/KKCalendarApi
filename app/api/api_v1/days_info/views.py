@@ -15,7 +15,7 @@ async def get_all_days(
     repo: Annotated[DayInfoRepository, Depends(get_day_info_repository)],
 ) -> Sequence[DayInfo] | str:
     try:
-        all_days = await repo.get_all_days()
+        all_days = await repo.get_all()
         return all_days
     except Exception as e:
         return f"Произошла ошибка: {e}"
