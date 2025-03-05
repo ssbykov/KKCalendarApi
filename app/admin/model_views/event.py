@@ -5,16 +5,20 @@ from sqladmin import ModelView
 from sqlalchemy import Select, select, func
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin
-from crud.days_info import DayInfoRepository
+from admin.mixines import ActionNextBackMixin, CommonActionsMixin
 from crud.events import EventRepository
-from database import Event, DayInfo
+from database import Event
 
 
-class EventAdmin(ActionNextBackMixin, ModelView, model=Event):
+class EventAdmin(
+    ModelView,
+    ActionNextBackMixin,
+    CommonActionsMixin,
+    model=Event,
+):
     repo_type = EventRepository
     name_plural = "События"
-    name = "Информация по событию"
+    name = "Событие"
     form_create_rules = [
         "days",
         "name",
@@ -48,7 +52,6 @@ class EventAdmin(ActionNextBackMixin, ModelView, model=Event):
 
     column_list = [
         Event.name,
-        Event.en_name,
         Event.ru_name,
     ]
     column_searchable_list = [Event.en_name, Event.ru_name]
@@ -66,6 +69,8 @@ class EventAdmin(ActionNextBackMixin, ModelView, model=Event):
         )
         or "",
     }
+
+    can_export = False
 
     column_details_exclude_list = [Event.id, Event.user_id, Event.is_mutable]
 
@@ -117,35 +122,3 @@ class EventAdmin(ActionNextBackMixin, ModelView, model=Event):
 
 def formater(column: str) -> str:
     return f'<div style="white-space: pre-wrap; word-wrap: break-word; max-width: 500px;">{column}</div>'
-
-
-class DayInfoAdmin(ActionNextBackMixin, ModelView, model=DayInfo):
-    repo_type = DayInfoRepository
-    name_plural = "Дни календаря"
-    name = "Информация по дню"
-    details_template = "details.html"
-    column_list = [DayInfo.id, DayInfo.date, DayInfo.moon_day]
-    column_searchable_list = [DayInfo.date, DayInfo.moon_day]
-    column_details_list = [
-        DayInfo.date,
-        DayInfo.moon_day,
-        DayInfo.elements,
-        DayInfo.la,
-        DayInfo.haircutting,
-        DayInfo.arch,
-        DayInfo.yelam,
-        DayInfo.events,
-    ]
-    can_create = False
-    can_delete = False
-
-    def is_visible(self, request: Request) -> bool:
-        return self.is_superuser(request)
-
-    def is_accessible(self, request: Request) -> bool:
-        return self.is_superuser(request)
-
-    @staticmethod
-    def is_superuser(request: Request) -> bool:
-        user = request.session.get("user")
-        return isinstance(user, dict) and bool(user.get("is_superuser"))
