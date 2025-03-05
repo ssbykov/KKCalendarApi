@@ -2,20 +2,13 @@
 {% block content %}
 <div class="col-12">
     <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                {% for pk in model_view.pk_columns -%}
-                {{ pk.name }}
-                {%- if not loop.last %};{% endif -%}
-                {% endfor %}: {{ get_object_identifier(model) }}</h3>
-        </div>
         <div class="card-body border-bottom py-3">
             <div class="table-responsive">
                 <table class="table card-table table-vcenter text-nowrap table-hover table-bordered">
                     <thead>
                     <tr>
-                        <th class="w-1">Column</th>
-                        <th class="w-1">Value</th>
+                        <th class="w-1">Колонка</th>
+                        <th class="w-1">Значение</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -48,7 +41,8 @@
             <div class="card-footer container">
                 <div class="row">
                     <div class="col-md-1" style="margin-right: 10px;">
-                        <a href="{{ url_for('admin:list', identity=model_view.identity) }}" class="btn">
+                        <a href="{{ url_for('admin:list', identity=model_view.identity) }}{{ model_view.get_page_for_url(request) }}"
+                           class="btn">
                             К списку
                         </a>
                     </div>
