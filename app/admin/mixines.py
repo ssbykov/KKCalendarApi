@@ -1,11 +1,11 @@
-from typing import Type
+from typing import Type, Any
 
 from sqladmin import action
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from crud.mixines import GetBackNextIdMixin
-from database import db_helper
+from crud.mixines import GetBackNextIdMixin, CommonMixin
+from database import db_helper, BaseWithId
 
 
 class ActionNextBackMixin:
@@ -38,3 +38,31 @@ class ActionNextBackMixin:
                 redirect_url = referer[: last_slash_index + 1] + str(url_id)
                 return redirect_url
         return referer
+
+
+class CommonActionsMixin:
+    repo_type: Type[CommonMixin]
+    model: Type[BaseWithId]
+
+    async def get_all(self, user: dict[str, Any] | None = None) -> list[Any] | None:
+        async for session in db_helper.get_session():
+            repo = self.repo_type(session)
+            all_items = await repo.get_all()
+            if user and not user.get("is_superuser"):
+                user_items = [
+                    item for item in all_items if item.user_id == user.get("id")
+                ]
+                return sorted(user_items, key=lambda event: event.id)
+            return list(all_items)
+
+    async def get_page_for_url(self, request: Request) -> str | None:
+        user = request.session.get("user")
+        if hasattr(self.model, "user_id") and user:
+            all_items = await self.get_all(user=user)
+        else:
+            all_items = await self.get_all()
+        if all_items and hasattr(self, "page_size"):
+            all_ids = sorted([item.id for item in all_items])
+            index = all_ids.index(int(request.path_params["pk"]))
+            list_page = len(all_ids[:index]) // self.page_size + 1
+            return f"?page={list_page}"
