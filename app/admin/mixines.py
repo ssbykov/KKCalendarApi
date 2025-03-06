@@ -1,6 +1,6 @@
-from typing import Type, Any, Generic
+from typing import Type, Any, Generic, cast
 
-from sqladmin import action
+from sqladmin import action, ModelView
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
@@ -29,10 +29,11 @@ class ActionNextBackMixin(Generic[T]):
             return referer
         async for session in db_helper.get_session():
             repo = self.repo_type(session)
+            list_query = cast(ModelView, self).list_query(request)
             if is_next:
-                url_id = await repo.get_next_id(int(current_id))
+                url_id = await repo.get_next_id(int(current_id), list_query)
             else:
-                url_id = await repo.get_back_id(int(current_id))
+                url_id = await repo.get_back_id(int(current_id), list_query)
 
             if url_id:
                 last_slash_index = referer.rfind("/")
@@ -58,11 +59,16 @@ class CommonActionsMixin(Generic[T]):
             return list(all_items)
         return None
 
-    async def get_page_for_url(self, request: Request) -> str | None:
+    async def get_item_position(self, request: Request) -> dict[str, int | Any]:
         all_items = await self.get_all(request)
         if all_items and hasattr(self, "page_size"):
             all_ids = sorted([item.id for item in all_items])
             index = all_ids.index(int(request.path_params["pk"]))
             list_page = len(all_ids[:index]) // self.page_size + 1
-            return f"?page={list_page}"
-        return None
+            return {"page": list_page, "item_position": index + 1}
+        return {"page": 1, "item_position": 0}
+
+    async def get_page_for_url(self, request: Request) -> str | None:
+        item_position = await self.get_item_position(request)
+        page = item_position.get("page")
+        return f"?page={page}"

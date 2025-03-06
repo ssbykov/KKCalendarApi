@@ -45,7 +45,9 @@ class NewAdmin(Admin):
     @owner_required
     async def details(self, request: Request) -> Response:
         result = await super().details(request)
-        return cast(Response, result)
+        context = result.context
+        context["request"] = request
+        return await self.templates.TemplateResponse(request, result.template, context)
 
     @owner_required
     async def edit(self, request: Request) -> Response:

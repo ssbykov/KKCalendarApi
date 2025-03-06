@@ -55,7 +55,6 @@ class EventAdmin(
         Event.ru_name,
     ]
     column_searchable_list = [Event.en_name, Event.ru_name]
-    details_template = "details.html"
     column_formatters_detail = {
         Event.ru_text: lambda model, attribute: Markup(
             formater(getattr(model, "ru_text", ""))

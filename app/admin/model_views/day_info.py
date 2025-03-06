@@ -25,7 +25,6 @@ class DayInfoAdmin(
         "yelam": "Йелам",
         "events": "События дня",
     }
-    details_template = "details.html"
     column_list = [DayInfo.id, DayInfo.date, DayInfo.moon_day]
     column_searchable_list = [DayInfo.date, DayInfo.moon_day]
     column_details_list = [

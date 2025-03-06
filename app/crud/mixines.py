@@ -8,7 +8,7 @@ from typing import (
     Generic,
 )
 
-from sqlalchemy import select
+from sqlalchemy import select, Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
 
@@ -31,6 +31,7 @@ class GetBackNextIdMixin(ABC, Generic[T]):
         current_id: int,
         condition: Callable[[InstrumentedAttribute[int], Any], Any],
         order: Any,
+        list_query: Select[Any],
     ) -> Optional[int]:
         """
         Вспомогательный метод для получения следующего или предыдущего ID события.
@@ -44,28 +45,37 @@ class GetBackNextIdMixin(ABC, Generic[T]):
             Следующий или предыдущий ID события, или None, если такого ID нет.
         """
         stmt = (
-            select(self.model.id)
-            .where(condition(self.model.id, current_id))
+            list_query.where(condition(self.model.id, current_id))
             .order_by(order)
             .limit(1)
         )
         result = await self.session.scalar(stmt)
-        return result
+        return result.id if result else None
 
-    async def get_next_id(self, current_id: int) -> Optional[int]:
+    async def get_next_id(
+        self, current_id: int, list_query: Select[Any]
+    ) -> Optional[int]:
         """
         Получает следующий ID события после указанного.
         """
         return await self._get_adjacent_id(
-            current_id, lambda id_attr, cid: id_attr > cid, self.model.id.asc()
+            current_id=current_id,
+            condition=lambda id_attr, cid: id_attr > cid,
+            order=self.model.id.asc(),
+            list_query=list_query,
         )
 
-    async def get_back_id(self, current_id: int) -> Optional[int]:
+    async def get_back_id(
+        self, current_id: int, list_query: Select[Any]
+    ) -> Optional[int]:
         """
         Получает предыдущий ID события перед указанным.
         """
         return await self._get_adjacent_id(
-            current_id, lambda id_attr, cid: id_attr < cid, self.model.id.desc()
+            current_id=current_id,
+            condition=lambda id_attr, cid: id_attr < cid,
+            order=self.model.id.desc(),
+            list_query=list_query,
         )
 
 
