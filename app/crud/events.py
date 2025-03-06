@@ -6,5 +6,5 @@ def get_event_repository(session: SessionDep) -> "EventRepository":
     return EventRepository(session)
 
 
-class EventRepository(CommonMixin, GetBackNextIdMixin):
+class EventRepository(CommonMixin[Event], GetBackNextIdMixin[Event]):
     model = Event

@@ -7,7 +7,6 @@ from starlette.responses import Response, RedirectResponse
 from core import settings
 from database import db_helper
 from .backend import AdminAuth, owner_required
-from .mixines import CommonActionsMixin
 from .model_views import EventAdmin, DayInfoAdmin
 
 
@@ -52,11 +51,10 @@ class NewAdmin(Admin):
     async def edit(self, request: Request) -> Response:
         response = await super().edit(request)
         if isinstance(response, RedirectResponse):
-            model_view = cast(
-                CommonActionsMixin,
-                self._find_model_view(request.path_params["identity"]),
-            )
-            if page_suffix := await model_view.get_page_for_url(request):
+            model_view = self._find_model_view(request.path_params["identity"])
+            if hasattr(model_view, "get_page_for_url") and (
+                page_suffix := await model_view.get_page_for_url(request)
+            ):
                 response.headers["location"] += page_suffix
                 return response
         return cast(Response, response)

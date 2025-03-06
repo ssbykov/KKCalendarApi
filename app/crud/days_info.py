@@ -25,7 +25,7 @@ def get_day_info_repository(session: SessionDep) -> "DayInfoRepository":
     return DayInfoRepository(session)
 
 
-class DayInfoRepository(GetBackNextIdMixin, CommonMixin):
+class DayInfoRepository(GetBackNextIdMixin[DayInfo], CommonMixin[DayInfo]):
     session: AsyncSession
     model = DayInfo
 

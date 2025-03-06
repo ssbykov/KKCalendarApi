@@ -8,8 +8,8 @@ from database import DayInfo
 
 class DayInfoAdmin(
     ModelView,
-    ActionNextBackMixin,
-    CommonActionsMixin,
+    ActionNextBackMixin[DayInfo],
+    CommonActionsMixin[DayInfo],
     model=DayInfo,
 ):
     repo_type = DayInfoRepository

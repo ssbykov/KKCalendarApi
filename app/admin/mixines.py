@@ -1,15 +1,16 @@
-from typing import Type, Any
+from typing import Type, Any, Generic
 
 from sqladmin import action
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
+from core.type_vars import T
 from crud.mixines import GetBackNextIdMixin, CommonMixin
-from database import db_helper, BaseWithId
+from database import db_helper
 
 
-class ActionNextBackMixin:
-    repo_type: Type[GetBackNextIdMixin]
+class ActionNextBackMixin(Generic[T]):
+    repo_type: Type[GetBackNextIdMixin[T]]
 
     @action(name="back", label="< Назад", add_in_detail=True, add_in_list=False)
     async def back_record(self, request: Request) -> RedirectResponse:
@@ -40,29 +41,28 @@ class ActionNextBackMixin:
         return referer
 
 
-class CommonActionsMixin:
-    repo_type: Type[CommonMixin]
-    model: Type[BaseWithId]
+class CommonActionsMixin(Generic[T]):
+    repo_type: Type[CommonMixin[T]]
+    model: Type[T]
 
-    async def get_all(self, user: dict[str, Any] | None = None) -> list[Any] | None:
+    async def get_all(self, request: Request) -> list[Any] | None:
         async for session in db_helper.get_session():
             repo = self.repo_type(session)
             all_items = await repo.get_all()
-            if user and not user.get("is_superuser"):
+            user = request.session.get("user")
+            if hasattr(self.model, "user_id") and user and not user.get("is_superuser"):
                 user_items = [
-                    item for item in all_items if item.user_id == user.get("id")
+                    item for item in all_items if item.user_id == user.get("id")  # type: ignore
                 ]
-                return sorted(user_items, key=lambda event: event.id)
+                return sorted(user_items, key=lambda item: item.id)
             return list(all_items)
+        return None
 
     async def get_page_for_url(self, request: Request) -> str | None:
-        user = request.session.get("user")
-        if hasattr(self.model, "user_id") and user:
-            all_items = await self.get_all(user=user)
-        else:
-            all_items = await self.get_all()
+        all_items = await self.get_all(request)
         if all_items and hasattr(self, "page_size"):
             all_ids = sorted([item.id for item in all_items])
             index = all_ids.index(int(request.path_params["pk"]))
             list_page = len(all_ids[:index]) // self.page_size + 1
             return f"?page={list_page}"
+        return None

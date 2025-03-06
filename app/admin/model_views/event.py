@@ -12,8 +12,8 @@ from database import Event
 
 class EventAdmin(
     ModelView,
-    ActionNextBackMixin,
-    CommonActionsMixin,
+    ActionNextBackMixin[Event],
+    CommonActionsMixin[Event],
     model=Event,
 ):
     repo_type = EventRepository

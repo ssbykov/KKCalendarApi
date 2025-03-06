@@ -1,19 +1,26 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Any, Optional, Type, Sequence, TypeVar
+from typing import (
+    Callable,
+    Any,
+    Optional,
+    Type,
+    Sequence,
+    Generic,
+)
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import InstrumentedAttribute
 
-from database import BaseWithId
+from core.type_vars import T
 
 
-class GetBackNextIdMixin(ABC):
+class GetBackNextIdMixin(ABC, Generic[T]):
     session: AsyncSession
 
     @property
     @abstractmethod
-    def model(self) -> Type[BaseWithId]:
+    def model(self) -> Type[T]:
         pass
 
     def __init__(self, session: AsyncSession):
@@ -62,12 +69,13 @@ class GetBackNextIdMixin(ABC):
         )
 
 
-T = TypeVar("T", bound="BaseWithId")
-
-
-class CommonMixin(ABC):
+class CommonMixin(ABC, Generic[T]):
     session: AsyncSession
-    model: Type[T]
+
+    @property
+    @abstractmethod
+    def model(self) -> Type[T]:
+        pass
 
     def __init__(self, session: AsyncSession):
         self.session = session
