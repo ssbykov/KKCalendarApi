@@ -16,16 +16,13 @@ class Event(BaseWithId, ToDictMixin):
 
     __tablename__ = "events"
 
-    name: Mapped[str] = mapped_column(nullable=False)
+    name: Mapped[str] = mapped_column(nullable=False, unique=True)
     moon_day: Mapped[str] = mapped_column(String(10), nullable=True)
     en_name: Mapped[str] = mapped_column(nullable=False)
     ru_name: Mapped[str] = mapped_column(nullable=False)
     en_text: Mapped[str] = mapped_column(Text, nullable=True)
     ru_text: Mapped[str] = mapped_column(Text, nullable=True)
     link: Mapped[str] = mapped_column(nullable=True)
-    # is_mutable: Mapped[bool] = mapped_column(
-    #     nullable=False, server_default="0", default=False
-    # )
     days: Mapped[list["DayInfo"]] = relationship(
         "DayInfo",
         secondary="dayinfo_events",
