@@ -87,7 +87,7 @@ class CalendarDayPars:
                         en_name=event[0],
                         ru_name=event[0],
                         link=event[1],
-                        is_mutable=False,
+                        # is_mutable=False,
                         user_id=int(user_id) if user_id else None,
                     )
                     for event in parsed_events

@@ -66,7 +66,7 @@ class EventAdmin(
 
     can_export = False
 
-    column_details_exclude_list = [Event.id, Event.user_id, Event.is_mutable]
+    column_details_exclude_list = [Event.id, Event.user_id]
 
     form_ajax_refs = {
         "days": {

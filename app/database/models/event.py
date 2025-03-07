@@ -23,9 +23,9 @@ class Event(BaseWithId, ToDictMixin):
     en_text: Mapped[str] = mapped_column(Text, nullable=True)
     ru_text: Mapped[str] = mapped_column(Text, nullable=True)
     link: Mapped[str] = mapped_column(nullable=True)
-    is_mutable: Mapped[bool] = mapped_column(
-        nullable=False, server_default="0", default=False
-    )
+    # is_mutable: Mapped[bool] = mapped_column(
+    #     nullable=False, server_default="0", default=False
+    # )
     days: Mapped[list["DayInfo"]] = relationship(
         "DayInfo",
         secondary="dayinfo_events",
