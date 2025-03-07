@@ -63,5 +63,15 @@ class NewAdmin(Admin):
 
     @owner_required
     async def delete(self, request: Request) -> Response:
+        identity = request.path_params["identity"]
+        model_view = self._find_model_view(identity)
+
+        if hasattr(
+            model_view, "check_dates_before_delete"
+        ) and await model_view.check_dates_before_delete(request):
+            return Response(
+                status_code=404,
+                content="Нельзя удалить событие, так как оно уже прошло",
+            )
         result = await super().delete(request)
         return cast(Response, result)
