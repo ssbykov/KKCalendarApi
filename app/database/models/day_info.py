@@ -45,7 +45,7 @@ class DayInfo(BaseWithId, ToDictMixin):
     )
 
     def __str__(self) -> str:
-        return f"Дата: {self.date}, лунный день {self.moon_day}, id: {self.id}"
+        return self.date
 
 
 class Elements(BaseWithId):
