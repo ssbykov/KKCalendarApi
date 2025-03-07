@@ -91,7 +91,7 @@ class EventAdmin(
         return self.get_query(request, stmt)
 
     def form_edit_query(self, request: Request) -> Select[Any]:
-        if self.get_user(request):
+        if self.get_user_not_superuser(request):
             if "user" in self.form_edit_rules:
                 self.form_edit_rules.remove("user")
         else:
@@ -99,7 +99,7 @@ class EventAdmin(
         return super().form_edit_query(request)
 
     def get_query(self, request: Request, stmt: Select[Any]) -> Select[Any]:
-        if user := self.get_user(request):
+        if user := self.get_user_not_superuser(request):
             stmt = stmt.filter(Event.user_id == user.get("id"))
         return stmt
 
@@ -111,8 +111,7 @@ class EventAdmin(
         request: Request,
     ) -> None:
         data["link"] = self.ensure_http_prefix(data["link"])
-        if user := self.get_user(request):
-            data["user_id"] = user.get("id")
+        data.setdefault("user", int(request.session.get("user", {}).get("id")))
         old_days = [
             day.id
             for day in model.days
@@ -129,7 +128,7 @@ class EventAdmin(
         data["days"] = new_days + old_days
 
     @staticmethod
-    def get_user(request: Request) -> Any | None:
+    def get_user_not_superuser(request: Request) -> Any | None:
         user = request.session.get("user")
         if isinstance(user, dict) and not user.get("is_superuser"):
             return user
