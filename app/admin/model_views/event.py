@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 
 from markupsafe import Markup
@@ -6,8 +7,9 @@ from sqlalchemy import Select, select, func
 from starlette.requests import Request
 
 from admin.mixines import ActionNextBackMixin, CommonActionsMixin
+from crud.days_info import DayInfoRepository
 from crud.events import EventRepository
-from database import Event
+from database import Event, db_helper
 
 
 class EventAdmin(
@@ -73,6 +75,13 @@ class EventAdmin(
 
     column_details_exclude_list = [Event.id, Event.user_id, Event.is_mutable]
 
+    form_ajax_refs = {
+        "days": {
+            "fields": ("date",),
+            "order_by": "date",
+        }
+    }
+
     def list_query(self, request: Request) -> Select[Any]:
         stmt: Select[Any] = select(self.model)
         return self.get_query(request, stmt)
@@ -104,6 +113,20 @@ class EventAdmin(
         data["link"] = self.ensure_http_prefix(data["link"])
         if user := self.get_user(request):
             data["user_id"] = user.get("id")
+        old_days = [
+            day.id
+            for day in model.days
+            if datetime.strptime(day.date, "%Y-%m-%d") <= datetime.now()
+        ]
+        new_days = []
+        for day_id in data.get("days", []):
+            async for session in db_helper.get_session():
+                repo = DayInfoRepository(session)
+                day_info = await repo.get_day_by_id(day_id)
+                if datetime.strptime(day_info.date, "%Y-%m-%d") > datetime.now():
+                    new_days.append(day_id)
+
+        data["days"] = new_days + old_days
 
     @staticmethod
     def get_user(request: Request) -> Any | None:

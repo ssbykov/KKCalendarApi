@@ -53,11 +53,17 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo], CommonMixin[DayInfo]):
         return result.id
 
     async def get_day_by_day(self, day: date) -> DayInfo:
-        stmt = self.main_stmt.where(DayInfo.date == str(day))
+        return await self._get_day_by(DayInfo.date == str(day))
+
+    async def get_day_by_id(self, day_id: int) -> DayInfo:
+        return await self._get_day_by(DayInfo.id == int(day_id))
+
+    async def _get_day_by(self, condition: Any) -> DayInfo:
+        stmt = self.main_stmt.where(condition)
         day_info = await self.session.scalar(stmt)
         if day_info:
             return day_info
-        raise HTTPException(status_code=404, detail=f"День с датой {day} не найден")
+        raise HTTPException(status_code=404, detail=f"День не найден")
 
     async def get_elements(self) -> Sequence[Elements]:
         result = await self.session.execute(select(Elements))
