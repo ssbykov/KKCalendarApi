@@ -4,6 +4,7 @@ from typing import Any
 from markupsafe import Markup
 from sqladmin import ModelView
 from sqlalchemy import Select, select, func
+from sqlalchemy.orm import selectinload
 from starlette.requests import Request
 
 from admin.mixines import ActionNextBackMixin, CommonActionsMixin
@@ -30,15 +31,7 @@ class EventAdmin(
         "ru_text",
         "link",
     ]
-    form_edit_rules = [
-        "days",
-        "name",
-        "en_name",
-        "en_text",
-        "ru_name",
-        "ru_text",
-        "link",
-    ]
+    form_edit_rules = form_create_rules.copy()
 
     column_labels = {
         "days": "Даты события",
@@ -112,11 +105,7 @@ class EventAdmin(
     ) -> None:
         data["link"] = self.ensure_http_prefix(data["link"])
         data.setdefault("user", int(request.session.get("user", {}).get("id")))
-        old_days = [
-            day.id
-            for day in model.days
-            if datetime.strptime(day.date, "%Y-%m-%d") <= datetime.now()
-        ]
+        old_days = self._get_past_days(model)
         new_days = []
         for day_id in data.get("days", []):
             async for session in db_helper.get_session():
@@ -126,6 +115,21 @@ class EventAdmin(
                     new_days.append(day_id)
 
         data["days"] = new_days + old_days
+
+    async def check_dates_before_delete(self, request: Request) -> bool:
+        stmt = self._stmt_by_identifier(request.query_params["pks"])
+        for relation in self._form_relations:
+            stmt = stmt.options(selectinload(relation))
+        event = await self._get_object_by_pk(stmt)
+        return bool(self._get_past_days(event))
+
+    @staticmethod
+    def _get_past_days(model: Event) -> list[Any]:
+        return [
+            day.id
+            for day in model.days
+            if datetime.strptime(day.date, "%Y-%m-%d") <= datetime.now()
+        ]
 
     @staticmethod
     def get_user_not_superuser(request: Request) -> Any | None:
