@@ -58,9 +58,7 @@
       <table class="table card-table table-vcenter text-nowrap">
         <thead>
           <tr>
-            <th class="w-1"><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select all"
-                id="select-all"></th>
-            <th class="w-1"></th>
+            <th class="w-1">Действия</th>
             {% for name in model_view._list_prop_names %}
             {% set label = model_view._column_labels.get(name, name) %}
             <th>
@@ -84,10 +82,6 @@
         <tbody>
           {% for row in pagination.rows %}
           <tr>
-            <td>
-              <input type="hidden" value="{{ get_object_identifier(row) }}">
-              <input class="form-check-input m-0 align-middle select-box" type="checkbox" aria-label="Select item">
-            </td>
             <td class="text-end">
               {% if model_view.can_view_details %}
               <a href="{{ model_view._build_url_for('admin:details', request, row) }}" data-bs-toggle="tooltip"
