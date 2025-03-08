@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any
 
 from markupsafe import Markup
@@ -8,7 +7,6 @@ from sqlalchemy.orm import selectinload
 from starlette.requests import Request
 
 from admin.mixines import ActionNextBackMixin, CommonActionsMixin
-from crud.days_info import DayInfoRepository
 from crud.events import EventRepository
 from database import Event, db_helper
 
@@ -106,12 +104,11 @@ class EventAdmin(
         data["link"] = self.ensure_http_prefix(data["link"])
         data.setdefault("user", int(request.session.get("user", {}).get("id")))
 
-    async def check_dates_before_delete(self, request: Request) -> bool:
+    async def get_event(self, request: Request) -> bool:
         stmt = self._stmt_by_identifier(request.query_params["pks"])
         for relation in self._form_relations:
             stmt = stmt.options(selectinload(relation))
-        event = await self._get_object_by_pk(stmt)
-        return bool(self._get_past_days(event))
+        return await self._get_object_by_pk(stmt)
 
     async def check_name_unique_before_update(self, name: str) -> bool:
         async for session in db_helper.get_session():
@@ -120,14 +117,6 @@ class EventAdmin(
             if event:
                 return False
         return True
-
-    @staticmethod
-    def _get_past_days(model: Event) -> list[Any]:
-        return [
-            day.id
-            for day in model.days
-            if datetime.strptime(day.date, "%Y-%m-%d") <= datetime.now()
-        ]
 
     @staticmethod
     def get_user_not_superuser(request: Request) -> Any | None:
