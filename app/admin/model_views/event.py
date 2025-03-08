@@ -105,16 +105,6 @@ class EventAdmin(
     ) -> None:
         data["link"] = self.ensure_http_prefix(data["link"])
         data.setdefault("user", int(request.session.get("user", {}).get("id")))
-        old_days = self._get_past_days(model)
-        new_days = []
-        for day_id in data.get("days", []):
-            async for session in db_helper.get_session():
-                repo = DayInfoRepository(session)
-                day_info = await repo.get_day_by_id(day_id)
-                if datetime.strptime(day_info.date, "%Y-%m-%d") > datetime.now():
-                    new_days.append(day_id)
-
-        data["days"] = new_days + old_days
 
     async def check_dates_before_delete(self, request: Request) -> bool:
         stmt = self._stmt_by_identifier(request.query_params["pks"])
@@ -122,6 +112,14 @@ class EventAdmin(
             stmt = stmt.options(selectinload(relation))
         event = await self._get_object_by_pk(stmt)
         return bool(self._get_past_days(event))
+
+    async def check_name_unique_before_update(self, name: str) -> bool:
+        async for session in db_helper.get_session():
+            repo = self.repo_type(session)
+            event = await repo.get_event_by_name(name)
+            if event:
+                return False
+        return True
 
     @staticmethod
     def _get_past_days(model: Event) -> list[Any]:

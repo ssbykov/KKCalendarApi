@@ -1,11 +1,16 @@
+from datetime import datetime
 from typing import Any, cast
 
 from sqladmin import Admin
+from sqladmin.authentication import login_required
+from sqlalchemy.exc import IntegrityError
+from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import Response, RedirectResponse
 
 from core import settings
-from database import db_helper
+from crud.days_info import DayInfoRepository
+from database import db_helper, DayInfo
 from .backend import AdminAuth, owner_required
 from .model_views import EventAdmin, DayInfoAdmin
 
@@ -51,9 +56,80 @@ class NewAdmin(Admin):
 
     @owner_required
     async def edit(self, request: Request) -> Response:
-        response = await super().edit(request)
+        """Edit model endpoint."""
+
+        await self._edit(request)
+
+        identity = request.path_params["identity"]
+        model_view = self._find_model_view(identity)
+
+        model = await model_view.get_object_for_edit(request)
+        if not model:
+            raise HTTPException(status_code=404)
+
+        Form = await model_view.scaffold_form(model_view._form_edit_rules)
+        context = {
+            "obj": model,
+            "model_view": model_view,
+            "form": Form(obj=model, data=self._normalize_wtform_data(model)),
+        }
+
+        if request.method == "GET":
+            return await self.templates.TemplateResponse(
+                request, model_view.edit_template, context
+            )
+
+        form_data = await self._handle_form_data(request, model)
+        form = Form(form_data)
+
+        past_days_in_model: list[str] = get_past_days_ids(model.days)
+
+        past_days_in_form = await filter_past_days_by_id(form.data.get("days", []))
+
+        if past_days_in_form != past_days_in_model:
+            context["error"] = "Нельзя изменить или добавить прошедшие даты"
+            return await self.templates.TemplateResponse(
+                request, model_view.edit_template, context, status_code=400
+            )
+
+        if not form.validate():
+            context["form"] = form
+            return await self.templates.TemplateResponse(
+                request, model_view.edit_template, context, status_code=400
+            )
+
+        form_data_dict = self._denormalize_wtform_data(form.data, model)
+        try:
+            obj = await model_view.update_model(
+                request, pk=request.path_params["pk"], data=form_data_dict
+            )
+
+        except IntegrityError:
+            if hasattr(
+                model_view, "check_name_unique_before_update"
+            ) and not await model_view.check_name_unique_before_update(
+                form_data_dict.get("name", "")
+            ):
+                context["error"] = "Данное название уже используется"
+                return await self.templates.TemplateResponse(
+                    request, model_view.edit_template, context, status_code=400
+                )
+            else:
+                raise
+        except Exception as e:
+            context["error"] = str(e)
+            return await self.templates.TemplateResponse(
+                request, model_view.edit_template, context, status_code=400
+            )
+
+        url = self.get_save_redirect_url(
+            request=request,
+            form=form_data,
+            obj=obj,
+            model_view=model_view,
+        )
+        response = RedirectResponse(url=url, status_code=302)
         if isinstance(response, RedirectResponse):
-            model_view = self._find_model_view(request.path_params["identity"])
             if hasattr(model_view, "get_page_for_url") and (
                 page_suffix := await model_view.get_page_for_url(request)
             ):
@@ -75,3 +151,22 @@ class NewAdmin(Admin):
             )
         result = await super().delete(request)
         return cast(Response, result)
+
+
+async def filter_past_days_by_id(day_ids: list[str]) -> list[str]:
+    past_days = []
+    for day_id in day_ids:
+        async for session in db_helper.get_session():
+            repo = DayInfoRepository(session)
+            day_info = await repo.get_day_by_id(day_id)
+            if datetime.strptime(day_info.date, "%Y-%m-%d") <= datetime.now():
+                past_days.append(day_id)
+    return sorted(past_days)
+
+
+def get_past_days_ids(days: list[DayInfo]) -> list[str]:
+    return sorted(
+        str(day.id)
+        for day in days
+        if datetime.strptime(day.date, "%Y-%m-%d") <= datetime.now()
+    )
