@@ -55,7 +55,7 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo], CommonMixin[DayInfo]):
     async def get_day_by_day(self, day: date) -> DayInfo:
         return await self._get_day_by(DayInfo.date == str(day))
 
-    async def get_day_by_id(self, day_id: int) -> DayInfo:
+    async def get_day_by_id(self, day_id: str) -> DayInfo:
         return await self._get_day_by(DayInfo.id == int(day_id))
 
     async def _get_day_by(self, condition: Any) -> DayInfo:
