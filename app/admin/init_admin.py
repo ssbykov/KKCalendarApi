@@ -1,11 +1,9 @@
 from datetime import datetime
 from typing import Any, cast
 
-from sqladmin import Admin, ModelView
+from sqladmin import Admin
 from sqladmin.authentication import login_required
-from sqladmin.helpers import get_object_identifier
 from sqlalchemy.exc import IntegrityError
-from starlette.datastructures import FormData, URL
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import Response, RedirectResponse
@@ -74,7 +72,6 @@ class NewAdmin(Admin):
             "obj": model,
             "model_view": model_view,
             "form": Form(obj=model, data=self._normalize_wtform_data(model)),
-            "error": request.session.pop("error", None),
         }
 
         if request.method == "GET":
@@ -182,27 +179,22 @@ class NewAdmin(Admin):
 
         form_data_dict = self._denormalize_wtform_data(form.data, model_view.model)
         try:
-            if isinstance(model_view, EventAdmin) and await filter_past_days_by_id(
-                form_data_dict.get("days", [])
-            ):
-                form_data_dict["days"] = []
-                context["error"] = "Нельзя изменить или добавить прошедшие даты"
-                request.session["error"] = context["error"]
+            if isinstance(model_view, EventAdmin):
+                if await model_view.get_event_by_name(form_data_dict.get("name", "")):
+                    context["error"] = "Данное название уже используется"
+                elif await filter_past_days_by_id(form_data_dict.get("days", [])):
+                    context["error"] = "Нельзя добавить прошедшие даты"
 
-            obj = await model_view.insert_model(request, form_data_dict)
-        except IntegrityError:
-            if isinstance(
-                model_view, EventAdmin
-            ) and await model_view.get_event_by_name(form_data_dict.get("name", "")):
-                context["error"] = "Данное название уже используется"
+            if context.get("error"):
+                form_data_dict["days"] = []
+                form.process(**form_data_dict)
                 return await self.templates.TemplateResponse(
                     request,
                     context["model_view"].create_template,
                     context,
                     status_code=400,
                 )
-            else:
-                raise
+            obj = await model_view.insert_model(request, form_data_dict)
 
         except Exception as e:
             context["error"] = str(e)
@@ -217,18 +209,6 @@ class NewAdmin(Admin):
             model_view=model_view,
         )
         return RedirectResponse(url=url, status_code=302)
-
-    def get_save_redirect_url(
-        self, request: Request, form: FormData, model_view: ModelView, obj: Any
-    ) -> str | URL:
-
-        identity = request.path_params["identity"]
-        identifier = get_object_identifier(obj)
-
-        if request.session.get("error"):
-            return request.url_for("admin:edit", identity=identity, pk=identifier)
-        else:
-            return request.url_for("admin:list", identity=identity)
 
 
 async def filter_past_days_by_id(day_ids: list[str]) -> list[str]:
