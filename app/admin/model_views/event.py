@@ -104,19 +104,17 @@ class EventAdmin(
         data["link"] = self.ensure_http_prefix(data["link"])
         data.setdefault("user", int(request.session.get("user", {}).get("id")))
 
-    async def get_event(self, request: Request) -> bool:
+    async def get_event(self, request: Request) -> Any:
         stmt = self._stmt_by_identifier(request.query_params["pks"])
         for relation in self._form_relations:
             stmt = stmt.options(selectinload(relation))
         return await self._get_object_by_pk(stmt)
 
-    async def check_name_unique_before_update(self, name: str) -> bool:
+    async def get_event_by_name(self, name: str) -> Event | None:
         async for session in db_helper.get_session():
             repo = self.repo_type(session)
-            event = await repo.get_event_by_name(name)
-            if event:
-                return False
-        return True
+            return await repo.get_event_by_name(name)
+        return None
 
     @staticmethod
     def get_user_not_superuser(request: Request) -> Any | None:
