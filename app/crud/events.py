@@ -1,9 +1,7 @@
-from typing import Any
-
-from starlette.exceptions import HTTPException
+from sqlalchemy import update
 
 from crud.mixines import GetBackNextIdMixin, CommonMixin
-from database import SessionDep, Event
+from database import SessionDep, Event, EventSchemaCreate
 
 
 def get_event_repository(session: SessionDep) -> "EventRepository":
@@ -14,8 +12,23 @@ class EventRepository(CommonMixin[Event], GetBackNextIdMixin[Event]):
     model = Event
 
     async def get_event_by_name(self, name: str) -> Event | None:
-        stmt = self.main_stmt.where(Event.name == name)
+        stmt = self.main_stmt.where(self.model.name == name)
         event = await self.session.scalar(stmt)
         if event:
             return event
         return None
+
+    async def ru_name_event_update(self, event_id: int, ru_name: str) -> None:
+        update_stmt = (
+            update(self.model).where(self.model.id == event_id).values(ru_name=ru_name)
+        )
+        await self.session.execute(update_stmt)
+        await self.session.commit()
+
+    async def add_event(self, event: EventSchemaCreate) -> int:
+        orm_event = event.to_orm()
+        self.session.add(orm_event)
+        await self.session.flush()
+        event_id = orm_event.id
+        await self.session.commit()
+        return event_id

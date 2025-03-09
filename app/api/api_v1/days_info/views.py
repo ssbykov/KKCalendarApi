@@ -25,4 +25,4 @@ async def get_all_days(
 async def get_day_info(
     day: date, repo: Annotated[DayInfoRepository, Depends(get_day_info_repository)]
 ) -> DayInfo | str:
-    return await repo.get_day_by_day(day=day)
+    return await repo.get_day_by_date(day=day)

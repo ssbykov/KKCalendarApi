@@ -2,7 +2,7 @@ from datetime import date
 from typing import Sequence, Any, Dict
 
 from fastapi import HTTPException
-from sqlalchemy import select, update, insert, delete
+from sqlalchemy import select, insert, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -14,11 +14,10 @@ from database import (
     LaPosition,
     Yelam,
     SkylightArch,
-    Event,
     BaseWithId,
     SessionDep,
 )
-from database import DayInfoEvent, DayInfoSchemaCreate, EventSchemaCreate
+from database import DayInfoEvent, DayInfoSchemaCreate
 
 
 def get_day_info_repository(session: SessionDep) -> "DayInfoRepository":
@@ -52,11 +51,13 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo], CommonMixin[DayInfo]):
             raise ValueError("Параметр не найден!")
         return result.id
 
-    async def get_day_by_day(self, day: date) -> DayInfo:
+    async def get_day_by_date(self, day: date) -> DayInfo:
         return await self._get_day_by(DayInfo.date == str(day))
 
     async def get_day_by_id(self, day_id: str) -> DayInfo:
         return await self._get_day_by(DayInfo.id == int(day_id))
+
+    # async def get_days(self) -> Sequence[DayInfo]:
 
     async def _get_day_by(self, condition: Any) -> DayInfo:
         stmt = self.main_stmt.where(condition)
@@ -91,29 +92,6 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo], CommonMixin[DayInfo]):
         return await self._get_id(
             self.session, SkylightArch, SkylightArch.moon_day == day
         )
-
-    async def get_event_id(self, event: EventSchemaCreate) -> int | None:
-        try:
-            return await self._get_id(
-                self.session,
-                Event,
-                Event.name == event.name and Event.link == event.link,
-            )
-        except ValueError:
-            return None
-
-    async def add_event(self, event: EventSchemaCreate) -> int:
-        orm_event = event.to_orm()
-        self.session.add(orm_event)
-        await self.session.flush()
-        event_id = orm_event.id
-        await self.session.commit()
-        return event_id
-
-    async def ru_name_event_update(self, event_id: int, ru_name: str) -> None:
-        update_stmt = update(Event).where(Event.id == event_id).values(ru_name=ru_name)
-        await self.session.execute(update_stmt)
-        await self.session.commit()
 
     async def add_days(self, days_info: list[DayInfoSchemaCreate]) -> None:
         """
