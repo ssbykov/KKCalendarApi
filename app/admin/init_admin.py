@@ -144,7 +144,7 @@ class NewAdmin(Admin):
         identity = request.path_params["identity"]
         model_view = self._find_model_view(identity)
 
-        if hasattr(model_view, "get_event"):
+        if isinstance(model_view, EventAdmin):
             event = await model_view.get_event(request)
             if get_past_days_ids(event.days):
                 return Response(
