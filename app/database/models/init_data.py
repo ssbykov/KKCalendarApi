@@ -456,7 +456,7 @@ EVENTS = [
         " in order to increase the merit and the devotion of future disciples,"
         " Buddha displayed a different miracles. On Chötrül Düchen as all Düchen the effects of"
         " positive and negative actions are multiplied 💥10 million💥 times",
-        "link": "https://www.karmakagyucalendar.org/Duchen/Chotrul-Duchen",
+        "link": "https://www.karmakagyucalendar.org/special-days/duchen/chotrul",
     },
     {
         "name": "Saga Dawa Düchen",
@@ -480,7 +480,7 @@ EVENTS = [
         " “The chain is broken, the emotions stilled, suffering is ended”."
         " This day also marks the anniversary of his parinirvana at Kushinagara, India."
         " Effects of all actions are multiplied 10 million times!",
-        "link": "https://www.karmakagyucalendar.org/Duchen/Saga-Dawa-Duchen",
+        "link": "https://www.karmakagyucalendar.org/special-days/duchen/saga-dawa",
     },
     {
         "name": "Chökhor Düchen",
@@ -494,7 +494,7 @@ EVENTS = [
         " The Buddha turned the Wheel of Dharma for the first time, at Sarnath, India,"
         " by teaching the 'Four Noble Truths'. Effects of all positive"
         " and negative actions are multiplied 💥10 million💥 times!",
-        "link": "https://www.karmakagyucalendar.org/Duchen/Chokhor-Duechen",
+        "link": "https://www.karmakagyucalendar.org/special-days/duchen/chokhor",
     },
     {
         "name": "Lha Bab Düchen",
@@ -522,7 +522,7 @@ EVENTS = [
         " which is located in modern Uttar Pradesh, and which is counted among the eight holy places."
         " It is a Dharmachakra day, one of the four 10 million times days of the year:"
         " all positive and negative actions are multiplied by 10 million!",
-        "link": "https://www.karmakagyucalendar.org/Duchen/Lhabab-Duchen",
+        "link": "https://www.karmakagyucalendar.org/special-days/duchen/lhabab",
     },
     # Ежегодные специальные лунные дни
     {
@@ -534,7 +534,7 @@ EVENTS = [
         " Эффект от всех позитивных и негативных действий умножается в 💥100 000💥 (сто тысяч) раз!",
         "en_text": "It is the 7th day of the 4th lunar month."
         " The effect of all positive and negative actions is multiplied by 💥100,000💥 (one hundred thousand) times!",
-        "link": "https://www.karmakagyucalendar.org/LunarYearly-SpecialDays/Kutampa",
+        "link": "https://www.karmakagyucalendar.org/special-days/lunar-yearly/kutampa",
     },
     {
         "name": "Losar",
@@ -543,7 +543,7 @@ EVENTS = [
         "ru_name": "Лосар - Тибетский новый год.",
         "ru_text": "С {tibetan_year}-м годом всех живых существ!",
         "en_text": "",
-        "link": "https://www.karmakagyucalendar.org/LunarYearly-SpecialDays/Losar",
+        "link": "https://www.karmakagyucalendar.org/special-days/lunar-yearly/losar",
     },
     {
         "name": "Demonstration of Miracles",
@@ -554,7 +554,7 @@ EVENTS = [
         " В эти дни все положительные и отрицательные действия умножаются в 💥100 000💥 раз.",
         "en_text": "From the 1st to the 15th day of the first lunar month."
         " On these days, all positive and negative actions are multiplied by 💥100,000💥 times.",
-        "link": "https://www.karmakagyucalendar.org/LunarYearly-SpecialDays/demonstration-of-miracles",
+        "link": "https://www.karmakagyucalendar.org/special-days/lunar-yearly/demonstration-miracles",
     },
     {
         "name": "Gutor དགུ་གཏོར་",
@@ -565,7 +565,7 @@ EVENTS = [
         " заканчивается танцами Махакалы и подношениями тормы на 29-й день 12-го лунного месяца (Гутор).",
         "en_text": "Begun in the monasteries a few days before, "
         " ends with Mahakala dances and torma offerings on the 29th day of the 12th lunar month (Gutor).",
-        "link": "https://www.karmakagyucalendar.org/LunarYearly-SpecialDays/Gutor",
+        "link": "https://www.karmakagyucalendar.org/special-days/lunar-yearly/gutor",
     },
     {
         "name": "Dzam Ling Chi Sang",
@@ -581,7 +581,7 @@ EVENTS = [
         "'Local deities' day' or 'universal prayer day' is marked by extensive offerings,"
         " especially of sang, made to local deities and earth spirits,"
         " often performed on the top of a hill, and combined with picnics and celebrations.",
-        "link": "https://www.karmakagyucalendar.org/LunarYearly-SpecialDays/dzam-ling-chi-sang",
+        "link": "https://www.karmakagyucalendar.org/special-days/lunar-yearly/dzam-ling-chi-sang",
     },
     {
         "name": "Ngenpa gu dzom",
@@ -592,7 +592,7 @@ EVENTS = [
         " Это самая неблагоприятная дата в году. Не о чем беспокоиться.",
         "en_text": "An inauspicious day for most activities (but a good day for a picnic)."
         " This is the most inauspicious date of the year. Nothing to worry about.",
-        "link": "https://www.karmakagyucalendar.org/LunarYearly-SpecialDays/ngenpa-gu-dzom",
+        "link": "https://www.karmakagyucalendar.org/special-days/lunar-yearly/ngenpa-gu-dzom",
     },
     # ежемесячные специальные дни
     {
@@ -607,7 +607,7 @@ EVENTS = [
         "en_text": "30th day of the Lunar months."
         "The effects of all actions are multiplied by 💥100 times💥, especially in practice."
         "It is also a new moon. Protection of life is stressed. Confession by the Sangha (Sojong)",
-        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/Shakyamuni-Buddha-Day",
+        "link": "https://www.karmakagyucalendar.org/special-days/lunar-monthly/shakyamuni-buddha-day",
     },
     {
         "name": "Buddha Amitābha Day",
@@ -620,7 +620,7 @@ EVENTS = [
         "en_text": "15th day of the Lunar months."
         " Effects of all actions are multiplied 💥100 times💥 and practice is emphasized."
         " This is Full moon also. Protection of life is stressed. Confession by the Sangha (Sojong).",
-        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/AmitabhaBuddha-Day",
+        "link": "https://www.karmakagyucalendar.org/special-days/lunar-monthly/buddha-amitabha-day",
     },
     {
         "name": "Dakini and Vajrayogini Day",
@@ -631,7 +631,7 @@ EVENTS = [
         "Воспринимается так же, как и день Гуру Ринпоче.",
         "en_text": "25th day of the Lunar months. Tsok offering and celebration."
         " To be observed in the same way as the Guru Rinpoche Day",
-        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/Dakini-Vajrayogini-Day",
+        "link": "https://www.karmakagyucalendar.org/special-days/lunar-monthly/dakini-vajrayogini-day",
     },
     {
         "name": "Dharmapala (Dharma Protectors') Day",
@@ -644,7 +644,7 @@ EVENTS = [
         "en_text": "29th day of the Lunar months."
         " Purification and fasting. Confession of the transgression of vows and other similar practices."
         " Tsok offerings and celebrations.",
-        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/Dharmapala-Day",
+        "link": "https://www.karmakagyucalendar.org/special-days/lunar-monthly/dharmapala-protector-day",
     },
     {
         "name": "Green Tara and Medicine Buddha Day",
@@ -655,7 +655,7 @@ EVENTS = [
         " Все позитивные и негативные действия усиливаются в 💥100 раз💥!",
         "en_text": "8th day of the Lunar months."
         " Every positive and negative actions multiplied 💥100 times💥!",
-        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/GreenTara-MedicineBuddha-Day",
+        "link": "https://www.karmakagyucalendar.org/special-days/lunar-monthly/green-tara-medicine-buddha-day",
     },
     {
         "name": "Guru Rinpoche (Padmasambhava) Day",
@@ -668,7 +668,7 @@ EVENTS = [
         "en_text": "10th day of the Lunar months."
         " Chakrasamvara and Yidam offering day of Tsok offerings and celebration."
         " Extra offerings are made and increased attention is given to what is happening.",
-        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/GuruRinpoche-Day",
+        "link": "https://www.karmakagyucalendar.org/special-days/lunar-monthly/guru-rinpoche-day",
     },
     {
         "name": "White Tara Day",
@@ -679,7 +679,7 @@ EVENTS = [
         " Посвящён практикам Белой Тары, связанным со здоровьем, продлением жизни и мудростью.",
         "en_text": "3rd day of the Lunar months."
         " Dedicated to the White Tara practice connected to health, longevity and wisdom.",
-        "link": "https://www.karmakagyucalendar.org/LunarMonthly-SpecialDays/White-Tara-day",
+        "link": "https://www.karmakagyucalendar.org/special-days/lunar-monthly/white-tara-day",
     },
     # специальные дни
     {
@@ -691,7 +691,7 @@ EVENTS = [
         "\n*Паден сэнпо — демон класса нага стихийных духов.",
         "en_text": "Unfavourable day for putting up Lungta or prayer flag."
         "\n*A paden senpo is a demon of the naga class of elemental spirits.",
-        "link": "https://www.karmakagyucalendar.org/special-days/Paden",
+        "link": "https://www.karmakagyucalendar.org/special-days/cyclical/paden",
     },
     {
         "name": "Luthep",
@@ -700,7 +700,7 @@ EVENTS = [
         "ru_name": "Лютеп - Благоприятный день.",
         "ru_text": "В этот день делают пуджу для Нагов.",
         "en_text": "On this day, pujas for the Naga are done.",
-        "link": "https://www.karmakagyucalendar.org/special-days/Luthep",
+        "link": "https://www.karmakagyucalendar.org/special-days/cyclical/luthep",
     },
     {
         "name": "Nyinak",
@@ -713,7 +713,7 @@ EVENTS = [
         "en_text": "Do not undertake any important new project such as marriage, inauguration,"
         " starting construction, retreat, teaching (Buddhist, religious), long trips...;"
         " do not hold any important events (funerals etc.).",
-        "link": "https://www.karmakagyucalendar.org/special-days/Nyinak",
+        "link": "https://www.karmakagyucalendar.org/special-days/cyclical/nyinak",
     },
     {
         "name": "Yenkong",
@@ -726,7 +726,7 @@ EVENTS = [
         "en_text": " Unfavourable day for tordok—practice for averting negative influences by throwing away tormas—,"
         " do not undertake any important new project such as marriage, inauguration, long trips...,"
         " do not hold important events (funeral etc.).",
-        "link": "https://www.karmakagyucalendar.org/special-days/Yenkong",
+        "link": "https://www.karmakagyucalendar.org/special-days/cyclical/yenkong",
     },
     {
         "name": "Sangen",
