@@ -151,6 +151,5 @@ class EventSchema(DayDataSchema):
 
 class EventSchemaCreate(EventSchema):
     base_class: Type["BaseWithId"] = Field(default=Event, exclude=True)
-    is_mutable: bool = False
 
     model_config = {"from_attributes": True}
