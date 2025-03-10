@@ -12,7 +12,7 @@ from database.schemas import DayInfoSchemaCreate, EventSchemaCreate
 from utils.translator import translate
 
 
-class CalendarDayPars:
+class HtmlParser:
     HOST = "https://www.karmakagyucalendar.org/current-calendar"
     MONTHS_TAG = "CjVfdc"
     DAY_TAG = "n8H08c UVNKR"
