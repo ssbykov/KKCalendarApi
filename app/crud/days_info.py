@@ -1,4 +1,3 @@
-from datetime import date
 from typing import Sequence, Any, Dict
 
 from fastapi import HTTPException
@@ -31,13 +30,13 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo], CommonMixin[DayInfo]):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
         self.session = session
-        self.main_stmt = select(DayInfo).options(
-            selectinload(DayInfo.elements),
-            selectinload(DayInfo.arch),
-            selectinload(DayInfo.la),
-            selectinload(DayInfo.yelam),
-            selectinload(DayInfo.haircutting),
-            selectinload(DayInfo.events),
+        self.main_stmt = select(self.model).options(
+            selectinload(self.model.elements),
+            selectinload(self.model.arch),
+            selectinload(self.model.la),
+            selectinload(self.model.yelam),
+            selectinload(self.model.haircutting),
+            selectinload(self.model.events),
         )
 
     @staticmethod
@@ -51,13 +50,16 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo], CommonMixin[DayInfo]):
             raise ValueError("Параметр не найден!")
         return result.id
 
-    async def get_day_by_date(self, day: date) -> DayInfo:
-        return await self._get_day_by(DayInfo.date == str(day))
+    async def get_day_by_date(self, day: str) -> DayInfo:
+        return await self._get_day_by(self.model.date == day)
 
     async def get_day_by_id(self, day_id: str) -> DayInfo:
-        return await self._get_day_by(DayInfo.id == int(day_id))
+        return await self._get_day_by(self.model.id == int(day_id))
 
-    # async def get_days(self) -> Sequence[DayInfo]:
+    async def get_days(self, start_date: str, end_date: str) -> Sequence[DayInfo]:
+        stmt = self.main_stmt.where(self.model.date.between(start_date, end_date))
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
 
     async def _get_day_by(self, condition: Any) -> DayInfo:
         stmt = self.main_stmt.where(condition)
@@ -97,7 +99,6 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo], CommonMixin[DayInfo]):
         """
         Добавляет новые записи в таблицу `day_info` и обновляет существующие, если данные отличаются.
 
-        :param days_info: список объектов `DayInfoSchemaCreate` с новыми или обновленными данными.
         """
         # Определяем диапазон дат для выборки из базы
         start_date = min(days_info, key=lambda d: d.date).date
@@ -105,9 +106,9 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo], CommonMixin[DayInfo]):
 
         # Запрос к БД: загружаем существующие записи в указанном диапазоне с descriptions
         stmt = (
-            select(DayInfo)
-            .options(selectinload(DayInfo.events))
-            .filter(DayInfo.date.between(start_date, end_date))
+            select(self.model)
+            .options(selectinload(self.model.events))
+            .filter(self.model.date.between(start_date, end_date))
         )
         result = await self.session.execute(stmt)
 
