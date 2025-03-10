@@ -22,7 +22,10 @@ dependencies = [
     "translators (>=5.9.5,<6.0.0)",
     "sqladmin (>=0.20.1,<0.21.0)",
     "orjson (>=3.10.15,<4.0.0)",
-    "itsdangerous (>=2.2.0,<3.0.0)"
+    "itsdangerous (>=2.2.0,<3.0.0)",
+    "google-api-python-client (>=2.163.0,<3.0.0)",
+    "google-auth-httplib2 (>=0.2.0,<0.3.0)",
+    "google-auth-oauthlib (>=1.2.1,<2.0.0)"
 ]
 
 
