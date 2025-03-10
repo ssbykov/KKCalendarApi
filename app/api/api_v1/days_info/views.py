@@ -1,4 +1,3 @@
-from datetime import date
 from typing import List, Annotated
 
 from fastapi import APIRouter, Depends
@@ -21,8 +20,10 @@ async def get_all_days(
         return f"Произошла ошибка: {e}"
 
 
-@router.get("/", response_model=DayInfoSchema | str)
-async def get_day_info(
-    day: date, repo: Annotated[DayInfoRepository, Depends(get_day_info_repository)]
-) -> DayInfo | str:
-    return await repo.get_day_by_date(day=day)
+@router.get("/", response_model=List[DayInfoSchema] | str)
+async def get_days(
+    start_date: str,
+    end_date: str,
+    repo: Annotated[DayInfoRepository, Depends(get_day_info_repository)],
+) -> Sequence[DayInfo] | str:
+    return await repo.get_days(start_date=start_date, end_date=end_date)
