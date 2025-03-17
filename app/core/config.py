@@ -57,6 +57,11 @@ class EmailSettings(BaseModel):
     templates_dir: str
 
 
+class CalendarSettings(BaseModel):
+    secret_file: str
+    calendar_id: str
+
+
 class DbSettings(BaseSettings):
     user: str
     password: str
@@ -94,6 +99,7 @@ class Settings(BaseSettings):
     db: DbSettings
     super_user: SuperUser
     email: EmailSettings
+    calendar: CalendarSettings
 
 
 # noinspection PyArgumentList
