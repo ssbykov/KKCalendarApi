@@ -18,6 +18,7 @@ from .model_views import (
     HaircuttingAdmin,
     ElementsAdmin,
     LaPositionAdmin,
+    SkylightArchAdmin,
 )
 
 
@@ -34,6 +35,7 @@ async def init_admin(app: Any) -> None:
     admin.add_view(HaircuttingAdmin)
     admin.add_view(ElementsAdmin)
     admin.add_view(LaPositionAdmin)
+    admin.add_view(SkylightArchAdmin)
     assert isinstance(admin.authentication_backend, AdminAuth)
     await admin.authentication_backend.create_superuser()
 
