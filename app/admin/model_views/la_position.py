@@ -2,31 +2,29 @@ from sqladmin import ModelView
 from starlette.requests import Request
 
 from admin.mixines import ActionNextBackMixin, CommonActionsMixin
-from crud.haircutting import HaircuttingRepository
-from database import HaircuttingDay
+from crud.la_position import LaPositionRepository
+from database import LaPosition
 
 
-class HaircuttingAdmin(
+class LaPositionAdmin(
     ModelView,
-    ActionNextBackMixin[HaircuttingDay],
-    CommonActionsMixin[HaircuttingDay],
-    model=HaircuttingDay,
+    ActionNextBackMixin[LaPosition],
+    CommonActionsMixin[LaPosition],
+    model=LaPosition,
 ):
-    repo_type = HaircuttingRepository
-    name_plural = "Дни для стрижки"
-    name = "День для стрижки"
+    repo_type = LaPositionRepository
+    name_plural = "Энергия Ла"
+    name = "Энергия Ла"
     column_labels = {
         "moon_day": "Лунный день",
         "en_name": "Заголовок на английском",
         "ru_name": "Заголовок на русском",
-        "is_inauspicious": "Благоприятность",
     }
-    column_list = ["moon_day", "ru_name"]
+    column_list = ["ru_name"]
     column_details_list = [
-        HaircuttingDay.moon_day,
-        HaircuttingDay.en_name,
-        HaircuttingDay.ru_name,
-        HaircuttingDay.is_inauspicious,
+        LaPosition.moon_day,
+        LaPosition.en_name,
+        LaPosition.ru_name,
     ]
     can_edit = False
     can_delete = False
