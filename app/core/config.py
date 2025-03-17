@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from dotenv import load_dotenv
 from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -9,6 +11,11 @@ class SqlAdmin(BaseModel):
     templates: str
     jwt_secret: str
     secret: str
+
+
+class ImageStorage(BaseModel):
+    root: str = str(Path(__file__).resolve().parent.parent)
+    storage: str = "/static/images"
 
 
 class RunConfig(BaseModel):
@@ -94,6 +101,7 @@ class Settings(BaseSettings):
     )
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
+    image_storage: ImageStorage = ImageStorage()
     sql_admin: SqlAdmin
     access_token: AccessToken
     db: DbSettings
