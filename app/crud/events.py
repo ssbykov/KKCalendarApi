@@ -1,4 +1,4 @@
-from sqlalchemy import update
+from sqlalchemy import update, func
 
 from crud.mixines import GetBackNextIdMixin, CommonMixin
 from database import SessionDep, Event, EventSchemaCreate
@@ -12,7 +12,7 @@ class EventRepository(CommonMixin[Event], GetBackNextIdMixin[Event]):
     model = Event
 
     async def get_event_by_name(self, name: str) -> Event | None:
-        stmt = self.main_stmt.where(self.model.name == name)
+        stmt = self.main_stmt.where(func.upper(self.model.name) == func.upper(name))
         event = await self.session.scalar(stmt)
         if event:
             return event
