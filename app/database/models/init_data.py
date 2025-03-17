@@ -215,11 +215,13 @@ ELEMENTS = [
         "en_name": "Fire-Water",
         "ru_name": "Огонь-Вода",
         "is_positive": False,
-        "ru_text": "Смерть. Крайне неблагоприятное сочетание."
+        "ru_text": "འཆི་བ SHIWA - СМЕРТЬ. Крайне неблагоприятное сочетание."
         " Комбинация предвещает смерть, и любая деятельность в этот день столкнётся со значительными препятствиями,"
         " которые могут ослабить жизненные силы."
         " Энергия этого дня неблагоприятна для любых действий, кроме тех, которые наносят вред другим.",
-        "en_text": "",
+        "en_text": 'འཆི་བ SHIWA - DEATH. The "vile" extremely unfavorable conjunction.'
+        " The combination prefigures death, and any activity on this day will face significant obstacles that may weaken one's vitality."
+        " This days energy is unfavorable to any actions except that which is harmful to others.",
     },
     {
         "en_name": "Fire-Wind",
