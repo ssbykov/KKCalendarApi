@@ -70,8 +70,15 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo], CommonMixin[DayInfo]):
 
     async def get_elements(self) -> Sequence[Elements]:
         result = await self.session.execute(select(Elements))
-        elements = result.scalars().all()
-        if elements:
+        if elements := result.scalars().all():
+            return elements
+        raise ValueError("Элементы не найдены")
+
+    async def get_elements_by_name(self, elements_name: str) -> Elements:
+        result = await self.session.execute(
+            select(Elements).where(Elements.en_name == elements_name)
+        )
+        if elements := result.scalar():
             return elements
         raise ValueError("Элементы не найдены")
 
