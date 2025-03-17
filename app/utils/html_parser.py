@@ -63,16 +63,16 @@ class HtmlParser:
                 )
                 yelam_id = await self.day_info_repo.get_yelam_day_id(moon)
                 links = [(a.get_text().strip(), a["href"]) for a in day.find_all("a")]
-                filter_words = [
+                filter_words = (
                     "🌑",
-                    "100 times day",
                     "🌕",
                     "10 000 000 times day",
+                    "1 000 000 times day",
                     "100 000 times day",
                     "10 000 times day",
-                    "10 000 times day",
                     "1 000 times day",
-                ]
+                    "100 times day",
+                )
                 parsed_events = [
                     (
                         next(
