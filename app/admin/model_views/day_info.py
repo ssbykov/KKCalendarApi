@@ -46,8 +46,3 @@ class DayInfoAdmin(
 
     def is_accessible(self, request: Request) -> bool:
         return self.is_superuser(request)
-
-    @staticmethod
-    def is_superuser(request: Request) -> bool:
-        user = request.session.get("user")
-        return isinstance(user, dict) and bool(user.get("is_superuser"))

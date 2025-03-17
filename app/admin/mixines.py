@@ -72,3 +72,8 @@ class CommonActionsMixin(Generic[T]):
         item_position = await self.get_item_position(request)
         page = item_position.get("page")
         return f"?page={page}"
+
+    @staticmethod
+    def is_superuser(request: Request) -> bool:
+        user = request.session.get("user")
+        return isinstance(user, dict) and bool(user.get("is_superuser"))

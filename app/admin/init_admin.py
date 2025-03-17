@@ -13,6 +13,7 @@ from crud.days_info import DayInfoRepository
 from database import db_helper, DayInfo
 from .backend import AdminAuth, owner_required
 from .model_views import EventAdmin, DayInfoAdmin
+from .model_views.haircutting import HaircuttingAdmin
 
 
 async def init_admin(app: Any) -> None:
@@ -25,6 +26,7 @@ async def init_admin(app: Any) -> None:
     )
     admin.add_view(DayInfoAdmin)
     admin.add_view(EventAdmin)
+    admin.add_view(HaircuttingAdmin)
     assert isinstance(admin.authentication_backend, AdminAuth)
     await admin.authentication_backend.create_superuser()
 
