@@ -2,7 +2,7 @@ from sqladmin import ModelView
 from starlette.requests import Request
 
 from admin.mixines import ActionNextBackMixin, CommonActionsMixin
-from crud.skylight_arch import SkylightArchRepository
+from crud.skylight_arches import SkylightArchRepository
 from database import SkylightArch
 
 

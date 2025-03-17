@@ -2,7 +2,7 @@ from sqladmin import ModelView
 from starlette.requests import Request
 
 from admin.mixines import ActionNextBackMixin, CommonActionsMixin
-from crud.haircutting import HaircuttingRepository
+from crud.haircutting_days import HaircuttingRepository
 from database import HaircuttingDay
 
 

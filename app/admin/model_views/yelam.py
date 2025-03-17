@@ -2,7 +2,7 @@ from sqladmin import ModelView
 from starlette.requests import Request
 
 from admin.mixines import ActionNextBackMixin, CommonActionsMixin
-from crud.Yelam import YelamRepository
+from crud.yelams import YelamRepository
 from database import Yelam
 
 

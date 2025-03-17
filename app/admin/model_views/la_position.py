@@ -2,7 +2,7 @@ from sqladmin import ModelView
 from starlette.requests import Request
 
 from admin.mixines import ActionNextBackMixin, CommonActionsMixin
-from crud.la_position import LaPositionRepository
+from crud.la_positions import LaPositionRepository
 from database import LaPosition
 
 
