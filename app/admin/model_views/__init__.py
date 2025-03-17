@@ -4,6 +4,7 @@ from .haircutting import HaircuttingAdmin
 from .elements import ElementsAdmin
 from .la_position import LaPositionAdmin
 from .skylight_arch import SkylightArchAdmin
+from .yelam import YelamAdmin
 
 __all__ = [
     "EventAdmin",
@@ -12,4 +13,5 @@ __all__ = [
     "ElementsAdmin",
     "LaPositionAdmin",
     "SkylightArchAdmin",
+    "YelamAdmin",
 ]
