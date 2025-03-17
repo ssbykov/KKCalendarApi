@@ -10,6 +10,7 @@ from .day_info import (
 from .event import Event, DayInfoEvent
 from .user import User
 from .access_token import AccessToken
+from .event_photo import EventPhoto
 
 __all__ = [
     "BaseWithId",
@@ -24,4 +25,5 @@ __all__ = [
     "User",
     "AccessToken",
     "Base",
+    "EventPhoto",
 ]
