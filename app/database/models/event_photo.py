@@ -8,13 +8,10 @@ from . import BaseWithId
 
 
 class EventPhoto(BaseWithId):
+    storage = FileSystemStorage(path=settings.image_storage.full_path)
     __tablename__ = "event_photos"
     name: Mapped[str] = mapped_column(String(30), nullable=False)
     photo_data: Mapped[str] = mapped_column(
-        ImageType(
-            storage=FileSystemStorage(
-                path=settings.image_storage.root + settings.image_storage.storage
-            )
-        ),
+        ImageType(storage=storage),
         nullable=False,
     )

@@ -1,3 +1,6 @@
+from pathlib import Path
+from typing import Any
+
 from markupsafe import Markup
 from sqladmin import ModelView
 from starlette.requests import Request
@@ -19,6 +22,8 @@ class EventPhotoAdmin(
     name = "Фото события"
     can_edit = True
     can_delete = True
+    can_export = False
+
     column_labels = {
         "name": "Название",
         "photo_data": "Файл",
@@ -35,6 +40,9 @@ class EventPhotoAdmin(
         )
         or "",
     }
+
+    async def after_model_delete(self, model: Any, request: Request) -> None:
+        Path(model.photo_data).unlink()
 
     def is_visible(self, request: Request) -> bool:
         return self.is_superuser(request)
