@@ -23,6 +23,8 @@ class Event(BaseWithId, ToDictMixin):
     en_text: Mapped[str] = mapped_column(Text, nullable=True)
     ru_text: Mapped[str] = mapped_column(Text, nullable=True)
     link: Mapped[str] = mapped_column(nullable=True)
+    photo_id: Mapped[int] = mapped_column(ForeignKey("event_photos.id"), nullable=True)
+    photo = relationship("EventPhoto", backref=backref("event"))
     days: Mapped[list["DayInfo"]] = relationship(
         "DayInfo",
         secondary="dayinfo_events",

@@ -28,6 +28,7 @@ class EventAdmin(
         "ru_name",
         "ru_text",
         "link",
+        "photo",
     ]
     form_edit_rules = form_create_rules.copy()
 
