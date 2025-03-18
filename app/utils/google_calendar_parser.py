@@ -40,7 +40,7 @@ class GoogleCalendarParser:
         account_info = json.loads(settings.calendar.secret_file)
         self.creds = service_account.Credentials.from_service_account_info(
             account_info, scopes=SCOPES
-        )
+        )  # type: ignore
         self.service = build("calendar", "v3", credentials=self.creds)
         self.day_info_repo = DayInfoRepository(session)
         self.event_repo = EventRepository(session)
@@ -118,7 +118,7 @@ class GoogleCalendarParser:
 
         await self.day_info_repo.add_days(days_info)
 
-    async def _calendar_request(self, year: int, month: int) -> Any | None:
+    async def _calendar_request(self, year: int, month: int) -> Any:
         start_of_month = (
             datetime(year, month, 1).isoformat() + "Z"
         )  # 'Z' указывает на время UTC
@@ -142,6 +142,7 @@ class GoogleCalendarParser:
             return days_info_result.get("items", [])[:-1]
         except HttpError as error:
             logging.error(f"An error occurred: {error}")
+            return []
 
     async def load_events(self, year: int, month: int) -> None:
         await self.get_events(year, month)
@@ -149,7 +150,7 @@ class GoogleCalendarParser:
     def _events_filter(
         self, head_events: list[str], body_events: list[str]
     ) -> list[dict[str, str]]:
-        events = []
+        events: list[dict[str, str]] = []
         buffer_body_events = body_events.copy()
         for head_event in head_events:
             if head_event not in self.FILTER_WORDS:
@@ -206,7 +207,7 @@ class GoogleCalendarParser:
         return events
 
 
-async def main():
+async def main() -> None:
     async for session in db_helper.get_session():
         parser = GoogleCalendarParser(session)
         await parser.load_events(2024, 11)

@@ -2,7 +2,7 @@ from datetime import datetime
 
 import requests
 from bs4 import BeautifulSoup as bs
-from fake_headers import Headers  # type: ignore
+from fake_headers import Headers
 
 from core.context_vars import super_user_id
 from crud.days_info import DayInfoRepository

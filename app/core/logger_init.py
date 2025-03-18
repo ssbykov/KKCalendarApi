@@ -4,7 +4,7 @@ from logging.handlers import RotatingFileHandler
 from core import settings
 
 
-def init_logger():
+def init_logger() -> None:
     log_level = settings.logger.log_level
     log_file = settings.logger.filename
     numeric_level = getattr(logging, log_level.upper(), logging.ERROR)

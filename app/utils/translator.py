@@ -1,5 +1,5 @@
-import translators as ts  # type: ignore
-from fake_headers import Headers  # type: ignore
+import translators as ts
+from fake_headers import Headers
 
 
 # Текст для перевода
