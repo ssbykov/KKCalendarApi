@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Any
 
+from fastapi_storages import StorageImage
 from markupsafe import Markup
 from sqladmin import ModelView
 from starlette.requests import Request
@@ -32,13 +33,9 @@ class EventPhotoAdmin(
     column_details_list = [EventPhoto.name, EventPhoto.photo_data]
 
     column_formatters_detail = {
-        EventPhoto.photo_data: lambda model, attribute: getattr(
-            model, "photo_data", None
-        )
-        and Markup(
-            f'<img src="/{model.photo_data.lstrip(settings.image_storage.root)}" width="100" height="100">'
-        )
-        or "",
+        "photo_data": lambda model, _: (
+            Markup(photo_url(model.photo_data)) if hasattr(model, "photo_data") else ""
+        ),
     }
 
     async def after_model_delete(self, model: Any, request: Request) -> None:
@@ -49,3 +46,11 @@ class EventPhotoAdmin(
 
     def is_accessible(self, request: Request) -> bool:
         return self.is_superuser(request)
+
+
+def photo_url(model: StorageImage) -> str:
+    ratio = 100 / max(model.width, model.height)
+    return (
+        f'<img src="/{model.lstrip(settings.image_storage.root)}" '
+        f"width={model.width * ratio} height={model.height * ratio}>"
+    )
