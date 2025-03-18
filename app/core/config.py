@@ -16,6 +16,12 @@ class SqlAdmin(BaseModel):
 class ImageStorage(BaseModel):
     root: str = str(Path(__file__).resolve().parent.parent)
     storage: str = "/static/images"
+    full_path: str = root + storage
+
+
+class LoggerConfig(BaseModel):
+    filename: str = "app.log"
+    log_level: str = "ERROR"
 
 
 class RunConfig(BaseModel):
@@ -102,6 +108,7 @@ class Settings(BaseSettings):
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     image_storage: ImageStorage = ImageStorage()
+    logger: LoggerConfig = LoggerConfig()
     sql_admin: SqlAdmin
     access_token: AccessToken
     db: DbSettings
