@@ -1,9 +1,12 @@
 from typing import List, Annotated
 
 from fastapi import APIRouter, Depends
+from starlette.exceptions import HTTPException
+from starlette.responses import FileResponse
 from typing_extensions import Sequence
 
 from crud.days_info import DayInfoRepository, get_day_info_repository
+from crud.event_photos import EventPhotoRepository, get_event_photos_repository
 from database import DayInfo, DayInfoSchema
 
 router = APIRouter()
@@ -27,3 +30,11 @@ async def get_days(
     repo: Annotated[DayInfoRepository, Depends(get_day_info_repository)],
 ) -> Sequence[DayInfo] | str:
     return await repo.get_days(start_date=start_date, end_date=end_date)
+
+
+@router.get("/photos/{photo_id}", response_model=None)
+async def get_photo(
+    photo_id: int,
+    repo: Annotated[EventPhotoRepository, Depends(get_event_photos_repository)],
+) -> FileResponse | HTTPException:
+    return await repo.get_photo_by_id(photo_id=photo_id)
