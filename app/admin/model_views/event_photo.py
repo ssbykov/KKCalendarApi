@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -38,6 +39,16 @@ class EventPhotoAdmin(
         ),
     }
 
+    async def on_model_change(
+        self, data: dict, model: Any, is_created: bool, request
+    ) -> None:
+        form = await request.form()
+
+        if "photo_data" in form and not form["photo_data"].size:
+            data.pop("photo_data", None)
+
+        await super().on_model_change(data, model, is_created, request)
+
     async def after_model_delete(self, model: Any, request: Request) -> None:
         Path(model.photo_data).unlink()
 
@@ -48,9 +59,13 @@ class EventPhotoAdmin(
         return self.is_superuser(request)
 
 
-def photo_url(model: StorageImage) -> str:
-    ratio = 100 / max(model.width, model.height)
-    return (
-        f'<img src="/{model.lstrip(settings.image_storage.root)}" '
-        f"width={model.width * ratio} height={model.height * ratio}>"
-    )
+def photo_url(model: StorageImage) -> str | None:
+    try:
+        ratio = 100 / max(model.width, model.height)
+        return (
+            f'<img src="/{model.lstrip(settings.image_storage.root)}" '
+            f"width={model.width * ratio} height={model.height * ratio}>"
+        )
+    except Exception as err:
+        logging.error(f"Error: {err}")
+        return None
