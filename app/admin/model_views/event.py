@@ -42,6 +42,7 @@ class EventAdmin(
         "ru_name": "Заголовок на русском",
         "ru_text": "Описание на русском",
         "link": "Ссылка на событие",
+        "photo": "Фото события",
     }
 
     column_list = [
@@ -59,7 +60,7 @@ class EventAdmin(
 
     can_export = False
 
-    column_details_exclude_list = [Event.id, Event.user_id]
+    column_details_exclude_list = [Event.id, Event.user_id, Event.photo_id]
 
     form_ajax_refs = {
         "days": {
