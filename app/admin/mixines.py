@@ -5,7 +5,7 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
 from core.type_vars import T
-from crud.mixines import GetBackNextIdMixin, CommonMixin
+from crud.mixines import GetBackNextIdMixin
 from database import db_helper
 
 
@@ -29,21 +29,50 @@ class ActionNextBackMixin(Generic[T]):
             return referer
         async for session in db_helper.get_session():
             repo = self.repo_type(session)
-            list_query = cast(ModelView, self).list_query(request)
-            if is_next:
-                url_id = await repo.get_next_id(int(current_id), list_query)
+            model_view = cast(ModelView, self)
+            list_query = model_view.list_query(request)
+            if default_sort := self._get_sort_column(model_view.column_default_sort):
+                sort_column = default_sort.key
+                current_val = getattr(
+                    await repo.get_by_id(int(current_id)), sort_column
+                )
             else:
-                url_id = await repo.get_back_id(int(current_id), list_query)
-
+                sort_column = "id"
+                current_val = int(current_id)
+            if is_next:
+                url_id = await repo.get_next_id(
+                    current_val,
+                    list_query,
+                    sort_column=sort_column,
+                )
+            else:
+                url_id = await repo.get_back_id(
+                    current_val,
+                    list_query,
+                    sort_column=sort_column,
+                )
             if url_id:
                 last_slash_index = referer.rfind("/")
                 redirect_url = referer[: last_slash_index + 1] + str(url_id)
                 return redirect_url
         return referer
 
+    @staticmethod
+    def _get_sort_column(
+        column_default_sort: Any,
+    ) -> Any:
+        if column_default_sort:
+            if isinstance(column_default_sort, list):
+                return column_default_sort[0][0]
+            if isinstance(column_default_sort, tuple):
+                return column_default_sort[0]
+            else:
+                return column_default_sort
+        return None
+
 
 class CommonActionsMixin(Generic[T]):
-    repo_type: Type[CommonMixin[T]]
+    repo_type: Type[GetBackNextIdMixin[T]]
     model: Type[T]
 
     async def get_all(self, request: Request) -> list[Any] | None:
