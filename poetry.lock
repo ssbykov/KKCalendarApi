@@ -2634,6 +2634,18 @@ tqdm = ">=4.66.4"
 pypi = ["build (>=1.2.2)", "twine (>=6.1.0)"]
 
 [[package]]
+name = "types-pillow"
+version = "10.2.0.20240822"
+description = "Typing stubs for Pillow"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "types-Pillow-10.2.0.20240822.tar.gz", hash = "sha256:559fb52a2ef991c326e4a0d20accb3bb63a7ba8d40eb493e0ecb0310ba52f0d3"},
+    {file = "types_Pillow-10.2.0.20240822-py3-none-any.whl", hash = "sha256:d9dab025aba07aeb12fd50a6799d4eac52a9603488eca09d7662543983f16c5d"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.12.2"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -2842,4 +2854,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "9c12ce31914b194591a442c41bf021cdae598208ea99b29b69319e398a510ac3"
+content-hash = "20f7f8436797d6123c03e5731d96162e9ec85e15302bd2ea0660c8948671aea4"
