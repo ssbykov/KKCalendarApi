@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 from fastapi_storages import StorageImage
 from markupsafe import Markup
@@ -40,11 +40,11 @@ class EventPhotoAdmin(
     }
 
     async def on_model_change(
-        self, data: dict, model: Any, is_created: bool, request
+        self, data: Dict[str, Any], model: Any, is_created: bool, request: Request
     ) -> None:
         form = await request.form()
 
-        if "photo_data" in form and not form["photo_data"].size:
+        if "photo_data" in form and not getattr(form["photo_data"], "size", 0):
             data.pop("photo_data", None)
 
         await super().on_model_change(data, model, is_created, request)
