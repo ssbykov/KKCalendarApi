@@ -147,6 +147,7 @@ class EventSchema(DayDataSchema):
     ru_text: str | None = None
     link: str | None = None
     user_id: int | None
+    photo_id: int | None = None
 
 
 class EventSchemaCreate(EventSchema):
