@@ -55,6 +55,7 @@ class GoogleCalendarParser:
             for index, value in enumerate(descriptions):
                 if "ELEMENTAL COMBINATION" in value:
                     body_events.extend(descriptions[:index])
+                    break
             summary = day.get("summary").split(" ⋅ ")
             head_events = summary[1:-5].copy()
 
@@ -152,6 +153,7 @@ class GoogleCalendarParser:
     ) -> list[dict[str, str]]:
         events: list[dict[str, str]] = []
         buffer_body_events = body_events.copy()
+        len_body_events = len(body_events)
         for head_event in head_events:
             if head_event not in self.FILTER_WORDS:
                 event = {"name": head_event, "text": "", "link": ""}
@@ -175,7 +177,7 @@ class GoogleCalendarParser:
                         break
                 events.append(event)
 
-        if buffer_body_events:
+        if buffer_body_events and len(buffer_body_events) != len_body_events:
             if events:
                 events[-1]["text"] += "\n" + "\n".join(buffer_body_events)
                 for buffer_body_event in buffer_body_events:
@@ -210,7 +212,7 @@ class GoogleCalendarParser:
 async def main() -> None:
     async for session in db_helper.get_session():
         parser = GoogleCalendarParser(session)
-        await parser.load_events(2024, 11)
+        await parser.load_events(2024, 4)
 
 
 if __name__ == "__main__":
