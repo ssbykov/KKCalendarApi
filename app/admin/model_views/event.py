@@ -124,7 +124,3 @@ class EventAdmin(
         if url and not (url.startswith("http://") or url.startswith("https://")):
             return f"http://{url}"
         return url
-
-
-def formater(column: str) -> str:
-    return f'<div style="white-space: pre-wrap; word-wrap: break-word; max-width: 500px;">{column}</div>'
