@@ -17,7 +17,7 @@ class DayInfoAdmin(
     name = "Информация по дню"
     column_labels = {
         "date": "Дата",
-        "moon_day": "Лунные дни",
+        "moon_day": "Лунный день",
         "elements": "Элементы",
         "la": "Энергия Ла",
         "haircutting": "Стрижка",
@@ -25,7 +25,8 @@ class DayInfoAdmin(
         "yelam": "Йелам",
         "events": "События дня",
     }
-    column_list = [DayInfo.id, DayInfo.date, DayInfo.moon_day]
+    column_list = [DayInfo.date, DayInfo.events, DayInfo.moon_day]
+    page_size = 25
     column_searchable_list = [DayInfo.date, DayInfo.moon_day]
     column_details_list = [
         DayInfo.date,
@@ -37,6 +38,8 @@ class DayInfoAdmin(
         DayInfo.yelam,
         DayInfo.events,
     ]
+    column_default_sort = (DayInfo.date, True)
+
     can_create = False
     can_delete = False
     can_export = False
