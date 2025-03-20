@@ -5,7 +5,7 @@ from sqlalchemy import select, insert, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from crud.mixines import GetBackNextIdMixin, CommonMixin
+from crud.mixines import GetBackNextIdMixin
 from database import (
     DayInfo,
     Elements,
@@ -23,7 +23,7 @@ def get_day_info_repository(session: SessionDep) -> "DayInfoRepository":
     return DayInfoRepository(session)
 
 
-class DayInfoRepository(GetBackNextIdMixin[DayInfo], CommonMixin[DayInfo]):
+class DayInfoRepository(GetBackNextIdMixin[DayInfo]):
     session: AsyncSession
     model = DayInfo
 

@@ -1,6 +1,6 @@
-from crud.mixines import CommonMixin, GetBackNextIdMixin
-from database import SkylightArch, Yelam
+from crud.mixines import GetBackNextIdMixin
+from database import Yelam
 
 
-class YelamRepository(CommonMixin[Yelam], GetBackNextIdMixin[Yelam]):
+class YelamRepository(GetBackNextIdMixin[Yelam]):
     model = Yelam

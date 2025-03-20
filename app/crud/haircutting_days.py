@@ -1,8 +1,6 @@
-from crud.mixines import CommonMixin, GetBackNextIdMixin
+from crud.mixines import GetBackNextIdMixin
 from database import HaircuttingDay
 
 
-class HaircuttingRepository(
-    CommonMixin[HaircuttingDay], GetBackNextIdMixin[HaircuttingDay]
-):
+class HaircuttingRepository(GetBackNextIdMixin[HaircuttingDay]):
     model = HaircuttingDay

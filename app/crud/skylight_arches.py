@@ -1,8 +1,6 @@
-from crud.mixines import CommonMixin, GetBackNextIdMixin
+from crud.mixines import GetBackNextIdMixin
 from database import SkylightArch
 
 
-class SkylightArchRepository(
-    CommonMixin[SkylightArch], GetBackNextIdMixin[SkylightArch]
-):
+class SkylightArchRepository(GetBackNextIdMixin[SkylightArch]):
     model = SkylightArch

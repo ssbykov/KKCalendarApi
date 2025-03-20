@@ -1,6 +1,6 @@
-from crud.mixines import CommonMixin, GetBackNextIdMixin
+from crud.mixines import GetBackNextIdMixin
 from database import Elements
 
 
-class ElementsRepository(CommonMixin[Elements], GetBackNextIdMixin[Elements]):
+class ElementsRepository(GetBackNextIdMixin[Elements]):
     model = Elements

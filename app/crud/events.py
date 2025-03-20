@@ -1,6 +1,6 @@
 from sqlalchemy import update, func
 
-from crud.mixines import GetBackNextIdMixin, CommonMixin
+from crud.mixines import GetBackNextIdMixin
 from database import SessionDep, Event, EventSchemaCreate
 
 
@@ -8,7 +8,7 @@ def get_event_repository(session: SessionDep) -> "EventRepository":
     return EventRepository(session)
 
 
-class EventRepository(CommonMixin[Event], GetBackNextIdMixin[Event]):
+class EventRepository(GetBackNextIdMixin[Event]):
     model = Event
 
     async def get_event_by_name(self, name: str) -> Event | None:
