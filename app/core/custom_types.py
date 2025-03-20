@@ -18,7 +18,7 @@ from fastapi_storages.base import StorageImage
 from core import settings
 
 
-class ImageType(_ImageType):
+class ImageType(_ImageType):  # type: ignore[misc]
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(
             storage=FileSystemStorage(path=settings.image_storage.full_path),
