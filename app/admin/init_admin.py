@@ -65,6 +65,8 @@ class NewAdmin(Admin):
     @owner_required
     async def details(self, request: Request) -> Response:
         result = await super().details(request)
+        if isinstance(result, RedirectResponse):
+            return result
         context = result.context
         context["request"] = request
         return await self.templates.TemplateResponse(request, result.template, context)

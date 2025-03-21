@@ -1,4 +1,4 @@
-from typing import Type, Any, Generic, cast
+from typing import Type, Any, Generic, cast, Tuple
 
 from sqladmin import action, ModelView
 from starlette.requests import Request
@@ -30,10 +30,8 @@ class ActionNextBackMixin(Generic[T]):
             return referer
         async for session in db_helper.get_session():
             repo = self.repo_type(session)
-            model_view = cast(ModelView, self)
-            list_query = model_view.list_query(request)
-            if default_sort := self.get_sort_column(model_view.column_default_sort):
-                sort_column = default_sort.key
+            if column := self.get_sort_column():
+                sort_column = column[0]
                 current_val = getattr(
                     await repo.get_by_id(int(current_id)), sort_column
                 )
@@ -43,7 +41,7 @@ class ActionNextBackMixin(Generic[T]):
 
             url_id = await repo.get_adjacent_id(
                 current_val=current_val,
-                list_query=list_query,
+                list_query=cast(ModelView, self).list_query(request),
                 sort_column=sort_column,
                 is_next=is_next,
             )
@@ -54,33 +52,42 @@ class ActionNextBackMixin(Generic[T]):
                 return redirect_url
         return referer
 
-    async def get_all(self, request: Request) -> list[Any] | None:
+    async def get_count_items(self, request: Request) -> int | None:
         async for session in db_helper.get_session():
             repo = self.repo_type(session)
-            all_items = await repo.get_all()
             user = request.session.get("user")
+            conditions = []
             if hasattr(self.model, "user_id") and user and not user.get("is_superuser"):
-                user_items = [
-                    item for item in all_items if item.user_id == user.get("id")  # type: ignore
-                ]
-                return sorted(user_items, key=lambda item: item.id)
-            return list(all_items)
+                conditions.append(getattr(self.model, "user_id") == user.get("id"))
+            return await repo.get_count_items(conditions)
         return None
 
     async def get_item_position(self, request: Request) -> dict[str, int | Any]:
         async for session in db_helper.get_session():
-            print(
-                await self.repo_type(session).get_async_position(
-                    request.path_params["pk"],
-                    column="id",
+            current_id = request.path_params["pk"]
+            repo = self.repo_type(session)
+
+            if column := self.get_sort_column():
+                is_desc = column[1]
+                sort_column = column[0]
+                current_val = getattr(
+                    await repo.get_by_id(int(current_id)),
+                    sort_column,
                 )
-            )
-        all_items = await self.get_all(request)
-        if all_items and hasattr(self, "page_size"):
-            all_ids = sorted([item.id for item in all_items])
-            index = all_ids.index(int(request.path_params["pk"]))
-            list_page = len(all_ids[:index]) // self.page_size + 1
-            return {"page": list_page, "item_position": index + 1}
+            else:
+                sort_column = "id"
+                is_desc = False
+                current_val = int(current_id)
+            if (
+                position := await repo.get_async_position(
+                    target_val=current_val,
+                    column=sort_column,
+                    request=request,
+                    is_desc=is_desc,
+                )
+            ) and hasattr(self, "page_size"):
+                list_page = (position - 1) // self.page_size + 1
+                return {"page": list_page, "item_position": position}
         return {"page": 1, "item_position": 0}
 
     async def get_page_for_url(self, request: Request) -> str | None:
@@ -90,18 +97,14 @@ class ActionNextBackMixin(Generic[T]):
 
     @staticmethod
     def is_superuser(request: Request) -> bool:
-        user = request.session.get("user")
-        return isinstance(user, dict) and bool(user.get("is_superuser"))
+        return bool(request.session.get("user", {}).get("is_superuser"))
 
-    @staticmethod
-    def get_sort_column(
-        column_default_sort: Any,
-    ) -> Any:
-        if column_default_sort:
-            if isinstance(column_default_sort, list):
-                return column_default_sort[0][0]
-            if isinstance(column_default_sort, tuple):
-                return column_default_sort[0]
+    def get_sort_column(self) -> Tuple[Any, bool] | None:
+        if column := cast(ModelView, self).column_default_sort:
+            if isinstance(column, list):
+                return column[0][0].key, column[0][1]
+            if isinstance(column, tuple):
+                return column[0].key, column[1]
             else:
-                return column_default_sort
+                return column, False
         return None
