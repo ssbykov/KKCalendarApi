@@ -1,7 +1,7 @@
 from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin, CommonActionsMixin
+from admin.mixines import ActionNextBackMixin
 from crud.yelams import YelamRepository
 from database import Yelam
 
@@ -9,7 +9,6 @@ from database import Yelam
 class YelamAdmin(
     ModelView,
     ActionNextBackMixin[Yelam],
-    CommonActionsMixin[Yelam],
     model=Yelam,
 ):
     repo_type = YelamRepository

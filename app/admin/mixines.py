@@ -11,6 +11,7 @@ from database import db_helper
 
 class ActionNextBackMixin(Generic[T]):
     repo_type: Type[GetBackNextIdMixin[T]]
+    model: Type[T]
 
     @action(name="back", label="< Назад", add_in_detail=True, add_in_list=False)
     async def back_record(self, request: Request) -> RedirectResponse:
@@ -31,7 +32,7 @@ class ActionNextBackMixin(Generic[T]):
             repo = self.repo_type(session)
             model_view = cast(ModelView, self)
             list_query = model_view.list_query(request)
-            if default_sort := self._get_sort_column(model_view.column_default_sort):
+            if default_sort := self.get_sort_column(model_view.column_default_sort):
                 sort_column = default_sort.key
                 current_val = getattr(
                     await repo.get_by_id(int(current_id)), sort_column
@@ -57,24 +58,6 @@ class ActionNextBackMixin(Generic[T]):
                 return redirect_url
         return referer
 
-    @staticmethod
-    def _get_sort_column(
-        column_default_sort: Any,
-    ) -> Any:
-        if column_default_sort:
-            if isinstance(column_default_sort, list):
-                return column_default_sort[0][0]
-            if isinstance(column_default_sort, tuple):
-                return column_default_sort[0]
-            else:
-                return column_default_sort
-        return None
-
-
-class CommonActionsMixin(Generic[T]):
-    repo_type: Type[GetBackNextIdMixin[T]]
-    model: Type[T]
-
     async def get_all(self, request: Request) -> list[Any] | None:
         async for session in db_helper.get_session():
             repo = self.repo_type(session)
@@ -89,6 +72,13 @@ class CommonActionsMixin(Generic[T]):
         return None
 
     async def get_item_position(self, request: Request) -> dict[str, int | Any]:
+        async for session in db_helper.get_session():
+            print(
+                await self.repo_type(session).get_async_position(
+                    request.path_params["pk"],
+                    column="id",
+                )
+            )
         all_items = await self.get_all(request)
         if all_items and hasattr(self, "page_size"):
             all_ids = sorted([item.id for item in all_items])
@@ -106,3 +96,16 @@ class CommonActionsMixin(Generic[T]):
     def is_superuser(request: Request) -> bool:
         user = request.session.get("user")
         return isinstance(user, dict) and bool(user.get("is_superuser"))
+
+    @staticmethod
+    def get_sort_column(
+        column_default_sort: Any,
+    ) -> Any:
+        if column_default_sort:
+            if isinstance(column_default_sort, list):
+                return column_default_sort[0][0]
+            if isinstance(column_default_sort, tuple):
+                return column_default_sort[0]
+            else:
+                return column_default_sort
+        return None

@@ -1,7 +1,7 @@
 from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin, CommonActionsMixin
+from admin.mixines import ActionNextBackMixin
 from crud.days_info import DayInfoRepository
 from database import DayInfo
 
@@ -9,7 +9,6 @@ from database import DayInfo
 class DayInfoAdmin(
     ModelView,
     ActionNextBackMixin[DayInfo],
-    CommonActionsMixin[DayInfo],
     model=DayInfo,
 ):
     repo_type = DayInfoRepository

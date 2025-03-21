@@ -1,7 +1,7 @@
 from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin, CommonActionsMixin
+from admin.mixines import ActionNextBackMixin
 from crud.haircutting_days import HaircuttingRepository
 from database import HaircuttingDay
 
@@ -9,7 +9,6 @@ from database import HaircuttingDay
 class HaircuttingAdmin(
     ModelView,
     ActionNextBackMixin[HaircuttingDay],
-    CommonActionsMixin[HaircuttingDay],
     model=HaircuttingDay,
 ):
     repo_type = HaircuttingRepository

@@ -1,7 +1,7 @@
 from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin, CommonActionsMixin
+from admin.mixines import ActionNextBackMixin
 from crud.la_positions import LaPositionRepository
 from database import LaPosition
 
@@ -9,7 +9,6 @@ from database import LaPosition
 class LaPositionAdmin(
     ModelView,
     ActionNextBackMixin[LaPosition],
-    CommonActionsMixin[LaPosition],
     model=LaPosition,
 ):
     repo_type = LaPositionRepository

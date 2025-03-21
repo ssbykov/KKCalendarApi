@@ -1,7 +1,7 @@
 from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin, CommonActionsMixin
+from admin.mixines import ActionNextBackMixin
 from crud.elements import ElementsRepository
 from database import Elements
 
@@ -9,7 +9,6 @@ from database import Elements
 class ElementsAdmin(
     ModelView,
     ActionNextBackMixin[Elements],
-    CommonActionsMixin[Elements],
     model=Elements,
 ):
     repo_type = ElementsRepository
