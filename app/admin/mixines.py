@@ -40,18 +40,14 @@ class ActionNextBackMixin(Generic[T]):
             else:
                 sort_column = "id"
                 current_val = int(current_id)
-            if is_next:
-                url_id = await repo.get_next_id(
-                    current_val,
-                    list_query,
-                    sort_column=sort_column,
-                )
-            else:
-                url_id = await repo.get_back_id(
-                    current_val,
-                    list_query,
-                    sort_column=sort_column,
-                )
+
+            url_id = await repo.get_adjacent_id(
+                current_val=current_val,
+                list_query=list_query,
+                sort_column=sort_column,
+                is_next=is_next,
+            )
+
             if url_id:
                 last_slash_index = referer.rfind("/")
                 redirect_url = referer[: last_slash_index + 1] + str(url_id)

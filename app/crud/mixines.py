@@ -7,7 +7,7 @@ from typing import (
     Generic,
 )
 
-from sqlalchemy import select, Select
+from sqlalchemy import select, Select, String, func, Integer, Boolean, Date, DateTime
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.type_vars import T
@@ -25,20 +25,22 @@ class GetBackNextIdMixin(ABC, Generic[T]):
         self.session = session
         self.main_stmt = select(self.model)
 
-    async def get_next_id(
-        self, current_val: int | str, list_query: Select[Any], sort_column: str = "id"
-    ) -> Optional[int]:
-
-        column = getattr(self.model, sort_column)
-        stmt = list_query.where(column > current_val).order_by(column.asc()).limit(1)
-        result = await self.session.scalar(stmt)
-        return result.id if result else None
-
-    async def get_back_id(
-        self, current_val: int | str, list_query: Select[Any], sort_column: str = "id"
+    async def get_adjacent_id(
+        self,
+        current_val: int | str,
+        list_query: Select[Any],
+        sort_column: str = "id",
+        is_next: bool = True,
     ) -> Optional[int]:
         column = getattr(self.model, sort_column)
-        stmt = list_query.where(column < current_val).order_by(column.desc()).limit(1)
+
+        condition, order_by = (
+            (column > current_val, column.asc())
+            if is_next
+            else (column < current_val, column.desc())
+        )
+        stmt = list_query.where(condition).order_by(order_by).limit(1)
+
         result = await self.session.scalar(stmt)
         return result.id if result else None
 
