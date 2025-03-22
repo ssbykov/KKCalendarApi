@@ -10,6 +10,7 @@ from .models import (
     Event,
     AccessToken,
     DayInfoEvent,
+    EventType,
 )
 from .db import db_helper, init_data, SessionDep
 
@@ -40,6 +41,7 @@ __all__ = [
     "Elements",
     "SkylightArch",
     "Event",
+    "EventType",
     "AccessToken",
     "DayInfo",
     "YelamSchema",

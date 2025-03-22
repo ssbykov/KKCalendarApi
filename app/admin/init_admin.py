@@ -21,6 +21,7 @@ from .model_views import (
     SkylightArchAdmin,
     YelamAdmin,
     EventPhotoAdmin,
+    EventTypeAdmin,
 )
 
 
@@ -40,6 +41,7 @@ async def init_admin(app: Any) -> None:
     admin.add_view(SkylightArchAdmin)
     admin.add_view(YelamAdmin)
     admin.add_view(EventPhotoAdmin)
+    admin.add_view(EventTypeAdmin)
     assert isinstance(admin.authentication_backend, AdminAuth)
     await admin.authentication_backend.create_superuser()
 

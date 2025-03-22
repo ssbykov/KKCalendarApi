@@ -6,6 +6,7 @@ from .la_position import LaPositionAdmin
 from .skylight_arch import SkylightArchAdmin
 from .yelam import YelamAdmin
 from .event_photo import EventPhotoAdmin
+from .event_type import EventTypeAdmin
 
 __all__ = [
     "EventAdmin",
@@ -16,4 +17,5 @@ __all__ = [
     "SkylightArchAdmin",
     "YelamAdmin",
     "EventPhotoAdmin",
+    "EventTypeAdmin",
 ]
