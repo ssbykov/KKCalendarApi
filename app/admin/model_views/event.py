@@ -56,6 +56,9 @@ class EventAdmin(
         )
         or "",
     }
+    detail_columns_counts = {
+        "days": {"count": 4, "width": 200},
+    }
 
     can_export = False
 

@@ -24,10 +24,15 @@
                         {% if name in model_view._relation_names %}
                         {% if is_list( value ) %}
                         <td>
-                            {% for elem, formatted_elem in zip(value, formatted_value) %}
-                            <a href="{{ model_view._build_url_for('admin:details', request, elem) }}">{{ formatted_elem
-                                }}<br></a>
-                            {% endfor %}
+                            {% set columns = model_view.get_detail_columns_count(name) %}
+                                  <div style="display: grid; grid-template-columns: repeat({{ columns.count }}, {{ columns.width }}px); gap: 10px;">
+                                {% for elem, formatted_elem in zip(value, formatted_value) %}
+                                <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    <a href="{{ model_view._build_url_for('admin:details', request, elem) }}">{{
+                                        formatted_elem }}</a>
+                                </div>
+                                {% endfor %}
+                            </div>
                         </td>
                         {% else %}
                         <td><a href="{{ model_view._url_for_details_with_prop(request, model, name) }}">{{

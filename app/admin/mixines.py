@@ -12,6 +12,7 @@ from database import db_helper
 class ActionNextBackMixin(Generic[T]):
     repo_type: Type[GetBackNextIdMixin[T]]
     model: Type[T]
+    detail_columns_counts: dict[str, dict[str, int]] = {}
 
     @action(name="back", label="< Назад", add_in_detail=True, add_in_list=False)
     async def back_record(self, request: Request) -> RedirectResponse:
@@ -108,3 +109,9 @@ class ActionNextBackMixin(Generic[T]):
             else:
                 return column, False
         return None
+
+    def get_detail_columns_count(self, name: str) -> dict[str, int]:
+        return self.detail_columns_counts.get(
+            name,
+            {"count": 1, "width": 500},
+        )
