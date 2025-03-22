@@ -38,6 +38,7 @@ class DayInfoAdmin(
         DayInfo.events,
     ]
     column_default_sort = (DayInfo.date, True)
+    column_sortable_list = [DayInfo.date]
 
     can_create = False
     can_delete = False
