@@ -93,7 +93,7 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo]):
         )
 
     async def get_yelam_day_id(self, moon: str) -> int:
-        month = moon[:-1] if len(moon) == 3 else moon
+        month = moon[:-1] if not moon[-1].isdigit() else moon
         return await self._get_id(self.session, Yelam, Yelam.month == int(month))
 
     async def get_arch_id(self, moon_day: str) -> int:
