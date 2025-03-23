@@ -1,12 +1,18 @@
-from typing import Type, TYPE_CHECKING
+from typing import Type
 
-from pydantic import Field
+from pydantic import Field, BaseModel
 
-from database import Event
+from database import Event, BaseWithId
 from .base_schema import BaseSchema
 
-if TYPE_CHECKING:
-    from database import BaseWithId
+
+class EventTypeSchema(BaseModel):
+    id: int
+    name: str
+    description: str | None = None
+
+    class Config:
+        from_attributes = True
 
 
 class EventSchema(BaseSchema):
@@ -17,12 +23,16 @@ class EventSchema(BaseSchema):
     en_text: str | None = None
     ru_text: str | None = None
     link: str | None = None
-    user_id: int | None
     photo_id: int | None = None
-    type_id: int | None = None
+    type: EventTypeSchema | None = None
+
+    class Config:
+        from_attributes = True
 
 
 class EventSchemaCreate(EventSchema):
     base_class: Type["BaseWithId"] = Field(default=Event, exclude=True)
+    user_id: int | None
+    type_id: int | None = None
 
     model_config = {"from_attributes": True}
