@@ -4,13 +4,13 @@ from .day_info import (
     LaSchema,
     ArchSchema,
     ElementsSchema,
-    DayDataSchema,
     DayInfoSchema,
     DayInfoSchemaCreate,
     EventSchema,
     EventSchemaCreate,
 )
 
+from .base_schema import BaseSchema
 
 __all__ = [
     "YelamSchema",
@@ -20,7 +20,7 @@ __all__ = [
     "ElementsSchema",
     "EventSchema",
     "EventSchemaCreate",
-    "DayDataSchema",
+    "BaseSchema",
     "DayInfoSchema",
     "DayInfoSchemaCreate",
 ]

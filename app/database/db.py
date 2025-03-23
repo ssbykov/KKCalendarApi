@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from core import settings
 from .models import *
 from .schemas import (
-    DayDataSchema,
+    BaseSchema,
     ArchSchema,
     ElementsSchema,
     HaircuttingSchema,
@@ -45,7 +45,7 @@ class DbHelper:
     async def _init_model(
         session: AsyncSession,
         model_class: Type[BaseWithId],
-        schema_class: Type[DayDataSchema],
+        schema_class: Type[BaseSchema],
     ) -> None:
         result = await session.execute(select(func.count()).select_from(model_class))
         count = result.scalar()

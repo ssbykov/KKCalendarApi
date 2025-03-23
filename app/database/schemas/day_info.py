@@ -15,29 +15,10 @@ from database import (
     DayInfo,
     Event,
 )
+from database.schemas.base_schema import BaseSchema
 
 
-class DayDataSchema(BaseModel):
-    """
-    Базовый класс для схем, которые могут быть преобразованы в ORM-модели.
-    """
-
-    base_class: Type[BaseWithId] = Field(default=BaseWithId, exclude=True)
-
-    def to_orm(self) -> BaseWithId:
-        """
-        Преобразует схему в ORM-модель.
-        """
-        column_names = list(self.base_class.__table__.columns.keys())
-        column_names.remove("id")
-        if sorted(column_names) == sorted(list(self.model_dump().keys())):
-            return self.base_class(**self.model_dump())
-        raise ValueError(
-            "Параметры model_class не соответствуют параметрам базового класса."
-        )
-
-
-class YelamSchema(DayDataSchema):
+class YelamSchema(BaseSchema):
     month: int = Field(ge=0, le=12)
     en_name: str = Field(max_length=20)
     ru_name: str = Field(max_length=20)
@@ -46,7 +27,7 @@ class YelamSchema(DayDataSchema):
     model_config = {"from_attributes": True}
 
 
-class HaircuttingSchema(DayDataSchema):
+class HaircuttingSchema(BaseSchema):
     moon_day: int = Field(ge=0, le=30)
     en_name: str = Field(max_length=100)
     ru_name: str = Field(max_length=100)
@@ -56,7 +37,7 @@ class HaircuttingSchema(DayDataSchema):
     model_config = {"from_attributes": True}
 
 
-class LaSchema(DayDataSchema):
+class LaSchema(BaseSchema):
     moon_day: int = Field(ge=0, le=30)
     en_name: str = Field(max_length=40)
     ru_name: str = Field(max_length=40)
@@ -65,7 +46,7 @@ class LaSchema(DayDataSchema):
     model_config = {"from_attributes": True}
 
 
-class ArchSchema(DayDataSchema):
+class ArchSchema(BaseSchema):
     moon_day: int = Field(ge=0, le=9)
     name: str = Field(max_length=10)
     en_desc: str = Field(max_length=100)
@@ -75,7 +56,7 @@ class ArchSchema(DayDataSchema):
     model_config = {"from_attributes": True}
 
 
-class ElementsSchema(DayDataSchema):
+class ElementsSchema(BaseSchema):
     en_name: str = Field(max_length=100)
     ru_name: str = Field(max_length=100)
     ru_text: str
@@ -100,7 +81,7 @@ class DayInfoSchema(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class DayInfoSchemaCreate(DayDataSchema):
+class DayInfoSchemaCreate(BaseSchema):
     date: str
     moon_day: str
     elements_id: int
@@ -138,7 +119,7 @@ class DayInfoSchemaCreate(DayDataSchema):
         return value
 
 
-class EventSchema(DayDataSchema):
+class EventSchema(BaseSchema):
     name: str
     moon_day: str | None = None
     en_name: str

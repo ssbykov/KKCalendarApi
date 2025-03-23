@@ -49,10 +49,7 @@ class EventAdmin(
         "emoji": "Эмодзи",
     }
 
-    column_list = [
-        Event.name,
-        Event.ru_name,
-    ]
+    column_list = ["emoji", "type", "ru_name"]
     column_searchable_list = [Event.en_name, Event.ru_name]
     column_formatters_detail = {
         Event.link: lambda model, attribute: getattr(model, "link", None)
