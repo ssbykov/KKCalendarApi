@@ -30,6 +30,7 @@ class EventAdmin(
         "link",
         "photo",
         "type",
+        "emoji",
     ]
     form_edit_rules = form_create_rules.copy()
 
@@ -45,6 +46,7 @@ class EventAdmin(
         "link": "Ссылка на событие",
         "photo": "Фото события",
         "type": "Тип события",
+        "emoji": "Эмодзи",
     }
 
     column_list = [
@@ -70,6 +72,7 @@ class EventAdmin(
         Event.user_id,
         Event.photo_id,
         Event.type_id,
+        Event.emoji_id,
     ]
 
     form_ajax_refs = {

@@ -27,6 +27,8 @@ class Event(BaseWithId, ToDictMixin):
     photo = relationship("EventPhoto", backref=backref("event"))
     type_id: Mapped[int] = mapped_column(ForeignKey("event_types.id"), nullable=True)
     type = relationship("EventType", backref=backref("events"))
+    emoji_id: Mapped[int] = mapped_column(ForeignKey("emoji.id"), nullable=True)
+    emoji = relationship("Emoji", backref=backref("events"))
     days: Mapped[list["DayInfo"]] = relationship(
         "DayInfo",
         secondary="dayinfo_events",

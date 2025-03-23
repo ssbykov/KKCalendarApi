@@ -12,15 +12,15 @@ class EmojiAdmin(
     model=Emoji,
 ):
     repo_type = EmojiRepository
-    name_plural = "Эмоджи"
-    name = "Эмоджи"
+    name_plural = "Эмодзи"
+    name = "Эмодзи"
     column_list = ["name", "emoji"]
     column_details_exclude_list = [
         Emoji.id,
     ]
     column_labels = {
         "name": "Название",
-        "emoji": "Эмоджи",
+        "emoji": "Эмодзи",
     }
     can_edit = True
     can_delete = True
