@@ -1,8 +1,12 @@
-from typing import Type
+from typing import Type, TYPE_CHECKING
 
 from pydantic import Field
 
-from database import BaseSchema, Event, BaseWithId
+from database import Event
+from .base_schema import BaseSchema
+
+if TYPE_CHECKING:
+    from database import BaseWithId
 
 
 class EventSchema(BaseSchema):

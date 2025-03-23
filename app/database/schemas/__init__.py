@@ -7,10 +7,11 @@ from .day_info import (
     DayInfoSchema,
     DayInfoSchemaCreate,
     EventSchema,
-    EventSchemaCreate,
+    # EventSchemaCreate,
 )
 
 from .base_schema import BaseSchema
+from .event import EventSchemaCreate
 
 __all__ = [
     "YelamSchema",
