@@ -37,6 +37,7 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo]):
             selectinload(self.model.la),
             selectinload(self.model.yelam),
             selectinload(self.model.haircutting),
+            selectinload(self.model.events).joinedload(Event.emoji),
             selectinload(self.model.events).joinedload(Event.type),
         )
 
