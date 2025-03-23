@@ -14,11 +14,15 @@ class EventTypeAdmin(
     repo_type = EventTypeRepository
     name_plural = "Типы событий"
     name = "Тип события"
-    column_list = ["ru_name", "rank"]
+    column_list = ["name", "rank"]
+    column_details_exclude_list = [
+        EventType.id,
+    ]
     column_labels = {
-        "ru_name": "Название",
-        "ru_desc": "Описание",
+        "name": "Название",
+        "desc": "Описание",
         "rank": "Ранг",
+        "events": "Cобытия",
     }
     can_edit = True
     can_delete = True

@@ -45,12 +45,12 @@ class Event(BaseWithId, ToDictMixin):
 
 class EventType(BaseWithId):
     __tablename__ = "event_types"
-    ru_name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
-    ru_desc: Mapped[str] = mapped_column(String(100), nullable=True)
+    name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
+    desc: Mapped[str] = mapped_column(String(100), nullable=True)
     rank: Mapped[int] = mapped_column(Integer, nullable=False)
 
     def __str__(self) -> str:
-        return self.ru_name
+        return self.name
 
 
 class DayInfoEvent(BaseWithId):
