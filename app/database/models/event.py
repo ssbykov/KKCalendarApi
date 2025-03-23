@@ -17,7 +17,7 @@ class Event(BaseWithId, ToDictMixin):
     __tablename__ = "events"
 
     name: Mapped[str] = mapped_column(nullable=False, unique=True)
-    moon_day: Mapped[str] = mapped_column(String(10), nullable=True)
+    moon_day: Mapped[str] = mapped_column(String(20), nullable=True)
     en_name: Mapped[str] = mapped_column(nullable=False)
     ru_name: Mapped[str] = mapped_column(nullable=False)
     en_text: Mapped[str] = mapped_column(Text, nullable=True)
@@ -25,9 +25,12 @@ class Event(BaseWithId, ToDictMixin):
     link: Mapped[str] = mapped_column(nullable=True)
     photo_id: Mapped[int] = mapped_column(ForeignKey("event_photos.id"), nullable=True)
     photo = relationship("EventPhoto", backref=backref("event"))
+    type_id: Mapped[int] = mapped_column(ForeignKey("event_types.id"), nullable=True)
+    type = relationship("EventType", backref=backref("events"))
     days: Mapped[list["DayInfo"]] = relationship(
         "DayInfo",
         secondary="dayinfo_events",
+        order_by="DayInfo.date",
         back_populates="events",
     )
     user_id: Mapped[int] = mapped_column(

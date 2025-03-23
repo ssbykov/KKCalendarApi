@@ -21,6 +21,7 @@ class EventAdmin(
     name = "Событие"
     form_create_rules = [
         "days",
+        "moon_day",
         "name",
         "en_name",
         "en_text",
@@ -28,6 +29,7 @@ class EventAdmin(
         "ru_text",
         "link",
         "photo",
+        "type",
     ]
     form_edit_rules = form_create_rules.copy()
 
@@ -42,6 +44,7 @@ class EventAdmin(
         "ru_text": "Описание на русском",
         "link": "Ссылка на событие",
         "photo": "Фото события",
+        "type": "Тип события",
     }
 
     column_list = [
@@ -62,7 +65,12 @@ class EventAdmin(
 
     can_export = False
 
-    column_details_exclude_list = [Event.id, Event.user_id, Event.photo_id]
+    column_details_exclude_list = [
+        Event.id,
+        Event.user_id,
+        Event.photo_id,
+        Event.type_id,
+    ]
 
     form_ajax_refs = {
         "days": {
