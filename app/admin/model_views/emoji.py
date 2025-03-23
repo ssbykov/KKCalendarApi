@@ -2,27 +2,25 @@ from sqladmin import ModelView
 from starlette.requests import Request
 
 from admin.mixines import ActionNextBackMixin
-from crud.event_type import EventTypeRepository
-from database.models import EventType
+from crud.emoji import EmojiRepository
+from database.models import Emoji
 
 
-class EventTypeAdmin(
+class EmojiAdmin(
     ModelView,
-    ActionNextBackMixin[EventType],
-    model=EventType,
+    ActionNextBackMixin[Emoji],
+    model=Emoji,
 ):
-    repo_type = EventTypeRepository
-    name_plural = "Типы событий"
-    name = "Тип события"
-    column_list = ["name", "rank"]
+    repo_type = EmojiRepository
+    name_plural = "Эмоджи"
+    name = "Эмоджи"
+    column_list = ["name", "emoji"]
     column_details_exclude_list = [
-        EventType.id,
+        Emoji.id,
     ]
     column_labels = {
         "name": "Название",
-        "desc": "Описание",
-        "rank": "Ранг",
-        "events": "Cобытия",
+        "emoji": "Эмоджи",
     }
     can_edit = True
     can_delete = True
