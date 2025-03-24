@@ -1,14 +1,14 @@
 from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin
+from admin.mixines import CustomNavMixin
 from crud.days_info import DayInfoRepository
 from database import DayInfo
 
 
 class DayInfoAdmin(
     ModelView,
-    ActionNextBackMixin[DayInfo],
+    CustomNavMixin[DayInfo],
     model=DayInfo,
 ):
     repo_type = DayInfoRepository

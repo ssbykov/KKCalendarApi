@@ -1,14 +1,14 @@
 from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin
+from admin.mixines import CustomNavMixin
 from crud.la_positions import LaPositionRepository
 from database import LaPosition
 
 
 class LaPositionAdmin(
     ModelView,
-    ActionNextBackMixin[LaPosition],
+    CustomNavMixin[LaPosition],
     model=LaPosition,
 ):
     repo_type = LaPositionRepository

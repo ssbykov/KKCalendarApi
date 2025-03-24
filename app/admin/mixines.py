@@ -9,7 +9,7 @@ from crud.mixines import GetBackNextIdMixin
 from database import db_helper
 
 
-class ActionNextBackMixin(Generic[T]):
+class CustomNavMixin(Generic[T]):
     repo_type: Type[GetBackNextIdMixin[T]]
     model: Type[T]
     detail_columns_counts: dict[str, dict[str, int]] = {}

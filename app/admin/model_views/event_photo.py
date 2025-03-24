@@ -7,7 +7,7 @@ from markupsafe import Markup
 from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin
+from admin.mixines import CustomNavMixin
 from core import settings
 from crud.event_photos import EventPhotoRepository
 from database.models import EventPhoto
@@ -15,7 +15,7 @@ from database.models import EventPhoto
 
 class EventPhotoAdmin(
     ModelView,
-    ActionNextBackMixin[EventPhoto],
+    CustomNavMixin[EventPhoto],
     model=EventPhoto,
 ):
     repo_type = EventPhotoRepository

@@ -1,14 +1,14 @@
 from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin
+from admin.mixines import CustomNavMixin
 from crud.emoji import EmojiRepository
 from database.models import Emoji
 
 
 class EmojiAdmin(
     ModelView,
-    ActionNextBackMixin[Emoji],
+    CustomNavMixin[Emoji],
     model=Emoji,
 ):
     repo_type = EmojiRepository

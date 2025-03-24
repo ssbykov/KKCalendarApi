@@ -1,14 +1,14 @@
 from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin
+from admin.mixines import CustomNavMixin
 from crud.haircutting_days import HaircuttingRepository
 from database import HaircuttingDay
 
 
 class HaircuttingAdmin(
     ModelView,
-    ActionNextBackMixin[HaircuttingDay],
+    CustomNavMixin[HaircuttingDay],
     model=HaircuttingDay,
 ):
     repo_type = HaircuttingRepository

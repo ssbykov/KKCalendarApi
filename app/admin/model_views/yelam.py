@@ -1,14 +1,14 @@
 from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin
+from admin.mixines import CustomNavMixin
 from crud.yelams import YelamRepository
 from database import Yelam
 
 
 class YelamAdmin(
     ModelView,
-    ActionNextBackMixin[Yelam],
+    CustomNavMixin[Yelam],
     model=Yelam,
 ):
     repo_type = YelamRepository

@@ -1,14 +1,14 @@
 from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin
+from admin.mixines import CustomNavMixin
 from crud.event_type import EventTypeRepository
 from database.models import EventType
 
 
 class EventTypeAdmin(
     ModelView,
-    ActionNextBackMixin[EventType],
+    CustomNavMixin[EventType],
     model=EventType,
 ):
     repo_type = EventTypeRepository

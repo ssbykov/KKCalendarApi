@@ -6,14 +6,14 @@ from sqlalchemy import Select, select, func
 from sqlalchemy.orm import selectinload
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin
+from admin.mixines import CustomNavMixin
 from crud.events import EventRepository
 from database import Event, db_helper
 
 
 class EventAdmin(
     ModelView,
-    ActionNextBackMixin[Event],
+    CustomNavMixin[Event],
     model=Event,
 ):
     repo_type = EventRepository

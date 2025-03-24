@@ -1,14 +1,14 @@
 from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import ActionNextBackMixin
+from admin.mixines import CustomNavMixin
 from crud.elements import ElementsRepository
 from database import Elements
 
 
 class ElementsAdmin(
     ModelView,
-    ActionNextBackMixin[Elements],
+    CustomNavMixin[Elements],
     model=Elements,
 ):
     repo_type = ElementsRepository
