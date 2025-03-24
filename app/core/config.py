@@ -6,6 +6,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
+ROOT: str = str(Path(__file__).resolve().parent.parent)
+
 
 class SqlAdmin(BaseModel):
     templates: str
@@ -14,7 +16,7 @@ class SqlAdmin(BaseModel):
 
 
 class ImageStorage(BaseModel):
-    root: str = str(Path(__file__).resolve().parent.parent)
+    root: str = ROOT
     storage: str = "/static/images"
     full_path: str = root + storage
 
@@ -81,6 +83,7 @@ class DbSettings(BaseSettings):
     host: str
     port: int
     database: str
+    backups_dir: str = ROOT + "/.backups/"
 
     @property
     def url(self) -> PostgresDsn:
