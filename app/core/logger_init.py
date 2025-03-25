@@ -4,9 +4,8 @@ from logging.handlers import RotatingFileHandler
 from core import settings
 
 
-def init_logger() -> None:
+def init_logger(log_file: str = settings.logger.filename) -> None:
     log_level = settings.logger.log_level
-    log_file = settings.logger.filename
     numeric_level = getattr(logging, log_level.upper(), logging.ERROR)
     handler = RotatingFileHandler(
         log_file, maxBytes=1 * 1024 * 1024, backupCount=1  # 5 MB, 3 backup files
