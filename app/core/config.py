@@ -77,6 +77,10 @@ class CalendarSettings(BaseModel):
     calendar_id: str
 
 
+class YandexDiskSettings(BaseModel):
+    token: str
+
+
 class DbSettings(BaseSettings):
     user: str
     password: str
@@ -118,6 +122,7 @@ class Settings(BaseSettings):
     super_user: SuperUser
     email: EmailSettings
     calendar: CalendarSettings
+    yandex_disk: YandexDiskSettings
 
 
 # noinspection PyArgumentList
