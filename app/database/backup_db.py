@@ -15,19 +15,22 @@ def generate_dump_name(db_name: str) -> str:
     return f"{db_name}_backup_{timestamp}.dump"
 
 
-async def create_database_dump():
+async def create_database_dump() -> str:
     db = settings.db
     file_name = generate_dump_name(db.database)
     dump_file = os.path.join(db.backups_dir, file_name)  # Используем os.path.join
 
     # Создаем pgpass файл
     if os.name == "nt":  # Windows
-        pgpass_path = os.path.join(os.getenv("APPDATA"), "postgresql", "pgpass.conf")
+        pgpass_path = os.path.join(
+            os.getenv("APPDATA", ""), "postgresql", "pgpass.conf"
+        )
         os.makedirs(os.path.dirname(pgpass_path), exist_ok=True)
     else:  # Linux/macOS
         pgpass_path = os.path.expanduser("~/.pgpass")
 
     try:
+
         # Записываем пароль в pgpass
         with open(pgpass_path, "w") as f:
             f.write(f"{db.host}:{db.port}:{db.database}:{db.user}:{db.password}\n")
@@ -55,19 +58,15 @@ async def create_database_dump():
         env = os.environ.copy()
         env["PGPASSFILE"] = pgpass_path
 
-        process = await asyncio.create_subprocess_exec(
-            *cmd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        loop = asyncio.get_running_loop()
+        process = await loop.run_in_executor(
+            None, lambda: subprocess.run(cmd, env=env, capture_output=True, text=True)
         )
-
-        # Ждем завершения процесса
-        stdout, stderr = await process.communicate()
 
         # Проверяем статус
         if process.returncode != 0:
-            logging.error(f"Ошибка дампа: {stderr.decode('utf-8')}")
-            raise subprocess.CalledProcessError(
-                process.returncode, cmd, output=stdout, stderr=stderr
-            )
+            logging.error(f"Ошибка дампа: {process.stderr}")
+            raise subprocess.CalledProcessError(process.returncode, cmd)
 
     finally:
         # Удаляем pgpass файл
@@ -82,7 +81,7 @@ async def create_database_dump():
 class YaDisk:
     API_URL = "https://cloud-api.yandex.net/v1/disk/resources"
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.token = settings.yandex_disk.token
         self.headers = {
             "Content-Type": "application/json",
@@ -90,7 +89,7 @@ class YaDisk:
         }
         self.folder_name = "db_backup"
 
-    async def _create_folder(self, session: aiohttp.ClientSession):
+    async def _create_folder(self, session: aiohttp.ClientSession) -> None:
         try:
             async with session.put(
                 self.API_URL, headers=self.headers, params={"path": self.folder_name}
@@ -100,7 +99,9 @@ class YaDisk:
         except Exception as e:
             logging.error(f"Ошибка при создании папки на Яндекс.Диске: {e}")
 
-    async def get_upload_url(self, session: aiohttp.ClientSession, file_name: str):
+    async def get_upload_url(
+        self, session: aiohttp.ClientSession, file_name: str
+    ) -> str | None:
         upload_url = self.API_URL + "/upload"
         params = {"path": f"{self.folder_name}/{file_name}", "overwrite": "true"}
         try:
@@ -110,17 +111,17 @@ class YaDisk:
                 if response.status != 200:
                     raise Exception(f"Статус: {response.status}")
                 data = await response.json()
-                return data["href"]
+                return str(data.get("href", ""))
         except Exception as e:
             logging.error(f"Ошибка при получении ссылки для загрузки файла: {e}")
             return None
 
-    async def copy_photos_to_disk(self, file_name: str):
+    async def copy_photos_to_disk(self, file_name: str) -> None:
         async with aiohttp.ClientSession() as session:
             await self._create_folder(session)
             upload_url = await self.get_upload_url(session, file_name)
             if not upload_url:
-                return
+                return None
 
             file_path = os.path.join(settings.db.backups_dir, file_name)
             try:
@@ -133,12 +134,13 @@ class YaDisk:
                 logging.error(f"Ошибка при загрузке файла: {e}")
 
 
-async def main():
+async def create_backup() -> str | None:
     init_logger(log_file="backup.log")
-    dump_file = await create_database_dump()
-    yadisk = YaDisk()
-    await yadisk.copy_photos_to_disk(dump_file)
+    if dump_file := await create_database_dump():
+        yadisk = YaDisk()
+        await yadisk.copy_photos_to_disk(dump_file)
+    return dump_file
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(create_backup())

@@ -6,12 +6,10 @@ from .day_info import (
     ElementsSchema,
     DayInfoSchema,
     DayInfoSchemaCreate,
-    EventSchema,
-    # EventSchemaCreate,
 )
 
 from .base_schema import BaseSchema
-from .event import EventSchemaCreate
+from .event import EventSchemaCreate, EventSchema
 
 __all__ = [
     "YelamSchema",

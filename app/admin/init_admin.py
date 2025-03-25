@@ -11,6 +11,7 @@ from starlette.responses import Response, RedirectResponse
 from core import settings
 from crud.days_info import DayInfoRepository
 from database import db_helper, DayInfo
+from database.backup_db import create_backup
 from .backend import AdminAuth, owner_required
 from .model_views import (
     EventAdmin,
@@ -181,6 +182,12 @@ class NewAdmin(Admin):
         identity = request.path_params["identity"]
         model_view = self._find_model_view(identity)
 
+        if isinstance(model_view, BackupDbAdmin):
+            file_name = await create_backup()
+            await model_view.insert_model(request, {"name": file_name})
+            url = request.url_for("admin:list", identity=identity)
+            return RedirectResponse(url=url, status_code=302)
+
         Form = await model_view.scaffold_form(model_view._form_create_rules)
         form_data = await self._handle_form_data(request)
         form = Form(form_data)
@@ -208,15 +215,15 @@ class NewAdmin(Admin):
                 elif await filter_past_days_by_id(form_data_dict.get("days", [])):
                     context["error"] = "Нельзя добавить прошедшие даты"
 
-            if context.get("error"):
-                form_data_dict["days"] = []
-                form.process(**form_data_dict)
-                return await self.templates.TemplateResponse(
-                    request,
-                    context["model_view"].create_template,
-                    context,
-                    status_code=400,
-                )
+                if context.get("error"):
+                    form_data_dict["days"] = []
+                    form.process(**form_data_dict)
+                    return await self.templates.TemplateResponse(
+                        request,
+                        context["model_view"].create_template,
+                        context,
+                        status_code=400,
+                    )
             obj = await model_view.insert_model(request, form_data_dict)
 
         except Exception as e:
