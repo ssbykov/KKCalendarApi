@@ -11,6 +11,7 @@ from .models import (
     AccessToken,
     DayInfoEvent,
     EventType,
+    Emoji,
     BackupDb,
 )
 from .db import db_helper, init_data, SessionDep
@@ -44,6 +45,7 @@ __all__ = [
     "SkylightArch",
     "Event",
     "EventType",
+    "Emoji",
     "AccessToken",
     "DayInfo",
     "YelamSchema",

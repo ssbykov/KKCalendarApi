@@ -1,5 +1,5 @@
 from crud.mixines import GetBackNextIdMixin
-from database.models import Emoji
+from database import Emoji
 
 
 class EmojiRepository(GetBackNextIdMixin[Emoji]):
