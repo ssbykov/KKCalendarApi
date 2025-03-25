@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from typing import Any, cast
 
@@ -172,6 +173,12 @@ class NewAdmin(Admin):
                     status_code=404,
                     content="Нельзя удалить событие с прошедшими датами",
                 )
+        if isinstance(model_view, BackupDbAdmin):
+            backup_id = int(request.query_params["pks"])
+            backup_db = await model_view.get_by_id(backup_id)
+            file_path = os.path.join(settings.db.backups_dir, backup_db.name)
+            if os.path.exists(file_path):
+                os.remove(file_path)
         result = await super().delete(request)
         return cast(Response, result)
 
