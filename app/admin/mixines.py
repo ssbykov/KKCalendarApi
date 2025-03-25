@@ -96,10 +96,6 @@ class CustomNavMixin(Generic[T]):
         page = item_position.get("page")
         return f"?page={page}"
 
-    @staticmethod
-    def is_superuser(request: Request) -> bool:
-        return bool(request.session.get("user", {}).get("is_superuser"))
-
     def get_sort_column(self) -> Tuple[Any, bool] | None:
         if column := cast(ModelView, self).column_default_sort:
             if isinstance(column, list):
