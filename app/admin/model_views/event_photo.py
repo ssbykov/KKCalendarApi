@@ -8,6 +8,7 @@ from sqladmin import ModelView
 from starlette.requests import Request
 
 from admin.mixines import CustomNavMixin
+from admin.utils import check_superuser
 from core import settings
 from crud.event_photos import EventPhotoRepository
 from database.models import EventPhoto
@@ -52,10 +53,10 @@ class EventPhotoAdmin(
         Path(model.photo_data).unlink()
 
     def is_visible(self, request: Request) -> bool:
-        return self.is_superuser(request)
+        return check_superuser(request)
 
     def is_accessible(self, request: Request) -> bool:
-        return self.is_superuser(request)
+        return check_superuser(request)
 
 
 def photo_url(model: StorageImage) -> str | None:

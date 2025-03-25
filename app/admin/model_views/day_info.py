@@ -2,6 +2,7 @@ from sqladmin import ModelView
 from starlette.requests import Request
 
 from admin.mixines import CustomNavMixin
+from admin.utils import check_superuser
 from crud.days_info import DayInfoRepository
 from database import DayInfo
 
@@ -45,7 +46,7 @@ class DayInfoAdmin(
     can_export = False
 
     def is_visible(self, request: Request) -> bool:
-        return self.is_superuser(request)
+        return check_superuser(request)
 
     def is_accessible(self, request: Request) -> bool:
-        return self.is_superuser(request)
+        return check_superuser(request)

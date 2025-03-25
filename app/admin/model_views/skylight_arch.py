@@ -2,6 +2,7 @@ from sqladmin import ModelView
 from starlette.requests import Request
 
 from admin.mixines import CustomNavMixin
+from admin.utils import check_superuser
 from crud.skylight_arches import SkylightArchRepository
 from database import SkylightArch
 
@@ -31,7 +32,7 @@ class SkylightArchAdmin(
     can_delete = False
 
     def is_visible(self, request: Request) -> bool:
-        return self.is_superuser(request)
+        return check_superuser(request)
 
     def is_accessible(self, request: Request) -> bool:
-        return self.is_superuser(request)
+        return check_superuser(request)
