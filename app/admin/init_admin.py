@@ -23,6 +23,7 @@ from .model_views import (
     EventPhotoAdmin,
     EventTypeAdmin,
     EmojiAdmin,
+    BackupDbAdmin,
 )
 
 
@@ -44,6 +45,7 @@ async def init_admin(app: Any) -> None:
     admin.add_view(EventPhotoAdmin)
     admin.add_view(EventTypeAdmin)
     admin.add_view(EmojiAdmin)
+    admin.add_view(BackupDbAdmin)
     assert isinstance(admin.authentication_backend, AdminAuth)
     await admin.authentication_backend.create_superuser()
 

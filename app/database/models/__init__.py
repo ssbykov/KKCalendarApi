@@ -16,6 +16,7 @@ from .user import User
 from .access_token import AccessToken
 from .event_photo import EventPhoto
 from .emoji import Emoji
+from .backup_db import BackupDb
 
 __all__ = [
     "BaseWithId",
@@ -33,4 +34,5 @@ __all__ = [
     "Base",
     "EventPhoto",
     "Emoji",
+    "BackupDb",
 ]

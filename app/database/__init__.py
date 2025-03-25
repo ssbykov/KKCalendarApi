@@ -11,6 +11,7 @@ from .models import (
     AccessToken,
     DayInfoEvent,
     EventType,
+    BackupDb,
 )
 from .db import db_helper, init_data, SessionDep
 
@@ -30,6 +31,7 @@ from .schemas import (
 __all__ = [
     "BaseWithId",
     "Base",
+    "BackupDb",
     "db_helper",
     "init_data",
     "SessionDep",
