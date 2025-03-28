@@ -6,7 +6,7 @@ authors = [
     {name = "Sergei Bykov",email = "ss.bykoff@gmail.com"}
 ]
 packages = [
-    { include = "app", from = "." },
+    { include = "app", as = "kagyucalendarapi" },
     ]
 license = {text = "MIT"}
 readme = "README.md"
