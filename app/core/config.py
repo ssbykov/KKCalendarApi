@@ -10,7 +10,7 @@ ROOT: str = str(Path(__file__).resolve().parent.parent)
 
 
 class SqlAdmin(BaseModel):
-    templates: str
+    templates: str = ROOT + "/admin/templates/"
     jwt_secret: str
     secret: str
 
