@@ -63,7 +63,7 @@ def photo_url(model: StorageImage) -> str | None:
     try:
         ratio = 100 / max(model.width, model.height)
         return (
-            f'<img src="/{model.lstrip(settings.image_storage.root)}" '
+            f'<img src="{model.removeprefix(settings.image_storage.root)}"'
             f"width={model.width * ratio} height={model.height * ratio}>"
         )
     except Exception as err:
