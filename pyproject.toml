@@ -1,14 +1,14 @@
 [project]
-name = "kagyucalendarapi"
+name = "app"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Sergei Bykov",email = "ss.bykoff@gmail.com"}
+    { name = "Sergei Bykov", email = "ss.bykoff@gmail.com" }
 ]
 packages = [
-    { include = "app", as = "kagyucalendarapi" },
-    ]
-license = {text = "MIT"}
+    { include = "app" },
+]
+license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -40,6 +40,6 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
-mypy = "^1.14.1"
+mypy = "^1.15.0"
 black = "^25.1.0"
 
