@@ -6,19 +6,19 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
-ROOT: str = str(Path(__file__).resolve().parent.parent)
+ROOT = Path(__file__).resolve().parent.parent
 
 
 class SqlAdmin(BaseModel):
-    templates: str = ROOT + "/admin/templates/"
+    templates: str = ROOT / "admin/templates/"
     jwt_secret: str
     secret: str
 
 
 class ImageStorage(BaseModel):
-    root: str = ROOT
-    storage: str = "/static/images"
-    full_path: str = root + storage
+    root: str = str(ROOT)
+    storage: str = "static/images"
+    full_path: str = ROOT / storage
 
 
 class LoggerConfig(BaseModel):
@@ -87,7 +87,7 @@ class DbSettings(BaseSettings):
     host: str
     port: int
     database: str
-    backups_dir: str = ROOT + "/.backups/"
+    backups_dir: Path = ROOT / ".backups/"
 
     @property
     def url(self) -> PostgresDsn:
@@ -107,7 +107,7 @@ class DbSettings(BaseSettings):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=ROOT / ".env",
         case_sensitive=False,
         env_nested_delimiter="__",
         env_prefix="APP_CONFIG__",
