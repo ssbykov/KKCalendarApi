@@ -34,7 +34,7 @@ def init_main_app() -> FastAPI:
         default_response_class=ORJSONResponse,
     )
     init_logger()
-    main_app.mount("/static", StaticFiles(directory="app/static"), name="static")
+    main_app.mount("/static", StaticFiles(directory="./static"), name="static")
 
     main_app.include_router(router=api_router)
 
