@@ -6,14 +6,14 @@ on:
   pull_request:
     branches: [main]
 
-env:
-  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/calendar-api
-  PYTHON_VERSION: "3.11"
-  NODE_VERSION: "18.x"
-
 jobs:
-  build:  # Первый job (без зависимостей)
+  build:
     runs-on: ubuntu-latest
+    env:
+      PYTHON_VERSION: "3.11"
+      NODE_VERSION: "18.x"
+      DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/calendar-api
+
     steps:
     - uses: actions/checkout@v4
 
@@ -26,7 +26,7 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build and push
+    - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:
         push: true
@@ -35,9 +35,13 @@ jobs:
           ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
 
   deploy:
-    needs: build  # Теперь зависит от существующего job 'build'
+    needs: build
     runs-on: ubuntu-latest
     environment: production
+    env:
+      DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/calendar-api
+      DB_PORT: 5432  # если не в секретах
+      RUN_HOST: 0.0.0.0  # если не в секретах
 
     steps:
     - name: Install SSH key
@@ -51,9 +55,7 @@ jobs:
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         DB_HOST: ${{ secrets.DB_HOST }}
-        DB_PORT: ${{ env.DB_PORT }}
         DB_DATABASE: ${{ secrets.DB_DATABASE }}
-        RUN_HOST: ${{ env.RUN_HOST }}
         SUPER_USER_EMAIL: ${{ secrets.SUPER_USER_EMAIL }}
         SUPER_USER_PASSWORD: ${{ secrets.SUPER_USER_PASSWORD }}
         ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
@@ -68,20 +70,16 @@ jobs:
         SQL_ADMIN_SECRET: ${{ secrets.SQL_ADMIN_SECRET }}
         SQL_ADMIN_JWT_SECRET: ${{ secrets.SQL_ADMIN_JWT_SECRET }}
       run: |
-        # Создаем временный каталог для SSH
         mkdir -p /tmp/.ssh
         echo "${{ secrets.SERVER_SSH_KEY }}" > /tmp/.ssh/id_rsa
         chmod 600 /tmp/.ssh/id_rsa
-        
-        # Добавляем хост в known_hosts
         ssh-keyscan ${{ secrets.SERVER_IP }} > /tmp/.ssh/known_hosts
-        
-        # Используем SSH с указанием кастомного каталога
+
         ssh -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/tmp/.ssh/known_hosts \
             -i /tmp/.ssh/id_rsa \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
-          docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+          docker pull $DOCKER_IMAGE:${{ github.sha }}
           docker stop calendar-api || true
           docker rm calendar-api || true
           docker run -d \
@@ -97,8 +95,8 @@ jobs:
             -e APP_CONFIG__SUPER_USER__PASSWORD='$SUPER_USER_PASSWORD' \
             -e APP_CONFIG__EMAIL__HOST='$EMAIL_HOST' \
             -e APP_CONFIG__EMAIL__PORT='$EMAIL_PORT' \
-            -e APP_CONFIG__EMAIL__ADMIN_EMAIL='ADMIN_EMAIL' \
-            -e APP_CONFIG__EMAIL__PASSWORD='EMAIL_PASSWORD' \
+            -e APP_CONFIG__EMAIL__ADMIN_EMAIL='$ADMIN_EMAIL' \
+            -e APP_CONFIG__EMAIL__PASSWORD='$EMAIL_PASSWORD' \
             -e APP_CONFIG__CALENDAR__CALENDAR_ID='$CALENDAR_ID' \
             -e APP_CONFIG__CALENDAR__SECRET_FILE='$CALENDAR_SECRET_FILE' \
             -e APP_CONFIG__YANDEX_DISK__TOKEN='$YANDEX_DISK_TOKEN' \
@@ -106,5 +104,5 @@ jobs:
             -e APP_CONFIG__ACCESS_TOKEN__VERIFICATION_TOKEN_SECRET='$VERIFICATION_TOKEN_SECRET' \
             -e APP_CONFIG__SQL_ADMIN__SECRET='$SQL_ADMIN_SECRET' \
             -e APP_CONFIG__SQL_ADMIN__JWT_SECRET='$SQL_ADMIN_JWT_SECRET' \
-            ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+            $DOCKER_IMAGE:${{ github.sha }}
         "
