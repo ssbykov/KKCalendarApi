@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: production  # ✅ Добавлено, чтобы были видны secrets из production
     env:
       PYTHON_VERSION: "3.11"
       NODE_VERSION: "18.x"
@@ -40,8 +41,8 @@ jobs:
     environment: production
     env:
       DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/calendar-api
-      DB_PORT: 5432  # если не в секретах
-      RUN_HOST: 0.0.0.0  # если не в секретах
+      DB_PORT: 5432
+      RUN_HOST: 0.0.0.0
 
     steps:
     - name: Install SSH key
