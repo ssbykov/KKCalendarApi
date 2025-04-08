@@ -1,0 +1,110 @@
+name: Docker CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/calendar-api
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "18.x"
+
+jobs:
+  build:  # Первый job (без зависимостей)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        push: true
+        tags: |
+          ${{ env.DOCKER_IMAGE }}:latest
+          ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+
+  deploy:
+    needs: build  # Теперь зависит от существующего job 'build'
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        known_hosts: unnecessary
+
+    - name: Deploy to production
+      env:
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_PORT: ${{ env.DB_PORT }}
+        DB_DATABASE: ${{ secrets.DB_DATABASE }}
+        RUN_HOST: ${{ env.RUN_HOST }}
+        SUPER_USER_EMAIL: ${{ secrets.SUPER_USER_EMAIL }}
+        SUPER_USER_PASSWORD: ${{ secrets.SUPER_USER_PASSWORD }}
+        ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+        EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+        EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+        CALENDAR_ID: ${{ secrets.CALENDAR_ID }}
+        CALENDAR_SECRET_FILE: ${{ secrets.CALENDAR_SECRET_FILE }}
+        YANDEX_DISK_TOKEN: ${{ secrets.YANDEX_DISK_TOKEN }}
+        RESET_PASSWORD_TOKEN_SECRET: ${{ secrets.RESET_PASSWORD_TOKEN_SECRET }}
+        VERIFICATION_TOKEN_SECRET: ${{ secrets.VERIFICATION_TOKEN_SECRET }}
+        SQL_ADMIN_SECRET: ${{ secrets.SQL_ADMIN_SECRET }}
+        SQL_ADMIN_JWT_SECRET: ${{ secrets.SQL_ADMIN_JWT_SECRET }}
+      run: |
+        # Создаем временный каталог для SSH
+        mkdir -p /tmp/.ssh
+        echo "${{ secrets.SERVER_SSH_KEY }}" > /tmp/.ssh/id_rsa
+        chmod 600 /tmp/.ssh/id_rsa
+        
+        # Добавляем хост в known_hosts
+        ssh-keyscan ${{ secrets.SERVER_IP }} > /tmp/.ssh/known_hosts
+        
+        # Используем SSH с указанием кастомного каталога
+        ssh -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/tmp/.ssh/known_hosts \
+            -i /tmp/.ssh/id_rsa \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
+          docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+          docker stop calendar-api || true
+          docker rm calendar-api || true
+          docker run -d \
+            --name calendar-api \
+            --restart unless-stopped \
+            -e APP_CONFIG__DB__USER='$DB_USER' \
+            -e APP_CONFIG__DB__PASSWORD='$DB_PASSWORD' \
+            -e APP_CONFIG__DB__HOST='$DB_HOST' \
+            -e APP_CONFIG__DB__PORT='$DB_PORT' \
+            -e APP_CONFIG__DB__DATABASE='$DB_DATABASE' \
+            -e APP_CONFIG__RUN__HOST='$RUN_HOST' \
+            -e APP_CONFIG__SUPER_USER__EMAIL='$SUPER_USER_EMAIL' \
+            -e APP_CONFIG__SUPER_USER__PASSWORD='$SUPER_USER_PASSWORD' \
+            -e APP_CONFIG__EMAIL__HOST='$EMAIL_HOST' \
+            -e APP_CONFIG__EMAIL__PORT='$EMAIL_PORT' \
+            -e APP_CONFIG__EMAIL__ADMIN_EMAIL='ADMIN_EMAIL' \
+            -e APP_CONFIG__EMAIL__PASSWORD='EMAIL_PASSWORD' \
+            -e APP_CONFIG__CALENDAR__CALENDAR_ID='$CALENDAR_ID' \
+            -e APP_CONFIG__CALENDAR__SECRET_FILE='$CALENDAR_SECRET_FILE' \
+            -e APP_CONFIG__YANDEX_DISK__TOKEN='$YANDEX_DISK_TOKEN' \
+            -e APP_CONFIG__ACCESS_TOKEN__RESET_PASSWORD_TOKEN_SECRET='$RESET_PASSWORD_TOKEN_SECRET' \
+            -e APP_CONFIG__ACCESS_TOKEN__VERIFICATION_TOKEN_SECRET='$VERIFICATION_TOKEN_SECRET' \
+            -e APP_CONFIG__SQL_ADMIN__SECRET='$SQL_ADMIN_SECRET' \
+            -e APP_CONFIG__SQL_ADMIN__JWT_SECRET='$SQL_ADMIN_JWT_SECRET' \
+            ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+        "
