@@ -1,10 +1,7 @@
 from pathlib import Path
 
-from dotenv import load_dotenv
 from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-load_dotenv()
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -27,7 +24,7 @@ class LoggerConfig(BaseModel):
 
 
 class RunConfig(BaseModel):
-    host: str = "127.0.0.1"
+    host: str
     port: int = 8000
 
 
@@ -66,10 +63,8 @@ class ApiPrefix(BaseModel):
 class EmailSettings(BaseModel):
     host: str
     port: int
-    username: str
     password: str
     admin_email: str
-    templates_dir: str
 
 
 class CalendarSettings(BaseModel):
@@ -107,12 +102,11 @@ class DbSettings(BaseSettings):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=ROOT / ".env",
+        env_file=ROOT.parent / ".env_dev",
         case_sensitive=False,
         env_nested_delimiter="__",
         env_prefix="APP_CONFIG__",
     )
-    run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     image_storage: ImageStorage = ImageStorage()
     logger: LoggerConfig = LoggerConfig()
@@ -123,6 +117,7 @@ class Settings(BaseSettings):
     email: EmailSettings
     calendar: CalendarSettings
     yandex_disk: YandexDiskSettings
+    run: RunConfig
 
 
 # noinspection PyArgumentList
