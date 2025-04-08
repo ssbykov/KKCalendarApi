@@ -17,6 +17,8 @@ TEMPLATE_DICT = {
     },
 }
 
+TEMPLATES_DIR = "utils/email_templates/"
+
 
 async def send_verification_email(
     user_email: str,
@@ -33,9 +35,7 @@ async def send_verification_email(
     msg["To"] = mail_params.admin_email if action == "verification" else user_email
     msg["Subject"] = action_dict.get("subject", "")
 
-    with open(
-        settings.email.templates_dir + action_dict.get("template", ""), "r"
-    ) as file:
+    with open(TEMPLATES_DIR + action_dict.get("template", ""), "r") as file:
         template_content = file.read()
 
     template = Template(template_content)
