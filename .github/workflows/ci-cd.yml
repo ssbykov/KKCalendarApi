@@ -114,7 +114,7 @@ jobs:
                 export APP_CONFIG__SQL_ADMIN__SECRET='${{ secrets.SQL_ADMIN_SECRET }}' &&
                 export APP_CONFIG__SQL_ADMIN__JWT_SECRET='${{ secrets.SQL_ADMIN_JWT_SECRET }}' &&
                 export APP_CONFIG__RUN__HOST='${{ secrets.APP_CONFIG__RUN__HOST }}' &&
-                export APP_CONFIG__RUN__PORN='${{ secrets.APP_CONFIG__RUN__PORT }}' &&
+                export APP_CONFIG__RUN__PORT='${{ secrets.APP_CONFIG__RUN__PORT }}' &&
 
                 docker compose down &&
                 docker compose up -d --build
