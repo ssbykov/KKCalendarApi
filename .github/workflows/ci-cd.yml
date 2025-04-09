@@ -73,6 +73,8 @@ jobs:
         run: |
           echo "Рабочий каталог: ${{ github.workspace }}"
           
+          cd ${{ github.workspace }}
+          
           mkdir -p /tmp/.ssh
           echo "${{ secrets.SERVER_SSH_KEY }}" > /tmp/.ssh/id_rsa
           chmod 600 /tmp/.ssh/id_rsa
@@ -81,8 +83,8 @@ jobs:
           # Копируем docker-compose.yml и .env на сервер
           scp -o StrictHostKeyChecking=no \
               -i /tmp/.ssh/id_rsa \
-              ${{ github.workspace }}/docker-compose.yml \
-              ${{ github.workspace }}/.env \
+              docker-compose.yml \
+              .env \
               ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}
           
           # Запускаем контейнеры через docker-compose
