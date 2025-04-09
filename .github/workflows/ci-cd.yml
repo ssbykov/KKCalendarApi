@@ -94,6 +94,6 @@ jobs:
               -i /tmp/.ssh/id_rsa \
               ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
                 cd /home/${{ secrets.SERVER_USER }} &&
-                docker-compose -f docker-compose.yml --env-file .env up -d --build &&
+                docker compose -f docker-compose.yml --env-file .env up -d --build &&
                 rm .env  # Удаляем .env после использования
               "
