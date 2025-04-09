@@ -86,11 +86,12 @@ jobs:
           ssh-keyscan ${{ secrets.SERVER_IP }} > /tmp/.ssh/known_hosts
 
           # Копируем необходимые файлы
+          # Копируем всё, что нужно
           scp -o StrictHostKeyChecking=no \
               -i /tmp/.ssh/id_rsa \
-              ./docker-compose.yml \
-              ./.env \
+              -r ./* \
               ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}
+
 
           # Выполняем деплой
           ssh -o StrictHostKeyChecking=no \
