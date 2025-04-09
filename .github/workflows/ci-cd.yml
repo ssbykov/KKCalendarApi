@@ -73,7 +73,7 @@ jobs:
         run: |
           echo "Рабочий каталог: ${{ github.workspace }}"
           
-          cd ${{ github.workspace }}
+          cd /home/runner/work/KKCalendarApi
           ls -la
           mkdir -p /tmp/.ssh
           echo "${{ secrets.SERVER_SSH_KEY }}" > /tmp/.ssh/id_rsa
