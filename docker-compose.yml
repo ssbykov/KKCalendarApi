@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:15
+    image: postgres:16
     env_file: .env
     environment:
       POSTGRES_USER: "${APP_CONFIG__DB__USER}"
