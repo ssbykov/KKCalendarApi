@@ -18,20 +18,14 @@ def generate_dump_name(db_name: str) -> str:
 async def create_database_dump() -> str:
     db = settings.db
     file_name = generate_dump_name(db.database)
-    backups_dir = db.backups_dir
-    dump_file = os.path.join(backups_dir, file_name)
-
-    # Создаем директорию для резервных копий, если она не существует
-    os.makedirs(backups_dir, exist_ok=True)
-
-    # Устанавливаем права доступа к директории
-    os.chmod(backups_dir, 0o777)  # Установка прав доступа на 777
+    dump_file = os.path.join(db.backups_dir, file_name)  # Используем os.path.join
 
     # Создаем pgpass файл
     if os.name == "nt":  # Windows
         pgpass_path = os.path.join(
             os.getenv("APPDATA", ""), "postgresql", "pgpass.conf"
         )
+        os.makedirs(os.path.dirname(pgpass_path), exist_ok=True)
     else:  # Linux/macOS
         pgpass_path = os.path.expanduser("~/.pgpass")
 
