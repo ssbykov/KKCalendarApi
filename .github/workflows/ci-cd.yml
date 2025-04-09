@@ -2,9 +2,9 @@ name: Docker CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
@@ -75,8 +75,8 @@ jobs:
           APP_CONFIG__SQL_ADMIN__SECRET=${{ secrets.SQL_ADMIN_SECRET }}
           APP_CONFIG__SQL_ADMIN__JWT_SECRET=${{ secrets.SQL_ADMIN_JWT_SECRET }}
           DOCKER_IMAGE=${{ env.DOCKER_IMAGE }}
+          TAG=${{ github.sha }}
           EOF
-          cat .env
 
       - name: Deploy to production
         run: |
@@ -85,15 +85,19 @@ jobs:
           chmod 600 /tmp/.ssh/id_rsa
           ssh-keyscan ${{ secrets.SERVER_IP }} > /tmp/.ssh/known_hosts
 
+          # Копируем необходимые файлы
           scp -o StrictHostKeyChecking=no \
               -i /tmp/.ssh/id_rsa \
               ./docker-compose.yml \
               ./.env \
               ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}
 
+          # Выполняем деплой
           ssh -o StrictHostKeyChecking=no \
               -i /tmp/.ssh/id_rsa \
               ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
                 cd /home/${{ secrets.SERVER_USER }} &&
-                export $(cat .env | xargs) && docker compose -f docker-compose.yml  up -d --build
+                docker compose down &&  # Останавливаем и удаляем старые контейнеры
+                docker compose -f docker-compose.yml --env-file .env up -d --build &&
+                rm -f .env  # Удаляем .env файл после использования
               "
