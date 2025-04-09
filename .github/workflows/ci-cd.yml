@@ -92,8 +92,8 @@ jobs:
           
           ssh -o StrictHostKeyChecking=no \
               -i /tmp/.ssh/id_rsa \
-              ***@*** "
-                cd /home/*** &&
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
+                cd /home/${{ secrets.SERVER_USER }} &&
                 docker compose -f docker-compose.yml --env-file .env up -d --build &&
-                rm .env
+                rm .env  # Удаляем .env после использования
               "
