@@ -16,7 +16,10 @@ jobs:
       DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/calendar-api
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -73,8 +76,11 @@ jobs:
         run: |
           echo "Рабочий каталог: ${{ github.workspace }}"
           
-          cd /home/runner/work/KKCalendarApi
+          cd /home/runner/work/KKCalendarApi/KKCalendarApi
+          
+          pwd
           ls -la
+          
           mkdir -p /tmp/.ssh
           echo "${{ secrets.SERVER_SSH_KEY }}" > /tmp/.ssh/id_rsa
           chmod 600 /tmp/.ssh/id_rsa
