@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: production  # ✅ Добавлено, чтобы были видны secrets из production
+    environment: production
     env:
       PYTHON_VERSION: "3.11"
       NODE_VERSION: "18.x"
@@ -76,6 +76,7 @@ jobs:
           APP_CONFIG__SQL_ADMIN__JWT_SECRET=${{ secrets.SQL_ADMIN_JWT_SECRET }}
           DOCKER_IMAGE=${{ env.DOCKER_IMAGE }}
           EOF
+          cat .env
 
       - name: Deploy to production
         run: |
@@ -83,17 +84,16 @@ jobs:
           echo "${{ secrets.SERVER_SSH_KEY }}" > /tmp/.ssh/id_rsa
           chmod 600 /tmp/.ssh/id_rsa
           ssh-keyscan ${{ secrets.SERVER_IP }} > /tmp/.ssh/known_hosts
-          
+
           scp -o StrictHostKeyChecking=no \
               -i /tmp/.ssh/id_rsa \
               ./docker-compose.yml \
               ./.env \
               ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}
-          
+
           ssh -o StrictHostKeyChecking=no \
               -i /tmp/.ssh/id_rsa \
               ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
                 cd /home/${{ secrets.SERVER_USER }} &&
-                docker compose -f docker-compose.yml --env-file .env up -d --build &&
-                rm .env  # Удаляем .env после использования
+                export $(cat .env | xargs) && docker compose -f docker-compose.yml  up -d --build
               "
