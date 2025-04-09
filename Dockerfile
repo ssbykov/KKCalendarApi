@@ -27,14 +27,7 @@ FROM python:3.11-slim
 
 # 1. Установка PostgreSQL Client
 RUN apt-get update && \
-    apt-get install -y curl gnupg ca-certificates lsb-release
-
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
-
-RUN wget -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/postgresql.gpg > /dev/null
-
-RUN apt-get update && \
-    apt-get install -y postgresql-client-16 && \
+    apt-get install -y curl postgresql-client && \
     rm -rf /var/lib/apt/lists/*
 
 # 2. Копирование зависимостей
