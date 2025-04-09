@@ -76,34 +76,18 @@ jobs:
         chmod 600 /tmp/.ssh/id_rsa
         ssh-keyscan ${{ secrets.SERVER_IP }} > /tmp/.ssh/known_hosts
 
+        # Копируем docker-compose.yml и .env на сервер
+        scp -o StrictHostKeyChecking=no \
+            -i /tmp/.ssh/id_rsa \
+            ${{ github.workspace }}/docker-compose.yml \
+            ${{ github.workspace }}/.env \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}
+
+        # Запускаем контейнеры через docker-compose
         ssh -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/tmp/.ssh/known_hosts \
             -i /tmp/.ssh/id_rsa \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
-          docker pull $DOCKER_IMAGE:${{ github.sha }}
-          docker stop calendar-api || true
-          docker rm calendar-api || true
-          docker run -d \
-            --name calendar-api \
-            --restart unless-stopped \
-            -e APP_CONFIG__DB__USER='$DB_USER' \
-            -e APP_CONFIG__DB__PASSWORD='$DB_PASSWORD' \
-            -e APP_CONFIG__DB__HOST='$DB_HOST' \
-            -e APP_CONFIG__DB__PORT='$DB_PORT' \
-            -e APP_CONFIG__DB__DATABASE='$DB_DATABASE' \
-            -e APP_CONFIG__RUN__HOST='$RUN_HOST' \
-            -e APP_CONFIG__SUPER_USER__EMAIL='$SUPER_USER_EMAIL' \
-            -e APP_CONFIG__SUPER_USER__PASSWORD='$SUPER_USER_PASSWORD' \
-            -e APP_CONFIG__EMAIL__HOST='$EMAIL_HOST' \
-            -e APP_CONFIG__EMAIL__PORT='$EMAIL_PORT' \
-            -e APP_CONFIG__EMAIL__ADMIN_EMAIL='$ADMIN_EMAIL' \
-            -e APP_CONFIG__EMAIL__PASSWORD='$EMAIL_PASSWORD' \
-            -e APP_CONFIG__CALENDAR__CALENDAR_ID='$CALENDAR_ID' \
-            -e APP_CONFIG__CALENDAR__SECRET_FILE='$CALENDAR_SECRET_FILE' \
-            -e APP_CONFIG__YANDEX_DISK__TOKEN='$YANDEX_DISK_TOKEN' \
-            -e APP_CONFIG__ACCESS_TOKEN__RESET_PASSWORD_TOKEN_SECRET='$RESET_PASSWORD_TOKEN_SECRET' \
-            -e APP_CONFIG__ACCESS_TOKEN__VERIFICATION_TOKEN_SECRET='$VERIFICATION_TOKEN_SECRET' \
-            -e APP_CONFIG__SQL_ADMIN__SECRET='$SQL_ADMIN_SECRET' \
-            -e APP_CONFIG__SQL_ADMIN__JWT_SECRET='$SQL_ADMIN_JWT_SECRET' \
-            $DOCKER_IMAGE:${{ github.sha }}
+          cd /home/${{ secrets.SERVER_USER }} &&
+          docker-compose -f docker-compose.yml --env-file .env up -d --build
         "
