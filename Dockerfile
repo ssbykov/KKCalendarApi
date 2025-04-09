@@ -27,7 +27,7 @@ FROM python:3.11-slim
 
 # 1. Установка PostgreSQL Client
 RUN apt-get update && \
-    apt-get install -y curl postgresql-client-16 && \
+    apt-get install -y curl postgresql-client && \
     rm -rf /var/lib/apt/lists/*
 
 # 2. Копирование зависимостей
