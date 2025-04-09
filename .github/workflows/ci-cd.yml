@@ -74,7 +74,7 @@ jobs:
           echo "Рабочий каталог: ${{ github.workspace }}"
           
           cd ${{ github.workspace }}
-          
+          ls -la
           mkdir -p /tmp/.ssh
           echo "${{ secrets.SERVER_SSH_KEY }}" > /tmp/.ssh/id_rsa
           chmod 600 /tmp/.ssh/id_rsa
