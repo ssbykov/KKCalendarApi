@@ -71,6 +71,8 @@ jobs:
           SQL_ADMIN_SECRET: ${{ secrets.SQL_ADMIN_SECRET }}
           SQL_ADMIN_JWT_SECRET: ${{ secrets.SQL_ADMIN_JWT_SECRET }}
         run: |
+          echo "Рабочий каталог: ${{ github.workspace }}"
+          
           mkdir -p /tmp/.ssh
           echo "${{ secrets.SERVER_SSH_KEY }}" > /tmp/.ssh/id_rsa
           chmod 600 /tmp/.ssh/id_rsa
