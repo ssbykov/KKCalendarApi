@@ -1,6 +1,8 @@
 import os
 import sys
 
+from crud.backup_db import BackupDbRepository
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from typing import Annotated, AsyncGenerator, Type, Any
@@ -56,9 +58,8 @@ class DbHelper:
 
     async def init_db(self) -> None:
         async for session in self.get_session():
-            for data in init_data:
-                await self._init_model(session, **data)
-            await session.commit()
+            repo = BackupDbRepository(session)
+            await repo.synchronize()
 
 
 db_helper = DbHelper(url=str(settings.db.url), echo=settings.db.echo)

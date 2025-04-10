@@ -16,7 +16,7 @@ from utils.html_parser import HtmlParser
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    # await db_helper.init_db()
+    await db_helper.init_db()
     await init_admin(app)
 
     # async for session in db_helper.get_session():
