@@ -73,7 +73,7 @@ jobs:
           APP_CONFIG__ACCESS_TOKEN__RESET_PASSWORD_TOKEN_SECRET=${{ secrets.RESET_PASSWORD_TOKEN_SECRET }}
           APP_CONFIG__ACCESS_TOKEN__VERIFICATION_TOKEN_SECRET=${{ secrets.VERIFICATION_TOKEN_SECRET }}
           APP_CONFIG__SQL_ADMIN__SECRET=${{ secrets.SQL_ADMIN_SECRET }}
-          APP_CONFIG__SQL_ADMIN__JWT_SECRET=${{ secrets.SQL_ADMIN_SECRET }}
+          APP_CONFIG__SQL_ADMIN__JWT_SECRET=${{ secrets.SQL_ADMIN_JWT_SECRET }}
           APP_CONFIG__RUN__HOST=0.0.0.0
           APP_CONFIG__RUN__PORT=8000
           EOF
@@ -85,38 +85,17 @@ jobs:
           chmod 600 /tmp/.ssh/id_rsa
           ssh-keyscan ${{ secrets.SERVER_IP }} > /tmp/.ssh/known_hosts
 
-          # Копируем всё нужное на сервер
+          # Копируем docker-compose.yml и .env на сервер
           scp -o StrictHostKeyChecking=no \
               -i /tmp/.ssh/id_rsa \
-              -r . .env \
+              docker-compose.yml .env \
               ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}
 
-          # Выполняем деплой
+          # Выполняем деплой на сервере
           ssh -o StrictHostKeyChecking=no \
               -i /tmp/.ssh/id_rsa \
               ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
                 cd /home/${{ secrets.SERVER_USER }} &&
-                export APP_CONFIG__DB__HOST='${{ secrets.DB_HOST }}' &&
-                export APP_CONFIG__DB__PORT='5432' &&
-                export APP_CONFIG__DB__USER='${{ secrets.DB_USER }}' &&
-                export APP_CONFIG__DB__PASSWORD='${{ secrets.DB_PASSWORD }}' &&
-                export APP_CONFIG__DB__DATABASE='${{ secrets.DB_DATABASE }}' &&
-                export APP_CONFIG__SUPER_USER__EMAIL='${{ secrets.SUPER_USER_EMAIL }}' &&
-                export APP_CONFIG__SUPER_USER__PASSWORD='${{ secrets.SUPER_USER_PASSWORD }}' &&
-                export APP_CONFIG__EMAIL__ADMIN_EMAIL='${{ secrets.ADMIN_EMAIL }}' &&
-                export APP_CONFIG__EMAIL__PASSWORD='${{ secrets.EMAIL_PASSWORD }}' &&
-                export APP_CONFIG__EMAIL__PORT='${{ secrets.EMAIL_PORT }}' &&
-                export APP_CONFIG__EMAIL__HOST='${{ secrets.EMAIL_HOST }}' &&
-                export APP_CONFIG__CALENDAR__CALENDAR_ID='${{ secrets.CALENDAR_ID }}' &&
-                export APP_CONFIG__CALENDAR__SECRET_FILE='${{ secrets.CALENDAR_SECRET_FILE }}' &&
-                export APP_CONFIG__YANDEX_DISK__TOKEN='${{ secrets.YANDEX_DISK_TOKEN }}' &&
-                export APP_CONFIG__ACCESS_TOKEN__RESET_PASSWORD_TOKEN_SECRET='${{ secrets.RESET_PASSWORD_TOKEN_SECRET }}' &&
-                export APP_CONFIG__ACCESS_TOKEN__VERIFICATION_TOKEN_SECRET='${{ secrets.VERIFICATION_TOKEN_SECRET }}' &&
-                export APP_CONFIG__SQL_ADMIN__SECRET='${{ secrets.SQL_ADMIN_SECRET }}' &&
-                export APP_CONFIG__SQL_ADMIN__JWT_SECRET='${{ secrets.SQL_ADMIN_JWT_SECRET }}' &&
-                export APP_CONFIG__RUN__HOST='${{ secrets.APP_CONFIG__RUN__HOST }}' &&
-                export APP_CONFIG__RUN__PORT='${{ secrets.APP_CONFIG__RUN__PORT }}' &&
-
                 docker compose down &&
                 docker compose up -d --build
               "
