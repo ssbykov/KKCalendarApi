@@ -10,3 +10,8 @@ router.include_router(
     router=router_api_v1,
     prefix=settings.api.prefix,
 )
+
+
+@router.get("/health", status_code=200)
+async def health_check():
+    return {"status": "ok", "service": "calendar-api"}
