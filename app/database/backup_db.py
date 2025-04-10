@@ -3,6 +3,7 @@ import logging
 import os
 import subprocess
 from datetime import datetime
+from pathlib import Path
 
 import aiohttp
 
@@ -15,19 +16,50 @@ def generate_dump_name(db_name: str) -> str:
     return f"{db_name}_backup_{timestamp}.dump"
 
 
+def create_pgpass_file(pgpass_path: str, db) -> None:
+    with open(pgpass_path, "w") as f:
+        f.write(f"{db.host}:{db.port}:{db.database}:{db.user}:{db.password}\n")
+    os.chmod(pgpass_path, 0o600)
+
+
+def remove_pgpass_file(pgpass_path: str) -> None:
+    try:
+        os.remove(pgpass_path)
+    except FileNotFoundError:
+        logging.warning("Файл pgpass не найден для удаления")
+
+
+async def run_command(cmd: list[str], pgpass_path: str) -> None:
+    env = os.environ.copy()
+    env["PGPASSFILE"] = pgpass_path
+
+    loop = asyncio.get_running_loop()
+    process = await loop.run_in_executor(
+        None,
+        lambda: subprocess.run(
+            cmd,
+            env=env,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="ignore",
+        ),
+    )
+
+    if process.returncode != 0:
+        logging.error(f"Ошибка выполнения команды: {process.stderr}")
+        raise subprocess.CalledProcessError(process.returncode, cmd)
+
+
 async def create_database_dump() -> str:
     db = settings.db
     file_name = generate_dump_name(db.database)
     backups_dir = db.backups_dir
     dump_file = os.path.join(backups_dir, file_name)
 
-    # Создаем директорию для резервных копий, если она не существует
     os.makedirs(backups_dir, exist_ok=True)
+    os.chmod(backups_dir, 0o777)
 
-    # Устанавливаем права доступа к директории
-    os.chmod(backups_dir, 0o777)  # Установка прав доступа на 777
-
-    # Создаем pgpass файл
     if os.name == "nt":  # Windows
         pgpass_path = os.path.join(
             os.getenv("APPDATA", ""), "postgresql", "pgpass.conf"
@@ -36,15 +68,8 @@ async def create_database_dump() -> str:
         pgpass_path = os.path.expanduser("~/.pgpass")
 
     try:
+        create_pgpass_file(pgpass_path, db)
 
-        # Записываем пароль в pgpass
-        with open(pgpass_path, "w") as f:
-            f.write(f"{db.host}:{db.port}:{db.database}:{db.user}:{db.password}\n")
-
-        # Устанавливаем права доступа
-        os.chmod(pgpass_path, 0o600)
-
-        # Создаем команду
         cmd = [
             "pg_dump",
             "-U",
@@ -60,28 +85,50 @@ async def create_database_dump() -> str:
             db.database,
         ]
 
-        # Запускаем команду асинхронно
-        env = os.environ.copy()
-        env["PGPASSFILE"] = pgpass_path
-
-        loop = asyncio.get_running_loop()
-        process = await loop.run_in_executor(
-            None, lambda: subprocess.run(cmd, env=env, capture_output=True, text=True)
-        )
-
-        # Проверяем статус
-        if process.returncode != 0:
-            logging.error(f"Ошибка дампа: {process.stderr}")
-            raise subprocess.CalledProcessError(process.returncode, cmd)
+        await run_command(cmd, pgpass_path)
 
     finally:
-        # Удаляем pgpass файл
-        try:
-            os.remove(pgpass_path)
-        except FileNotFoundError:
-            logging.warning("Файл pgpass не найден для удаления")
+        remove_pgpass_file(pgpass_path)
 
     return file_name
+
+
+async def restore_database_from_dump(dump_file: str) -> None:
+    db = settings.db
+    path_dump_file = Path(settings.db.backups_dir) / dump_file
+
+    if not path_dump_file.exists():
+        logging.error(f"Файл дампа {path_dump_file} не найден")
+        return None
+
+    if os.name == "nt":  # Windows
+        pgpass_path = os.path.join(
+            os.getenv("APPDATA", ""), "postgresql", "pgpass.conf"
+        )
+    else:  # Linux/macOS
+        pgpass_path = os.path.expanduser("~/.pgpass")
+
+    try:
+        create_pgpass_file(pgpass_path, db)
+
+        cmd = [
+            "pg_restore",
+            "-U",
+            db.user,
+            "-h",
+            db.host,
+            "-p",
+            str(db.port),
+            "-d",
+            db.database,
+            "-c",
+            str(path_dump_file),
+        ]
+
+        await run_command(cmd, pgpass_path)
+
+    finally:
+        remove_pgpass_file(pgpass_path)
 
 
 class YaDisk:
@@ -150,3 +197,4 @@ async def create_backup() -> str | None:
 
 if __name__ == "__main__":
     asyncio.run(create_backup())
+    # asyncio.run(restore_database_from_dump("test_backup_2025-04-10_14-41-38.dump"))
