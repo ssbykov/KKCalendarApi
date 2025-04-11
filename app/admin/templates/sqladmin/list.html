@@ -124,13 +124,13 @@
                 <tbody>
                 {% for row in pagination.rows %}
                 <tr>
-                    {% if "restore" in model_view._custom_actions_in_list %}
+<!--                    {% if "restore" in model_view._custom_actions_in_list %}-->
                     <td>
                         <input type="hidden" value="{{ get_object_identifier(row) }}">
                         <input class="form-check-input m-0 align-middle select-box" type="checkbox"
                                aria-label="Select item">
                     </td>
-                    {% endif %}
+<!--                    {% endif %}-->
                     <td class="text-end">
                         {% if model_view.can_view_details %}
                         <a href="{{ model_view._build_url_for('admin:details', request, row) }}"
