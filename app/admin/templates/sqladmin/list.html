@@ -41,6 +41,39 @@
         </div>
         <div class="card-body border-bottom py-3">
             <div class="d-flex justify-content-between">
+                <div class="dropdown col-4">
+                    <button {% if not model_view._custom_actions_in_list %}
+                            style="display: none;"
+                            {% endif %}
+                            class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                        Actions
+                    </button>
+                    {% if model_view.can_delete or model_view._custom_actions_in_list %}
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        {% if model_view.can_delete %}
+                        <a class="dropdown-item" id="action-delete" href="#" data-name="{{ model_view.name }}"
+                           data-url="{{ url_for('admin:delete', identity=model_view.identity) }}" data-bs-toggle="modal"
+                           data-bs-target="#modal-delete">Удалить выбранное</a>
+                        {% endif %}
+                        {% for custom_action, label in model_view._custom_actions_in_list.items() %}
+                        {% if custom_action in model_view._custom_actions_confirmation %}
+                        <a class="dropdown-item" id="action-customconfirm-{{ custom_action }}" href="#"
+                           data-bs-toggle="modal"
+                           data-bs-target="#modal-confirmation-{{ custom_action }}">
+                            {{ label }}
+                        </a>
+                        {% else %}
+                        <a class="dropdown-item" id="action-custom-{{ custom_action }}" href="#"
+                           data-url="{{ model_view._url_for_action(request, custom_action) }}">
+                            {{ label }}
+                        </a>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
                 {% if model_view.column_searchable_list %}
                 <div class="col-md-4 text-muted">
                     <div class="input-group">
@@ -60,6 +93,9 @@
             <table class="table card-table table-vcenter text-nowrap">
                 <thead>
                 <tr>
+                    {% if model_view._custom_actions_in_list %}
+                    <th class="w-1"></th>
+                    {% endif %}
                     <th class="w-1">Действия</th>
                     {% for name in model_view._list_prop_names %}
                     {% set label = model_view._column_labels.get(name, name) %}
@@ -88,6 +124,13 @@
                 <tbody>
                 {% for row in pagination.rows %}
                 <tr>
+                    {% if "restore" in model_view._custom_actions_in_list %}
+                    <td>
+                        <input type="hidden" value="{{ get_object_identifier(row) }}">
+                        <input class="form-check-input m-0 align-middle select-box" type="checkbox"
+                               aria-label="Select item">
+                    </td>
+                    {% endif %}
                     <td class="text-end">
                         {% if model_view.can_view_details %}
                         <a href="{{ model_view._build_url_for('admin:details', request, row) }}"
