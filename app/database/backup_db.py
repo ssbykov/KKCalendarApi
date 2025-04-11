@@ -20,7 +20,7 @@ def generate_dump_name(db_name: str) -> str:
     return f"{db_name}_backup_{timestamp}.dump"
 
 
-def create_pgpass_file(pgpass_path: str, db: DbSettings) -> None:
+def create_pgpass_file(pgpass_path: str, db: "DbSettings") -> None:
     with open(pgpass_path, "w") as f:
         f.write(f"{db.host}:{db.port}:{db.database}:{db.user}:{db.password}\n")
     os.chmod(pgpass_path, 0o600)
