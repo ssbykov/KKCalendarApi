@@ -44,7 +44,7 @@ COPY . .
 # 3.1 Копирование резервных копий
 COPY /app/.backups /app/.backups
 # 3.2 Копирование шаблонов
-COPY ./app/templates /app/templates
+COPY ./app/admin/templates /app/admin/templates
 
 # 4. Настройка окружения
 ENV PYTHONUNBUFFERED=1 \
