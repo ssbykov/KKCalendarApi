@@ -68,7 +68,7 @@ class NewAdmin(Admin):
             return await self.templates.TemplateResponse(
                 request, "sqladmin/login.html", context, status_code=400
             )
-        await db_helper.init_db()
+        await db_helper.init_db_backups()
         return RedirectResponse(request.url_for("admin:index"), status_code=302)
 
     @owner_required
