@@ -10,7 +10,7 @@ from database import BackupDb
 class BackupDbRepository(GetBackNextIdMixin[BackupDb]):
     model = BackupDb
 
-    async def synchronize(self):
+    async def synchronize(self) -> None:
         db_items = await self.session.execute(select(self.model))
         items = [item.name for item in db_items.scalars().all()]
 

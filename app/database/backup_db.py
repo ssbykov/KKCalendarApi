@@ -4,11 +4,15 @@ import os
 import subprocess
 from datetime import datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import aiohttp
 
 from core import settings
 from core.logger_init import init_logger
+
+if TYPE_CHECKING:
+    from core.config import DbSettings
 
 
 def generate_dump_name(db_name: str) -> str:
@@ -16,7 +20,7 @@ def generate_dump_name(db_name: str) -> str:
     return f"{db_name}_backup_{timestamp}.dump"
 
 
-def create_pgpass_file(pgpass_path: str, db) -> None:
+def create_pgpass_file(pgpass_path: str, db: DbSettings) -> None:
     with open(pgpass_path, "w") as f:
         f.write(f"{db.host}:{db.port}:{db.database}:{db.user}:{db.password}\n")
     os.chmod(pgpass_path, 0o600)
