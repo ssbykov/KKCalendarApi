@@ -30,6 +30,8 @@ class HaircuttingAdmin(
     ]
     can_edit = False
     can_delete = False
+    can_export = False
+    can_create = False
 
     def is_visible(self, request: Request) -> bool:
         return check_superuser(request)
