@@ -41,6 +41,8 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 # 3. Копирование кода приложения
 COPY . .
+# 3.1 Копирование резервных копий
+COPY .backups /app/.backups
 
 # 4. Настройка окружения
 ENV PYTHONUNBUFFERED=1 \
