@@ -2,6 +2,11 @@ import os
 from datetime import datetime
 from typing import Any, cast
 
+from starlette.datastructures import URL
+from core import settings
+from crud.days_info import DayInfoRepository
+from database import db_helper, DayInfo
+from database.backup_db import create_backup
 from sqladmin import Admin
 from sqladmin.authentication import login_required
 from sqlalchemy.exc import IntegrityError
@@ -9,10 +14,6 @@ from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import Response, RedirectResponse
 
-from core import settings
-from crud.days_info import DayInfoRepository
-from database import db_helper, DayInfo
-from database.backup_db import create_backup
 from .backend import AdminAuth, owner_required
 from .model_views import (
     EventAdmin,
@@ -34,7 +35,7 @@ async def init_admin(app: Any) -> None:
         app,
         db_helper.engine,
         title="Календарь событий",
-        templates_dir=settings.sql_admin.templates,
+        templates_dir=str(settings.sql_admin.templates),
         authentication_backend=AdminAuth(secret_key=settings.sql_admin.secret),
     )
     admin.add_view(DayInfoAdmin)
@@ -67,7 +68,7 @@ class NewAdmin(Admin):
             return await self.templates.TemplateResponse(
                 request, "sqladmin/login.html", context, status_code=400
             )
-
+        await db_helper.init_db()
         return RedirectResponse(request.url_for("admin:index"), status_code=302)
 
     @owner_required
@@ -175,10 +176,10 @@ class NewAdmin(Admin):
                 )
         if isinstance(model_view, BackupDbAdmin):
             backup_id = int(request.query_params["pks"])
-            backup_db = await model_view.get_by_id(backup_id)
-            file_path = os.path.join(settings.db.backups_dir, backup_db.name)
-            if os.path.exists(file_path):
-                os.remove(file_path)
+            if backup_db := await model_view.get_by_id(backup_id):
+                file_path = os.path.join(settings.db.backups_dir, backup_db.name)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
         result = await super().delete(request)
         return cast(Response, result)
 
@@ -239,11 +240,14 @@ class NewAdmin(Admin):
                 request, context["model_view"].create_template, context, status_code=400
             )
 
-        url = self.get_save_redirect_url(
-            request=request,
-            form=form_data,
-            obj=obj,
-            model_view=model_view,
+        url = cast(
+            URL,
+            self.get_save_redirect_url(
+                request=request,
+                form=form_data,
+                obj=obj,
+                model_view=model_view,
+            ),
         )
         return RedirectResponse(url=url, status_code=302)
 

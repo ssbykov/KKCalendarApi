@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from typing import Any, Dict
 
-from fastapi_storages import StorageImage
+from fastapi_storages import StorageImage  # type: ignore
 from markupsafe import Markup
 from sqladmin import ModelView
 from starlette.requests import Request

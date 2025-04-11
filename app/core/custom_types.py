@@ -2,8 +2,8 @@ import logging
 from pathlib import Path
 from typing import Any, Optional
 
-from fastapi_storages import FileSystemStorage
-from fastapi_storages.integrations.sqlalchemy import ImageType as _ImageType
+from fastapi_storages import FileSystemStorage  # type: ignore
+from fastapi_storages.integrations.sqlalchemy import ImageType as _ImageType  # type: ignore
 from sqlalchemy.engine.interfaces import Dialect
 
 try:
@@ -13,7 +13,7 @@ try:
 except ImportError:  # pragma: no cover
     PIL = False
 
-from fastapi_storages.base import StorageImage
+from fastapi_storages.base import StorageImage  # type: ignore
 
 from core import settings
 

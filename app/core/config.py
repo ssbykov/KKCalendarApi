@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 class SqlAdmin(BaseModel):
-    templates: str = ROOT / "admin/templates/"
+    templates: Path = ROOT / "admin/templates/"
     jwt_secret: str
     secret: str
 
@@ -15,7 +15,7 @@ class SqlAdmin(BaseModel):
 class ImageStorage(BaseModel):
     root: str = str(ROOT)
     storage: str = "static/images"
-    full_path: str = ROOT / storage
+    full_path: Path = ROOT / storage
 
 
 class LoggerConfig(BaseModel):
@@ -102,7 +102,7 @@ class DbSettings(BaseSettings):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=ROOT.parent / ".env",
+        env_file=ROOT.parent / ".env_dev",
         case_sensitive=False,
         env_nested_delimiter="__",
         env_prefix="APP_CONFIG__",
