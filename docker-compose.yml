@@ -30,8 +30,7 @@ services:
       STATIC_URL: "/static/"
     volumes:
       - ./app/static:/app/static
-      - ./app/static/admin:/app/static/admin:ro,cached
-      - ./app/admin/templates:/app/admin/templates:ro,cached
+      - ./app/static/admin:/app/static/admin
       - ./app/admin/templates:/usr/local/lib/python3.11/site-packages/admin/templates
     depends_on:
       postgres:
@@ -52,7 +51,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./app/static:/app/static  # Статика должна быть доступна Nginx
-#      - ./app/static/admin:/app/static/admin  # Статика админки
+      - ./app/static/admin:/app/static/admin  # Статика админки
       - ./assets/favicon.ico:/app/static/favicon.ico  # Favicon
     depends_on:
       - app
