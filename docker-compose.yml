@@ -31,7 +31,7 @@ services:
     volumes:
       - ./app/static:/app/static
       - ./app/static/admin:/app/static/admin
-      - ./app/admin/templates:/usr/local/lib/python3.11/site-packages/admin/templates
+      - ./app/admin/:/usr/local/lib/python3.11/site-packages/admin/
     depends_on:
       postgres:
         condition: service_healthy
