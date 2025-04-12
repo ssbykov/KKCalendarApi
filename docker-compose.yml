@@ -31,6 +31,7 @@ services:
     volumes:
       - ./app/static:/app/static  # Монтирование статики
       - ./app/static/admin:/app/static/admin  # Отдельно монтируем админку
+      - ./app/admin/templates:/app/admin/templates
     depends_on:
       postgres:
         condition: service_healthy
@@ -51,7 +52,6 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./app/static:/app/static  # Статика должна быть доступна Nginx
       - ./app/static/admin:/app/static/admin  # Статика админки
-      - ./app/admin/templates:/app/admin/templates
       - ./assets/favicon.ico:/app/static/favicon.ico  # Favicon
     depends_on:
       - app
