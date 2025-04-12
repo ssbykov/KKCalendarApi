@@ -30,7 +30,7 @@ services:
       STATIC_URL: "/static/"
     volumes:
       - ./app/static:/app/static
-      - ./app/static/admin:/app/static/admin
+      - ./app/static/admin:/app/static/admin:ro,cached
       - ./app/admin/templates:/app/admin/templates:ro,cached
       - ./app/admin/templates:/usr/local/lib/python3.11/site-packages/admin/templates
     depends_on:
