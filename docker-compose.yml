@@ -27,11 +27,12 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: "postgresql://${APP_CONFIG__DB__USER}:${APP_CONFIG__DB__PASSWORD}@postgres:5432/${APP_CONFIG__DB__DATABASE}"
-      STATIC_URL: "/static/"  # Добавлено для правильных URL статики
+      STATIC_URL: "/static/"
     volumes:
-      - ./app/static:/app/static  # Монтирование статики
-      - ./app/static/admin:/app/static/admin  # Отдельно монтируем админку
+      - ./app/static:/app/static
+      - ./app/static/admin:/app/static/admin
       - ./app/admin/templates:/app/admin/templates
+      - ./app/admin/templates:/usr/local/lib/python3.11/site-packages/admin/templates  # Добавлено
     depends_on:
       postgres:
         condition: service_healthy
