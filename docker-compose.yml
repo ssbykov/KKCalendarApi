@@ -52,7 +52,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./app/static:/app/static  # Статика должна быть доступна Nginx
-      - ./app/static/admin:/app/static/admin  # Статика админки
+#      - ./app/static/admin:/app/static/admin  # Статика админки
       - ./assets/favicon.ico:/app/static/favicon.ico  # Favicon
     depends_on:
       - app
