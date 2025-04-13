@@ -106,7 +106,7 @@ jobs:
 
           # Копируем папки
           scp -r -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
-            app/ alembic/ nginx/ \
+            app/ nginx/ \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/
 
           # Копируем favicon
