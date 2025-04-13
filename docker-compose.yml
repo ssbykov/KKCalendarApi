@@ -30,8 +30,6 @@ services:
       STATIC_URL: "/static/"
     volumes:
       - ./app/static:/app/static
-      - ./app/admin/templates:/app/admin/templates
-      - ./app/admin/templates:/usr/local/lib/python3.11/site-packages/admin/templates
     depends_on:
       postgres:
         condition: service_healthy

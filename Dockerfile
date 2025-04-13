@@ -47,11 +47,5 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app \
     NODE_ENV=production
 
-# 5. Создаем симлинки для шаблонов (если нужно)
-RUN if [ -d "/app/app/admin/templates" ]; then \
-      mkdir -p /usr/local/lib/python3.11/site-packages/admin/templates && \
-      ln -sf /app/app/admin/templates/* /usr/local/lib/python3.11/site-packages/admin/templates/; \
-    fi
-
-# 6. Запуск приложения
+# 5. Запуск приложения
 CMD ["bash", "-c", "cd ./app && alembic upgrade head && python -m app.main"]
