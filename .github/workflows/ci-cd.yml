@@ -109,10 +109,6 @@ jobs:
             app/ nginx/ \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/
 
-          # Копируем favicon
-          scp -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
-            assets/favicon.ico \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/app/static/
 
       - name: Deploy application
         run: |
