@@ -88,7 +88,7 @@ jobs:
           # Копируем docker-compose.yml и .env на сервер
           scp -o StrictHostKeyChecking=no \
               -i /tmp/.ssh/id_rsa \
-              docker-compose.yml .env \
+              Dockerfile docker-compose.yml .env \
               ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}
 
           # Выполняем деплой на сервере
