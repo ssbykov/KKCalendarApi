@@ -79,12 +79,23 @@ jobs:
           APP_CONFIG__RUN__PORT=8000
           EOF
 
+      - name: Clean up conflicting nginx.conf on server
+        run: |
+          ssh -o UserKnownHostsFile=/tmp/.ssh/known_hosts -o StrictHostKeyChecking=no \
+            -i /tmp/.ssh/id_rsa \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+            "rm -rf /home/${{ secrets.SERVER_USER }}/nginx/nginx.conf"
+
       - name: Deploy to production
         run: |
-          # Копируем все нужные файлы
+          # Копируем нужные файлы, включая nginx.conf
           scp -o UserKnownHostsFile=/tmp/.ssh/known_hosts -o StrictHostKeyChecking=no -i /tmp/.ssh/id_rsa \
             Dockerfile docker-compose.yml .env pyproject.toml poetry.lock \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}
+
+          scp -o UserKnownHostsFile=/tmp/.ssh/known_hosts -o StrictHostKeyChecking=no -i /tmp/.ssh/id_rsa \
+            nginx/nginx.conf \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/nginx/nginx.conf
 
           # Выполняем деплой
           ssh -o UserKnownHostsFile=/tmp/.ssh/known_hosts -o StrictHostKeyChecking=no -i /tmp/.ssh/id_rsa \

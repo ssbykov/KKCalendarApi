@@ -49,9 +49,9 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./app/static:/app/static
-      - ./assets/favicon.ico:/app/static/favicon.ico  # Favicon
+      - ./assets/favicon.ico:/app/static/favicon.ico
     depends_on:
       - app
     networks:
