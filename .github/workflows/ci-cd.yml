@@ -101,7 +101,7 @@ jobs:
         run: |
           # Копируем основные файлы
           scp -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
-            docker-compose.yml .env \
+            pyproject.toml poetry.lock docker-compose.yml .env \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/
 
           # Копируем папки
