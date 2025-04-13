@@ -86,7 +86,7 @@ jobs:
           ssh -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
             "mkdir -p /home/${{ secrets.SERVER_USER }}/nginx && \
-             chmod 755 /home/${{ secrets.SERVER_USER }}/nginx"
+             chown ${{ secrets.SERVER_USER }}:${{ secrets.SERVER_USER }} /home/${{ secrets.SERVER_USER }}/nginx"
 
       - name: Copy application files
         run: |
