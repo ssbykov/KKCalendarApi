@@ -90,8 +90,8 @@ jobs:
 
       - name: Copy application files
         run: |
-          scp -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
-            Dockerfile docker-compose.yml .env pyproject.toml poetry.lock \
+          scp -r -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
+            . \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/
 
       - name: Create nginx directory
