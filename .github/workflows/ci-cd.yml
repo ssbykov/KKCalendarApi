@@ -80,11 +80,11 @@ jobs:
 
       - name: Deploy to production
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-      
+          mkdir -p /tmp/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY }}" > /tmp/.ssh/id_rsa
+          chmod 600 /tmp/.ssh/id_rsa
+          ssh-keyscan ${{ secrets.SERVER_IP }} > /tmp/.ssh/known_hosts
+
           # Копируем ВСЕ необходимые файлы
           scp -i ~/.ssh/id_rsa \
               Dockerfile docker-compose.yml .env \
