@@ -81,50 +81,24 @@ jobs:
           APP_CONFIG__RUN__PORT=8000
           EOF
 
-      - name: Prepare directories
+      - name: Deploy to production
         run: |
-          # Создаем папку nginx в домашней директории
-          ssh -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
-            "mkdir -p /home/${{ secrets.SERVER_USER }}/nginx"
+          mkdir -p /tmp/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY }}" > /tmp/.ssh/id_rsa
+          chmod 600 /tmp/.ssh/id_rsa
+          ssh-keyscan ${{ secrets.SERVER_IP }} > /tmp/.ssh/known_hosts
 
-      - name: Copy application files
-        run: |
-          scp -r -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
-            . \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/
+          # Копируем docker-compose.yml и .env на сервер
+          scp -o StrictHostKeyChecking=no \
+              -i /tmp/.ssh/id_rsa \
+              docker-compose.yml .env \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}
 
-      - name: Create nginx directory
-        run: |
-          ssh -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
-            "mkdir -p /home/${{ secrets.SERVER_USER }}/nginx && \
-             chmod 775 /home/${{ secrets.SERVER_USER }}/nginx"
-
-      - name: Deploy nginx config
-        run: |
-          # Копируем во временную папку
-          scp -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
-            nginx/nginx.conf \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/nginx.conf.tmp
-          
-          # Перемещаем с правильными правами
-          ssh -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
-            "mv /tmp/nginx.conf.tmp /home/${{ secrets.SERVER_USER }}/nginx/nginx.conf && \
-             chmod 644 /home/${{ secrets.SERVER_USER }}/nginx/nginx.conf"
-
-      - name: Deploy application
-        run: |
-          ssh -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
-            "cd /home/${{ secrets.SERVER_USER }} && \
-             docker compose down && \
-             docker compose build --no-cache && \
-             docker compose up -d"
-
-      - name: Verify deployment
-        run: |
-          ssh -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
-            "docker ps && curl -I http://localhost:8000/health"
+          # Выполняем деплой на сервере
+          ssh -o StrictHostKeyChecking=no \
+              -i /tmp/.ssh/id_rsa \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
+                cd /home/${{ secrets.SERVER_USER }} &&
+                docker compose down &&
+                docker compose up -d --build
+              "
