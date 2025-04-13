@@ -2,9 +2,9 @@ name: Docker CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   build:
@@ -47,11 +47,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          known_hosts: unnecessary
+      - name: Install SSH key and known_hosts
+        run: |
+          mkdir -p /tmp/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY }}" > /tmp/.ssh/id_rsa
+          chmod 600 /tmp/.ssh/id_rsa
+          ssh-keyscan ${{ secrets.SERVER_IP }} > /tmp/.ssh/known_hosts
 
       - name: Create .env file dynamically
         run: |
@@ -80,23 +81,16 @@ jobs:
 
       - name: Deploy to production
         run: |
-          mkdir -p /tmp/.ssh
-          echo "${{ secrets.SERVER_SSH_KEY }}" > /tmp/.ssh/id_rsa
-          chmod 600 /tmp/.ssh/id_rsa
-          ssh-keyscan ${{ secrets.SERVER_IP }} > /tmp/.ssh/known_hosts
+          # Копируем все нужные файлы
+          scp -o UserKnownHostsFile=/tmp/.ssh/known_hosts -o StrictHostKeyChecking=no -i /tmp/.ssh/id_rsa \
+            Dockerfile docker-compose.yml .env pyproject.toml poetry.lock \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}
 
-          # Копируем ВСЕ необходимые файлы
-          scp -i ~/.ssh/id_rsa \
-              Dockerfile docker-compose.yml .env \
-              pyproject.toml poetry.lock \
-              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}
-
-          # Выполняем деплой на сервере
-          ssh -o StrictHostKeyChecking=no \
-              -i /tmp/.ssh/id_rsa \
-              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
-                cd /home/${{ secrets.SERVER_USER }} &&
-                docker compose down &&
-                docker compose build --no-cache &&
-                docker compose up -d
-              "
+          # Выполняем деплой
+          ssh -o UserKnownHostsFile=/tmp/.ssh/known_hosts -o StrictHostKeyChecking=no -i /tmp/.ssh/id_rsa \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
+              cd /home/${{ secrets.SERVER_USER }} &&
+              docker compose down &&
+              docker compose build --no-cache &&
+              docker compose up -d
+            "
