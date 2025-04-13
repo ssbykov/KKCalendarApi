@@ -94,11 +94,25 @@ jobs:
             Dockerfile docker-compose.yml .env pyproject.toml poetry.lock \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/
 
-      - name: Copy nginx config
+      - name: Create nginx directory
         run: |
+          ssh -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+            "mkdir -p /home/${{ secrets.SERVER_USER }}/nginx && \
+             chmod 775 /home/${{ secrets.SERVER_USER }}/nginx"
+
+      - name: Deploy nginx config
+        run: |
+          # Копируем во временную папку
           scp -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
             nginx/nginx.conf \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SERVER_USER }}/nginx/nginx.conf
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/nginx.conf.tmp
+          
+          # Перемещаем с правильными правами
+          ssh -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+            "mv /tmp/nginx.conf.tmp /home/${{ secrets.SERVER_USER }}/nginx/nginx.conf && \
+             chmod 644 /home/${{ secrets.SERVER_USER }}/nginx/nginx.conf"
 
       - name: Deploy application
         run: |
