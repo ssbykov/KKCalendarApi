@@ -8,7 +8,14 @@ RUN apt-get update && \
     apt-get install -y curl && \
     rm -rf /var/lib/apt/lists/*
 
-# 2. Установка Poetry
+# 2. Установка Node.js
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g npm@latest
+
+# 3. Установка Poetry
 ENV POETRY_VERSION=2.1.2 \
     POETRY_HOME=/opt/poetry \
     POETRY_NO_INTERACTION=1 \
@@ -17,7 +24,7 @@ ENV POETRY_VERSION=2.1.2 \
 RUN curl -sSL https://install.python-poetry.org | python3 - && \
     /opt/poetry/bin/poetry --version
 
-# 3. Установка зависимостей
+# 4. Установка зависимостей
 WORKDIR /app
 COPY pyproject.toml poetry.lock ./
 RUN /opt/poetry/bin/poetry install --only main --no-root --no-ansi
