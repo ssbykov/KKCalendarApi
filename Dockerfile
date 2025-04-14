@@ -3,24 +3,24 @@
 # Этап сборки
 FROM python:3.11-slim as builder
 
-# 2. Установка Poetry
+# 3. Установка Poetry
 ENV POETRY_VERSION=2.1.2 \
     POETRY_HOME=/opt/poetry \
     POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_CREATE=false
 
 RUN curl -sSL https://install.python-poetry.org | python3 - && \
-    ln -sf /opt/poetry/bin/poetry /usr/local/bin/poetry
+    /opt/poetry/bin/poetry --version
 
-# 3. Установка зависимостей
+# 4. Установка зависимостей
 WORKDIR /app
 COPY pyproject.toml poetry.lock ./
-RUN poetry install --only main --no-root --no-ansi
+RUN /opt/poetry/bin/poetry install --only main --no-root --no-ansi
 
 # Финальный образ
 FROM python:3.11-slim
 
-# 1. Установка Node.js (без dev-зависимостей)
+# 1. Установка системных зависимостей и Node.js (для runtime)
 RUN apt-get update && \
     apt-get install -y curl gnupg && \
     curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
