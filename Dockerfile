@@ -15,11 +15,10 @@ RUN apt-get update && \
     sh nodesource_setup.sh && \
     apt-get update && \
     apt-get install -y nodejs && \
-    npm install -g npm@latest && \
+    npm install -g npm@9 && \
     rm nodesource_setup.sh && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
 
 # 3. Установка Poetry
 ENV POETRY_VERSION=2.1.2 \
