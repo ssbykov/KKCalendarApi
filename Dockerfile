@@ -48,7 +48,8 @@ RUN apt-get update && \
     curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
     apt-get update && \
     apt-get install -y postgresql-client-16 && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* \
+
 
 # 2. Копирование зависимостей
 WORKDIR /app
