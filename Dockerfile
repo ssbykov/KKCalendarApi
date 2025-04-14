@@ -43,8 +43,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN python3 -c "from exejs import evaluate; print('JS test:', evaluate('1+1'))"
-
 # Проверка Node.js
 RUN node -v && npm -v && which node
 
