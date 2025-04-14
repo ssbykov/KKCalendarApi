@@ -37,9 +37,14 @@ RUN /opt/poetry/bin/poetry install --only main --no-root --no-ansi
 # Финальный образ
 FROM python:3.11-slim
 
-# Установка Node.js (нужно для exejs)
+# 1. Установка системных зависимостей и Node.js (для runtime)
 RUN apt-get update && \
-    apt-get install -y curl gnupg wget &&
+    apt-get install -y curl gnupg wget && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g npm@9 && \
+    apt-get install -y postgresql-client && \
+    rm -rf /var/lib/apt/lists/*
 
 # 1. Установка PostgreSQL Client
 RUN apt-get update && \
