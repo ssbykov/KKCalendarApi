@@ -10,16 +10,15 @@ RUN apt-get update && \
 
 # 2. Установка Node.js
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    curl ca-certificates && \
-    mkdir -p /etc/apt/keyrings && \
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" > /etc/apt/sources.list.d/nodesource.list && \
-    apt-get update && \
+    apt-get install -y wget && \
+    wget https://deb.nodesource.com/setup_18.x -O nodesource_setup.sh && \
+    bash nodesource_setup.sh && \
     apt-get install -y nodejs && \
     npm install -g npm@latest && \
+    rm nodesource_setup.sh && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* \
+
 # 3. Установка Poetry
 ENV POETRY_VERSION=2.1.2 \
     POETRY_HOME=/opt/poetry \
