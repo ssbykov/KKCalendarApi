@@ -25,36 +25,36 @@ RUN poetry install --only main --no-root --no-ansi
 # Финальный образ
 FROM python:3.11-slim
 
-# 1. Установка всех системных зависимостей в одном RUN (оптимизация слоев)
+# Установка Node.js и зависимостей
 RUN apt-get update && \
-    # Установка базовых утилит
-    apt-get install -y curl gnupg2 lsb-release && \
-    # Установка Node.js
+    apt-get install -y curl gnupg && \
     curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs && \
-    # Установка PostgreSQL Client
+    # Явное создание симлинков
+    ln -sf /usr/bin/node /usr/local/bin/node && \
+    ln -sf /usr/bin/npm /usr/local/bin/npm && \
+    # Установка PostgreSQL
+    apt-get install -y gnupg2 lsb-release && \
     curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg && \
     echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
     apt-get update && \
     apt-get install -y postgresql-client-16 && \
     # Очистка
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    # Проверка установки
-    node -v && npm -v
+    rm -rf /var/lib/apt/lists/*
 
-# 2. Копирование зависимостей Python
+# Проверка Node.js
+RUN node -v && npm -v && which node
+
+# Копирование зависимостей Python
 WORKDIR /app
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /root/.cache/pypoetry/virtualenvs /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-# 3. Копирование кода приложения
+# Копирование приложения
 COPY . .
 
-# 4. Настройка окружения
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/app \
-    NODE_ENV=production
+# Явное указание пути к Node.js для exejs
+ENV NODE_PATH=/usr/bin/node
 
-# 5. Запуск приложения
-CMD ["bash", "-c", "cd ./app && alembic upgrade head && python -m app.main"]
+CMD ["bash", "-c", "cd app && alembic upgrade head && python -m app.main"]
