@@ -3,11 +3,6 @@
 # Этап сборки
 FROM python:3.11-slim as builder
 
-# 1. Установка системных зависимостей
-RUN apt-get update && \
-    apt-get install -y curl && \
-    rm -rf /var/lib/apt/lists/*
-
 # Установка Node.js
 RUN apt-get update && \
     apt-get install -y curl gnupg && \
