@@ -2,13 +2,6 @@
 
 FROM python:3.11-slim as builder
 
-# 1. Установка Node.js и системных зависимостей
-RUN apt-get update && \
-    apt-get install -y curl gnupg && \
-    curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs build-essential && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 # 2. Установка Poetry
 ENV POETRY_VERSION=2.1.2 \
@@ -27,22 +20,23 @@ RUN poetry install --only main --no-root --no-ansi
 # Финальный образ
 FROM python:3.11-slim
 
-# 1. Установка Node.js (без dev-зависимостей)
+# 1. Установка Node.js и PostgreSQL Client в одном RUN (для уменьшения слоев)
 RUN apt-get update && \
-    apt-get install -y curl gnupg && \
-    curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# 1. Установка PostgreSQL Client
-RUN apt-get update && \
+    # Установка зависимостей для Node.js и PostgreSQL
     apt-get install -y curl gnupg2 lsb-release && \
+    # Установка Node.js
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    # Установка PostgreSQL Client
     echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
-    curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg && \
     apt-get update && \
     apt-get install -y postgresql-client-16 && \
-    rm -rf /var/lib/apt/lists/* \
+    # Очистка
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    # Проверка установки Node.js
+    node -v && npm -v
 
 
 # 2. Копирование зависимостей
