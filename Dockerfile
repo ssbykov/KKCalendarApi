@@ -46,13 +46,17 @@ RUN apt-get update && \
 # Проверка Node.js
 RUN node -v && npm -v && which node
 
-# Копирование зависимостей Python
 WORKDIR /app
-COPY --from=builder /root/.cache/pypoetry/virtualenvs /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Копирование приложения
+# 3. Копирование кода приложения
 COPY . .
+
+# 4. Настройка окружения
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    NODE_ENV=production
 
 # Явное указание пути к Node.js для exejs
 ENV NODE_PATH=/usr/bin/node
