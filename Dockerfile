@@ -9,9 +9,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # 2. Установка Node.js
-# 2. Установка Node.js
 RUN wget https://deb.nodesource.com/setup_18.x -O nodesource_setup.sh && \
-    bash nodesource_setup.sh && \
+    sh nodesource_setup.sh && \
     apt-get update && \
     apt-get install -y nodejs && \
     npm install -g npm@latest && \
