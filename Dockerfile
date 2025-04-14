@@ -46,6 +46,8 @@ RUN apt-get update && \
 # Проверка Node.js
 RUN node -v && npm -v && which node
 
+RUN python3 -c "from exejs import evaluate; print(evaluate('1+1'))"
+
 WORKDIR /app
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
@@ -60,5 +62,8 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Явное указание пути к Node.js для exejs
 ENV NODE_PATH=/usr/bin/node
+
+ENV PATH="/usr/bin:/usr/local/bin:${PATH}" \
+    NODE_PATH="/usr/lib/node_modules"
 
 CMD ["bash", "-c", "cd app && alembic upgrade head && python -m app.main"]
