@@ -27,24 +27,26 @@ ENV POETRY_VERSION=2.1.2 \
     POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_CREATE=false
 
-RUN curl -sSL https://install.python-poetry.org | python3 - && \
-    ln -s /root/.local/bin/poetry /usr/local/bin/poetry
 
-# Установка зависимостей
+# Проверка Node.js
+RUN node -v && npm -v && which node
+
 WORKDIR /app
-COPY pyproject.toml poetry.lock ./
-RUN poetry install --only main
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Копирование кода приложения
+# 3. Копирование кода приложения
 COPY . .
 
-# Проверка exejs
-RUN python3 -c "from exejs import evaluate; print('JS test:', evaluate('1+1'))"
-
-# Переменные окружения
+# 4. Настройка окружения
 ENV PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app \
-    NODE_PATH=/usr/bin/node \
-    PATH="/usr/bin:/usr/local/bin:${PATH}"
+    NODE_ENV=production
+
+# Явное указание пути к Node.js для exejs
+ENV NODE_PATH=/usr/bin/node
+
+ENV PATH="/usr/bin:/usr/local/bin:${PATH}" \
+    NODE_PATH="/usr/lib/node_modules"
 
 CMD ["bash", "-c", "cd app && alembic upgrade head && python -m app.main"]
