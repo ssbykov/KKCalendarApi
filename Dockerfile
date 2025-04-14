@@ -9,15 +9,15 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # 2. Установка Node.js
-RUN apt-get update && \
-    apt-get install -y wget && \
-    wget https://deb.nodesource.com/setup_18.x -O nodesource_setup.sh && \
+# 2. Установка Node.js
+RUN wget https://deb.nodesource.com/setup_18.x -O nodesource_setup.sh && \
     bash nodesource_setup.sh && \
+    apt-get update && \
     apt-get install -y nodejs && \
     npm install -g npm@latest && \
     rm nodesource_setup.sh && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* \
+    rm -rf /var/lib/apt/lists/*
 
 # 3. Установка Poetry
 ENV POETRY_VERSION=2.1.2 \
