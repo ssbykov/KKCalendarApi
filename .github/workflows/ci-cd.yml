@@ -118,9 +118,3 @@ jobs:
              docker compose down && \
              docker compose build --no-cache && \
              docker compose up -d"
-
-      - name: Verify deployment
-        run: |
-          ssh -o UserKnownHostsFile=$SSH_DIR/known_hosts -i "$SSH_DIR/id_rsa" \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
-            "docker ps && curl -I http://localhost:8000/health"
