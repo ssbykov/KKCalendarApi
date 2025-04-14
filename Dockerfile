@@ -43,10 +43,10 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+RUN python3 -c "from exejs import evaluate; print('JS test:', evaluate('1+1'))"
+
 # Проверка Node.js
 RUN node -v && npm -v && which node
-
-RUN python3 -c "from exejs import evaluate; print(evaluate('1+1'))"
 
 WORKDIR /app
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
