@@ -2,12 +2,11 @@ import asyncio
 import json
 import logging
 import re
-from datetime import datetime
-from typing import Any
+from datetime import datetime, timedelta
+from typing import Any, List, Tuple
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 
 from core import settings
 from crud.days_info import DayInfoRepository
@@ -45,10 +44,13 @@ class GoogleCalendarParser:
         self.day_info_repo = DayInfoRepository(session)
         self.event_repo = EventRepository(session)
 
-    async def load_events(self, year: int, month: int, period: int = 1) -> None:
+    async def load_events(
+        self, year: int, month: int, period: int = 1
+    ) -> dict[str, list[str]]:
         calendar_days_info = await self._calendar_request(year, month, period)
         days_info = []
         events_for_translate = {}
+        new_events = []
         for day in calendar_days_info:
             descriptions = day.get("description").split("\n\n")
             body_events = []
@@ -88,6 +90,7 @@ class GoogleCalendarParser:
                         user_id=int(user_id) if user_id else None,
                     )
                     new_event_id = await self.event_repo.add_event(event_schema)
+                    new_events.append(event_schema.name)
                     events_for_translate[new_event_id] = event["name"]
                     events.append(new_event_id)
 
@@ -117,31 +120,69 @@ class GoogleCalendarParser:
         for event_id, ru_name in zip(events_for_translate.keys(), translated_events):
             await self.event_repo.ru_name_event_update(event_id, ru_name)
 
-        await self.day_info_repo.add_days(days_info)
+        result = await self.day_info_repo.add_days(days_info)
+        if new_events:
+            result["Новые события"] = new_events
+        return result
 
     async def _calendar_request(self, year: int, month: int, period: int = 1) -> Any:
-        start_of_month = (
-            datetime(year, month, 1).isoformat() + "Z"
-        )  # 'Z' указывает на время UTC
-        add_year = (month + period) // 12
-        new_month = (month + period) % 12
-        end_of_month = datetime(year + add_year, new_month, 1).isoformat() + "Z"
+        month_pairs = self.generate_month_period(
+            start_year=year,
+            start_month=month,
+            months_count=period,
+        )
+
+        # Параллельные запросы для каждого месяца
+        all_results = await asyncio.gather(
+            *[self._fetch_month_data(year, month) for year, month in month_pairs]
+        )
+
+        return [day for month_events in all_results for day in month_events]
+
+    @staticmethod
+    def generate_month_period(
+        start_year: int, start_month: int, months_count: int = 12
+    ) -> List[Tuple[int, int]]:
+        result = []
+        current_year, current_month = start_year, start_month
+
+        for _ in range(months_count):
+            result.append((current_year, current_month))
+
+            current_month += 1
+            if current_month > 12:
+                current_month = 1
+                current_year += 1
+
+        return result
+
+    async def _fetch_month_data(self, year: int, month: int) -> list[Any]:
+        """Запрашивает данные календаря за конкретный месяц."""
+        start_date = datetime(year, month, 1).isoformat() + "Z"
+
+        # Вычисляем последний день месяца
+        if month == 12:
+            next_month = datetime(year + 1, 1, 1)
+        else:
+            next_month = datetime(year, month + 1, 1)
+
+        end_date = (next_month - timedelta(days=1)).isoformat() + "Z"
 
         try:
-            days_info_result = (
-                self.service.events()
+            events = await asyncio.to_thread(
+                lambda: self.service.events()
                 .list(
                     calendarId=self.calendar_id,
-                    timeMin=start_of_month,
-                    timeMax=end_of_month,
+                    timeMin=start_date,
+                    timeMax=end_date,
                     singleEvents=True,
                     orderBy="startTime",
                 )
                 .execute()
             )
-            return days_info_result.get("items", [])[:-1]
-        except HttpError as error:
-            logging.error(f"An error occurred: {error}")
+            return events.get("items", [])
+        except Exception as error:
+            logging.error(f"Ошибка при запросе {year}-{month}: {error}")
             return []
 
     def _events_filter(

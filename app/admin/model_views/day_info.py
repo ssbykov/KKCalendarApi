@@ -1,10 +1,15 @@
-from sqladmin import ModelView
+from datetime import datetime
+
+from sqladmin import ModelView, action
 from starlette.requests import Request
+from starlette.responses import RedirectResponse
 
 from admin.mixines import CustomNavMixin
 from admin.utils import check_superuser
 from crud.days_info import DayInfoRepository
-from database import DayInfo
+from database import DayInfo, db_helper
+from database.backup_db import create_backup
+from utils.google_calendar_parser import GoogleCalendarParser
 
 
 class DayInfoAdmin(
@@ -50,3 +55,19 @@ class DayInfoAdmin(
 
     def is_accessible(self, request: Request) -> bool:
         return check_superuser(request)
+
+    @action(
+        name="load_new_data",
+        label="Загрузить данные",
+        add_in_detail=False,
+        add_in_list=True,
+        confirmation_message=f"Перед выполнением действия будет создана резервная копия базы данных. Продолжить?",
+    )
+    async def restore_db(self, request: Request) -> RedirectResponse:
+        await create_backup()
+        async for session in db_helper.get_session():
+            parser = GoogleCalendarParser(session)
+            today = datetime.now()
+            result = await parser.load_events(today.year, today.month, 12)
+            request.session["flash_messages"] = result
+        return RedirectResponse(request.url_for("admin:list", identity=self.identity))
