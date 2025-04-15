@@ -45,8 +45,8 @@ class GoogleCalendarParser:
         self.day_info_repo = DayInfoRepository(session)
         self.event_repo = EventRepository(session)
 
-    async def get_events(self, year: int, month: int) -> None:
-        calendar_days_info = await self._calendar_request(year, month)
+    async def load_events(self, year: int, month: int, period: int = 1) -> None:
+        calendar_days_info = await self._calendar_request(year, month, period)
         days_info = []
         events_for_translate = {}
         for day in calendar_days_info:
@@ -119,14 +119,13 @@ class GoogleCalendarParser:
 
         await self.day_info_repo.add_days(days_info)
 
-    async def _calendar_request(self, year: int, month: int) -> Any:
+    async def _calendar_request(self, year: int, month: int, period: int = 1) -> Any:
         start_of_month = (
             datetime(year, month, 1).isoformat() + "Z"
         )  # 'Z' указывает на время UTC
-        if month == 12:
-            end_of_month = datetime(year + 1, 1, 1).isoformat() + "Z"
-        else:
-            end_of_month = datetime(year, month + 1, 1).isoformat() + "Z"
+        add_year = (month + period) // 12
+        new_month = (month + period) % 12
+        end_of_month = datetime(year + add_year, new_month, 1).isoformat() + "Z"
 
         try:
             days_info_result = (
@@ -144,9 +143,6 @@ class GoogleCalendarParser:
         except HttpError as error:
             logging.error(f"An error occurred: {error}")
             return []
-
-    async def load_events(self, year: int, month: int) -> None:
-        await self.get_events(year, month)
 
     def _events_filter(
         self, head_events: list[str], body_events: list[str]
@@ -212,7 +208,7 @@ class GoogleCalendarParser:
 async def main() -> None:
     async for session in db_helper.get_session():
         parser = GoogleCalendarParser(session)
-        await parser.load_events(2024, 4)
+        await parser.load_events(2025, 4, 9)
 
 
 if __name__ == "__main__":
