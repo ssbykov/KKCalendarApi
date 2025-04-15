@@ -56,7 +56,7 @@ class DbHelper:
                 el_schema = schema_class(**el)
                 session.add(el_schema.to_orm())
 
-    async def init_db_backups(self) -> None:
+    async def synch_backups(self) -> None:
         async for session in self.get_session():
             repo = BackupDbRepository(session)
             await repo.synchronize()
