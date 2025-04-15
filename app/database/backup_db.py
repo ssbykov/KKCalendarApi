@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 import aiohttp
 
 from core import settings
-from core.logger_init import init_logger
+from database import db_helper
 
 if TYPE_CHECKING:
     from core.config import DbSettings
@@ -192,13 +192,12 @@ class YaDisk:
 
 
 async def create_backup() -> str | None:
-    init_logger(log_file="backup.log")
     if dump_file := await create_database_dump():
         yadisk = YaDisk()
         await yadisk.copy_photos_to_disk(dump_file)
+        await db_helper.synch_backups()
     return dump_file
 
 
 if __name__ == "__main__":
     asyncio.run(create_backup())
-    # asyncio.run(restore_database_from_dump("test_backup_2025-04-10_14-41-38.dump"))
