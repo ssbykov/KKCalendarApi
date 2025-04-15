@@ -1,5 +1,13 @@
 {% extends "sqladmin/layout.html" %}
 {% block content %}
+{% if request.session.get("flash_messages") %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ request.session.get("flash_messages") }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% set _ = request.session.pop("flash_messages") %}
+{% endif %}
+
 <div class="col-12">
     <div class="card">
         <div class="card-header">
@@ -93,7 +101,7 @@
             <table class="table card-table table-vcenter text-nowrap">
                 <thead>
                 <tr>
-                    {% if model_view._custom_actions_in_list %}
+                    {% if "restore" in model_view._custom_actions_in_list %}
                     <th class="w-1"></th>
                     {% endif %}
                     <th class="w-1">Действия</th>
