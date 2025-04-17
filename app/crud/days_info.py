@@ -85,28 +85,28 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo]):
             return elements
         raise ValueError("Элементы не найдены")
 
-    async def get_haircutting_day_id(self, moon_day: int) -> int:
+    async def get_haircutting_day_id(self, moon_day: int | str) -> int:
         return await self._get_id(
-            self.session, HaircuttingDay, HaircuttingDay.moon_day == moon_day
+            self.session, HaircuttingDay, HaircuttingDay.moon_day == int(moon_day)
         )
 
-    async def get_la_id(self, moon_day: int) -> int:
+    async def get_la_id(self, moon_day: int | str) -> int:
         return await self._get_id(
-            self.session, LaPosition, LaPosition.moon_day == moon_day
+            self.session, LaPosition, LaPosition.moon_day == int(moon_day)
         )
 
     async def get_yelam_day_id(self, moon: str) -> int:
         month = moon[:-1] if not moon[-1].isdigit() else moon
         return await self._get_id(self.session, Yelam, Yelam.month == int(month))
 
-    async def get_arch_id(self, moon_day: str) -> int:
-        day = int(moon_day[-1])
+    async def get_arch_id(self, moon_day: str | int) -> int:
+        day = int(str(moon_day)[-1])
         return await self._get_id(
             self.session, SkylightArch, SkylightArch.moon_day == day
         )
 
     async def add_days(
-        self, days_info: list[DayInfoSchemaCreate]
+        self, days_info: list[DayInfoSchemaCreate], update: bool = True
     ) -> dict[str, list[str]]:
         """
         Добавляет новые записи в таблицу `day_info` и обновляет существующие, если данные отличаются.
@@ -148,9 +148,11 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo]):
 
             if day_date not in days_info_in_base:
                 # Если даты нет в базе — создаем новую запись
+                new_days.append(day_info.date)
+                if not update:
+                    continue
                 new_day = DayInfoSchemaCreate(**day_dump).to_orm()
                 self.session.add(new_day)
-                new_days.append(day_info.date)
                 await self.session.flush()
                 for event_id in event_ids_new:
                     await self.session.execute(
@@ -165,6 +167,11 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo]):
                 current_events = set(day_dump.get("events", []))
                 new_events = set(days_dict_in_base[day_date].get("events", []))
                 if current_events != new_events:
+
+                    renew_days.append(day_info.date)
+                    if not update:
+                        continue
+
                     for key, value in day_dump.items():
                         if key != event_key:
                             setattr(db_day, key, value)
@@ -187,7 +194,8 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo]):
                                 DayInfoEvent.event_id == event_id,
                             )
                         )
-                    renew_days.append(day_info.date)
 
-        await self.session.commit()
+        if update:
+            await self.session.commit()
+
         return {"Добавленные дни": new_days, "Обновленные дни": renew_days}
