@@ -1,3 +1,5 @@
+import logging
+
 import translators as ts  # type: ignore
 from fake_headers import Headers  # type: ignore
 
@@ -18,5 +20,5 @@ def translate(text: str) -> str:
         else:
             return str(translated_text)  # Преобразуем в строку, если это необходимо
     except Exception as e:
-        print(f"Translation failed: {e}")
+        logging.error(f"Translation failed: {e}")
         return text

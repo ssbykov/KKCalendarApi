@@ -117,7 +117,7 @@ class GoogleCalendarParser:
                 .execute()
             )
             return days_info_result.get("items", [])  # type: ignore
-        except HttpError as error:
+        except Exception as error:
             logging.error(f"An error occurred: {error}")
             return []
 
