@@ -4,9 +4,11 @@ import requests
 from bs4 import BeautifulSoup as bs
 from fake_headers import Headers  # type: ignore
 
+from core import settings
 from core.context_vars import super_user_id
 from crud.days_info import DayInfoRepository
 from crud.events import EventRepository
+from crud.users import UsersRepository
 from database import SessionDep
 from database.schemas import DayInfoSchemaCreate, EventSchemaCreate
 from utils.translator import translate
@@ -19,8 +21,9 @@ class HtmlParser:
 
     def __init__(self, session: SessionDep):
         self.headers = Headers(browser="chrome", os="win").generate()
-        self.day_info_repo = DayInfoRepository(session)
-        self.event_repo = EventRepository(session)
+        self.session = session
+        self.day_info_repo = DayInfoRepository(self.session)
+        self.event_repo = EventRepository(self.session)
 
     async def get_days_info(self) -> None:
         # Получаем HTML документ
@@ -44,6 +47,8 @@ class HtmlParser:
         days_info: list[DayInfoSchemaCreate] = []
         events_for_translate = {}
         for index, block in enumerate(doc.find_all(class_=self.DAY_TAG)):
+            user_repo = UsersRepository(self.session)
+            user_id = await user_repo.get_user_id(settings.super_user.email)
             for day in block.find_all(class_="zfr3Q CDt4Ke"):
                 day_list = day.get_text().split(" ⋅ ")
 
@@ -83,7 +88,6 @@ class HtmlParser:
                     for item in day_list[1:elements_index]
                     if item not in filter_words
                 ]
-                user_id = super_user_id.get("super_user_id")
                 events_schema = list(
                     EventSchemaCreate(
                         name=event[0],
