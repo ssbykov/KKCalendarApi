@@ -36,6 +36,7 @@ dependencies = [
     "types-beautifulsoup4 (>=4.12.0.20250204,<5.0.0.0)",
     "google-api-python-client-stubs (>=1.29.0,<2.0.0)",
     "cryptography (>=44.0.2,<45.0.0)",
+    "apscheduler (>=3.11.0,<4.0.0)",
 ]
 
 
