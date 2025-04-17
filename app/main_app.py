@@ -9,13 +9,16 @@ from admin.init_admin import init_admin
 from api import router as api_router
 from core.logger_init import init_logger
 from database import db_helper
+from scheduler import startup_scheduler, shutdown_scheduler
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     await db_helper.synch_backups()
     await init_admin(app)
+    await startup_scheduler()
     yield
+    await shutdown_scheduler()
     await db_helper.dispose()
 
 
