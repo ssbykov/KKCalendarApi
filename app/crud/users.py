@@ -1,0 +1,14 @@
+from sqlalchemy import select
+
+from crud.mixines import GetBackNextIdMixin
+from database.models import User
+
+
+class UsersRepository(GetBackNextIdMixin[User]):
+    model = User
+
+    async def get_user_id(self, email: str) -> int:
+        result = await self.session.execute(
+            select(self.model.id).where(self.model.email == email)
+        )
+        return result.scalar_one()
