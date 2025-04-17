@@ -9,6 +9,6 @@ class UsersRepository(GetBackNextIdMixin[User]):
 
     async def get_user_id(self, email: str) -> int:
         result = await self.session.execute(
-            select(self.model.id).where(self.model.email == email)
+            select(self.model.id).where(self.model.email == email)  # type: ignore[arg-type]
         )
         return result.scalar_one()
