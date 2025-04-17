@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup as bs
 from fake_headers import Headers  # type: ignore
 
 from core import settings
-from core.context_vars import super_user_id
 from crud.days_info import DayInfoRepository
 from crud.events import EventRepository
 from crud.users import UsersRepository
