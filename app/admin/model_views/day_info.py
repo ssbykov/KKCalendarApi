@@ -63,7 +63,7 @@ class DayInfoAdmin(
         add_in_list=True,
         confirmation_message=f"Перед выполнением действия будет создана резервная копия базы данных. Продолжить?",
     )
-    async def restore_db(self, request: Request) -> RedirectResponse:
+    async def update_db(self, request: Request) -> RedirectResponse:
         await create_backup()
         async for session in db_helper.get_session():
             parser = GoogleCalendarParser(session)
