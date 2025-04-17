@@ -1,6 +1,7 @@
 import logging
 import smtplib
 from email.message import EmailMessage
+from typing import Any
 
 from jinja2 import Template
 
@@ -15,18 +16,19 @@ TEMPLATE_DICT = {
         "template": "verify_confirmation_template.html",
         "subject": "Подтверждение верификации",
     },
+    "check_update": {
+        "template": "check_update_template.html",
+        "subject": "Проверка обновления календаря",
+    },
 }
 
 TEMPLATES_DIR = "utils/email_templates/"
 
 
-async def send_verification_email(
-    user_email: str,
-    token: str,
-    action: str,
-    url_verification: str = "",
-) -> None:
+async def send_verification_email(action: str, context: dict[str, Any]) -> None:
     if not (action_dict := TEMPLATE_DICT.get(action)):
+        return
+    if not (user_email := context.get("user_email")):
         return
     # Создаем объект сообщения
     mail_params = settings.email
@@ -40,11 +42,7 @@ async def send_verification_email(
 
     template = Template(template_content)
 
-    rendered_html_content = template.render(
-        user_email=user_email,
-        url_verification=url_verification,
-        token=token,
-    )
+    rendered_html_content = template.render(**context)
 
     msg.add_alternative(rendered_html_content, subtype="html")
 

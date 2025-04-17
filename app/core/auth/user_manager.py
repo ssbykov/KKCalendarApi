@@ -48,12 +48,12 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             f"/{config.settings.api.auth_url}"
             f"/verify/?token={token}"
         )
-        await send_verification_email(
-            user_email=user.email,
-            url_verification=verification_url,
-            token=token,
-            action="verification",
-        )
+        context = {
+            "user_email": user.email,
+            "token": token,
+            "url_verification": verification_url,
+        }
+        await send_verification_email(action="verification", context=context)
         logger.warning(
             "Verification requested for user %r. Verification token: %r", user.id, token
         )

@@ -25,10 +25,13 @@ async def verify_user(
 ) -> str:
     try:
         user = await user_manager.verify(token=token)
+        context = {
+            "user_email": user.email,
+            "token": token,
+        }
         await send_verification_email(
-            user_email=user.email,
-            token=token,
             action="verify_confirmation",
+            context=context,
         )
         return f"Пользователь {user.email} верифицирован."
     except InvalidVerifyToken:
