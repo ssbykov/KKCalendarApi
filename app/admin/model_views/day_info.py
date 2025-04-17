@@ -68,6 +68,8 @@ class DayInfoAdmin(
         async for session in db_helper.get_session():
             parser = GoogleCalendarParser(session)
             today = datetime.now()
-            result = await parser.load_events(today.year, today.month, 12)
+            result = await parser.load_events(
+                year=today.year, month=today.month, period=12, update=True
+            )
             request.session["flash_messages"] = result
         return RedirectResponse(request.url_for("admin:list", identity=self.identity))
