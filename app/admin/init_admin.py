@@ -191,8 +191,7 @@ class NewAdmin(Admin):
         model_view = self._find_model_view(identity)
 
         if isinstance(model_view, BackupDbAdmin):
-            file_name = await create_backup()
-            await model_view.insert_model(request, {"name": file_name})
+            await create_backup()
             url = request.url_for("admin:list", identity=identity)
             return RedirectResponse(url=url, status_code=302)
 
