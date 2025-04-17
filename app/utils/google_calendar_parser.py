@@ -1,4 +1,3 @@
-import asyncio
 import json
 import logging
 import re
@@ -55,7 +54,7 @@ class GoogleCalendarParser:
         self.event_repo = EventRepository(self.session)
 
     async def load_events(
-        self, year: int, month: int, period: int = 1, update: bool = True
+        self, year: int, month: int, period: int, update: bool
     ) -> dict[str, list[str]]:
         calendar_days_info = await self._calendar_request(year, month, period)
         user_repo = UsersRepository(self.session)
@@ -117,7 +116,7 @@ class GoogleCalendarParser:
                 )
                 .execute()
             )
-            return days_info_result.get("items", [])
+            return days_info_result.get("items", [])  # type: ignore
         except HttpError as error:
             logging.error(f"An error occurred: {error}")
             return []
@@ -250,11 +249,14 @@ class GoogleCalendarParser:
         return events
 
 
-async def main() -> None:
+async def calendar_parser_run(
+    period: int, update: bool = False
+) -> dict[str, list[str]] | None:
     async for session in db_helper.get_session():
         parser = GoogleCalendarParser(session)
-        await parser.load_events(2025, 4, 9)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+        today = datetime.now()
+        result = await parser.load_events(
+            year=today.year, month=today.month, period=period, update=update
+        )
+        return result
+    return None

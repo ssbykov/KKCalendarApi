@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from sqladmin import ModelView, action
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
@@ -7,9 +5,9 @@ from starlette.responses import RedirectResponse
 from admin.mixines import CustomNavMixin
 from admin.utils import check_superuser
 from crud.days_info import DayInfoRepository
-from database import DayInfo, db_helper
+from database import DayInfo
 from database.backup_db import create_backup
-from utils.google_calendar_parser import GoogleCalendarParser
+from utils.google_calendar_parser import calendar_parser_run
 
 
 class DayInfoAdmin(
@@ -65,11 +63,6 @@ class DayInfoAdmin(
     )
     async def update_db(self, request: Request) -> RedirectResponse:
         await create_backup()
-        async for session in db_helper.get_session():
-            parser = GoogleCalendarParser(session)
-            today = datetime.now()
-            result = await parser.load_events(
-                year=today.year, month=today.month, period=12, update=True
-            )
-            request.session["flash_messages"] = result
+        result = await calendar_parser_run(period=12, update=True)
+        request.session["flash_messages"] = result
         return RedirectResponse(request.url_for("admin:list", identity=self.identity))
