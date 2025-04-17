@@ -4,7 +4,6 @@ from typing import Callable, Any, cast
 
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_users import InvalidPasswordException
-from fastapi_users.exceptions import UserAlreadyExists
 from pydantic import ValidationError, EmailStr
 from sqladmin import ModelView
 from sqladmin.authentication import AuthenticationBackend
@@ -14,7 +13,6 @@ from starlette.requests import Request
 from core import settings
 from core.auth.access_tokens_helper import AccessTokensHelper
 from core.auth.user_manager_helper import UserManagerHelper
-from core.context_vars import super_user_id
 from database.schemas.admin_auth_response import AdminAuthResponse
 from database.schemas.user import UserCreate
 
@@ -141,15 +139,9 @@ class AdminAuth(AuthenticationBackend):
             is_superuser=is_superuser,
             is_verified=is_verified,
         )
-        try:
-            super_user = await self.user_manager_helper.create_user(
-                user_create=user_create
-            )
-        except UserAlreadyExists:
-            super_user = await self.user_manager_helper.get_user_by_email(
-                user_email=email
-            )
-        super_user_id.set(super_user.id)
+        super_user = await self.user_manager_helper.get_user_by_email(user_email=email)
+        if not super_user:
+            await self.user_manager_helper.create_user(user_create=user_create)
 
 
 def owner_required(func: Callable[..., Any]) -> Callable[..., Any]:
