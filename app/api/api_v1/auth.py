@@ -1,6 +1,8 @@
 from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, Depends
+from fastapi.requests import Request
+from fastapi.templating import Jinja2Templates
 from fastapi_users.exceptions import InvalidVerifyToken, UserAlreadyVerified
 
 from api.dependencies.backend import authentication_backend
@@ -9,6 +11,8 @@ from database.schemas.user import UserRead, UserCreate
 from utils.email_sender import send_email
 from .fastapi_users import fastapi_users
 from ..dependencies.user_manager import get_user_manager
+
+templates = Jinja2Templates(directory=settings.sql_admin.templates)
 
 router = APIRouter(
     prefix=settings.api.v1.auth,
@@ -19,7 +23,7 @@ if TYPE_CHECKING:
     from core.auth.user_manager import UserManager
 
 
-@router.get("/verify/")
+@router.get("/verify")
 async def verify_user(
     token: str, user_manager: "UserManager" = Depends(get_user_manager)
 ) -> str:
@@ -38,6 +42,14 @@ async def verify_user(
         return "Невалидный токен"
     except UserAlreadyVerified:
         return "Пользователь уже верифицирован"
+
+
+@router.get("/reset-password")
+def reset_password_form(request: Request):
+    token = request.query_params.get("token")
+    return templates.TemplateResponse(
+        "reset_password.html", {"request": request, "token": token}
+    )
 
 
 # login, logout
