@@ -6,7 +6,7 @@ from fastapi_users.exceptions import InvalidVerifyToken, UserAlreadyVerified
 from api.dependencies.backend import authentication_backend
 from core.config import settings
 from database.schemas.user import UserRead, UserCreate
-from utils.email_sender import send_verification_email
+from utils.email_sender import send_email
 from .fastapi_users import fastapi_users
 from ..dependencies.user_manager import get_user_manager
 
@@ -29,7 +29,7 @@ async def verify_user(
             "user_email": user.email,
             "token": token,
         }
-        await send_verification_email(
+        await send_email(
             action="verify_confirmation",
             context=context,
         )

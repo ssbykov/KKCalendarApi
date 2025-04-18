@@ -25,7 +25,7 @@ TEMPLATE_DICT = {
 TEMPLATES_DIR = "utils/email_templates/"
 
 
-async def send_verification_email(action: str, context: dict[str, Any]) -> None:
+async def send_email(action: str, context: dict[str, Any]) -> None:
     if not (action_dict := TEMPLATE_DICT.get(action)):
         return
     if not (user_email := context.get("user_email")):
@@ -37,7 +37,9 @@ async def send_verification_email(action: str, context: dict[str, Any]) -> None:
     msg["To"] = mail_params.admin_email if action == "verification" else user_email
     msg["Subject"] = action_dict.get("subject", "")
 
-    with open(TEMPLATES_DIR + action_dict.get("template", ""), "r") as file:
+    with open(
+        TEMPLATES_DIR + action_dict.get("template", ""), "r", encoding="utf-8"
+    ) as file:
         template_content = file.read()
 
     template = Template(template_content)
