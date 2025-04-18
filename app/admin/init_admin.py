@@ -2,18 +2,18 @@ import os
 from datetime import datetime
 from typing import Any, cast
 
-from starlette.datastructures import URL
-from core import settings
-from crud.days_info import DayInfoRepository
-from database import db_helper, DayInfo
-from database.backup_db import create_backup
 from sqladmin import Admin
 from sqladmin.authentication import login_required
 from sqlalchemy.exc import IntegrityError
+from starlette.datastructures import URL
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import Response, RedirectResponse
 
+from core import settings
+from crud.days_info import DayInfoRepository
+from database import db_helper, DayInfo
+from database.backup_db import create_backup
 from .backend import AdminAuth, owner_required
 from .model_views import (
     EventAdmin,
@@ -27,6 +27,7 @@ from .model_views import (
     EventTypeAdmin,
     EmojiAdmin,
     BackupDbAdmin,
+    UserAdmin,
 )
 
 
@@ -49,6 +50,7 @@ async def init_admin(app: Any) -> None:
     admin.add_view(EventTypeAdmin)
     admin.add_view(EmojiAdmin)
     admin.add_view(BackupDbAdmin)
+    admin.add_view(UserAdmin)
     assert isinstance(admin.authentication_backend, AdminAuth)
     await admin.authentication_backend.create_superuser()
 
