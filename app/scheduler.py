@@ -4,7 +4,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler  # type: ignore
 from apscheduler.triggers.cron import CronTrigger  # type: ignore
 
 from core import settings
-from utils.email_sender import send_verification_email
+from utils.email_sender import send_email
 from utils.google_calendar_parser import calendar_parser_run
 
 scheduler = AsyncIOScheduler()
@@ -16,7 +16,7 @@ async def check_calendar_update() -> None:
         "user_email": settings.super_user.email,
         "update_result": result,
     }
-    await send_verification_email(
+    await send_email(
         action="check_update",
         context=context,
     )
