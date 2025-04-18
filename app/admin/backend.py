@@ -29,47 +29,14 @@ class AdminAuth(AuthenticationBackend):
     ) -> AdminAuthResponse:
         form = await request.form()
         is_new_user = form.get("new_user")
+        is_reset_password = form.get("reset_password")
         username, password = str(form["username"]), str(form["password"])
 
         if is_new_user:
-            try:
-                user_create = UserCreate(
-                    email=username,
-                    password=password,
-                    is_active=True,
-                    is_superuser=False,
-                    is_verified=False,
-                )
-            except ValidationError:
-                return AdminAuthResponse(
-                    is_ok=False,
-                    error="Проверьте правильность email",
-                )
-            if await self.user_manager_helper.get_user_by_email(user_email=username):
-                return AdminAuthResponse(
-                    is_ok=False,
-                    error="Пользователь с таким email уже существует",
-                )
-            try:
-                user = await self.user_manager_helper.create_user(
-                    user_create=user_create
-                )
-                await self.user_manager_helper.request_verify(user=user)
-                return AdminAuthResponse(
-                    is_ok=False,
-                    message="Пользователь успешно зарегистрирован. "
-                    "Дождитесь Уведомление о верификации на почту.",
-                )
-            except InvalidPasswordException as e:
-                return AdminAuthResponse(
-                    is_ok=False,
-                    error=e.reason,
-                )
-            except Exception as e:
-                return AdminAuthResponse(
-                    is_ok=False,
-                    error=str(e),
-                )
+            return await self.create_new_user(username, password)
+
+        elif is_reset_password:
+            return await self.forgot_password(username, password, request)
 
         else:
             credentials = OAuth2PasswordRequestForm(
@@ -142,6 +109,67 @@ class AdminAuth(AuthenticationBackend):
         super_user = await self.user_manager_helper.get_user_by_email(user_email=email)
         if not super_user:
             await self.user_manager_helper.create_user(user_create=user_create)
+
+    async def forgot_password(self, username: str, password: str, request: Request):
+        user = await self.user_manager_helper.get_user_by_email(user_email=username)
+        try:
+            request.session.update({"password": password})
+            await self.user_manager_helper.forgot_password(user=user, request=request)
+
+            return AdminAuthResponse(
+                is_ok=False,
+                message="Ссылка о подтверждении смены пароля отправлена на почту.",
+            )
+        except InvalidPasswordException as e:
+            return AdminAuthResponse(
+                is_ok=False,
+                error=e.reason,
+            )
+        except Exception as e:
+            return AdminAuthResponse(
+                is_ok=False,
+                error=str(e),
+            )
+
+    async def create_new_user(self, username: str, password: str):
+        try:
+            user_create = UserCreate(
+                email=username,
+                password=password,
+                is_active=True,
+                is_superuser=False,
+                is_verified=False,
+            )
+        except ValidationError:
+            return AdminAuthResponse(
+                is_ok=False,
+                error="Проверьте правильность email",
+            )
+
+        if await self.user_manager_helper.get_user_by_email(user_email=username):
+            return AdminAuthResponse(
+                is_ok=False,
+                error="Пользователь с таким email уже существует",
+            )
+
+        try:
+            user = await self.user_manager_helper.create_user(user_create=user_create)
+            await self.user_manager_helper.request_verify(user=user)
+            return AdminAuthResponse(
+                is_ok=False,
+                message="Пользователь успешно зарегистрирован. "
+                "Дождитесь Уведомление о верификации на почту.",
+            )
+        except InvalidPasswordException as e:
+            return AdminAuthResponse(
+                is_ok=False,
+                error=e.reason,
+            )
+        except Exception as e:
+            return AdminAuthResponse(
+                is_ok=False,
+                error=str(e),
+            )
 
 
 def owner_required(func: Callable[..., Any]) -> Callable[..., Any]:

@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Callable, Any
 
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_users.exceptions import UserNotExists
+from starlette.requests import Request
 
 from api.dependencies.access_tokens import get_access_token_db
 from api.dependencies.user_manager import get_user_manager
@@ -90,3 +91,12 @@ class UserManagerHelper:
         token: str,
     ) -> User:
         return await user_manager.verify(token=token)
+
+    @staticmethod
+    @with_user_manager
+    async def forgot_password(
+        user_manager: "UserManager",
+        user: User,
+        request: Request,
+    ) -> User:
+        return await user_manager.forgot_password(user=user, request=request)

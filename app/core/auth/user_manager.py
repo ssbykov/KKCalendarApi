@@ -7,7 +7,7 @@ from fastapi_users.schemas import UC
 
 from core import settings, config
 from database.models import User
-from utils.email_sender import send_verification_email
+from utils.email_sender import send_email
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +32,20 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         token: str,
         request: Optional["Request"] = None,
     ) -> None:
-        logger.warning(
-            "User %r has forgot their password. Reset token: %r", user.id, token
+        reset_url = (
+            f"http://{config.settings.run.host}"
+            f":{config.settings.run.port}"
+            f"/{config.settings.api.auth_url}"
+            f"/reset-password"
         )
+        password = request.session.get("password")
+        context = {
+            "user_email": user.email,
+            "token": token,
+            "password": password,
+            "url_reset": reset_url,
+        }
+        await send_email(action="forgot_password", context=context)
 
     async def on_after_request_verify(
         self,
@@ -53,10 +64,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             "token": token,
             "url_verification": verification_url,
         }
-        await send_verification_email(action="verification", context=context)
-        logger.warning(
-            "Verification requested for user %r. Verification token: %r", user.id, token
-        )
+        await send_email(action="verification", context=context)
 
     async def validate_password(
         self,

@@ -20,6 +20,10 @@ TEMPLATE_DICT = {
         "template": "check_update_template.html",
         "subject": "Проверка обновления календаря",
     },
+    "forgot_password": {
+        "template": "reset_password_template.html",
+        "subject": "Подтверждение изменения пароля",
+    },
 }
 
 TEMPLATES_DIR = "utils/email_templates/"
