@@ -186,9 +186,10 @@ class YaDisk:
                     async with session.put(upload_url, data=f) as response:
                         if response.status != 201:
                             raise Exception(f"Статус:{response.status}")
-                        # await response.read() # необязательно, но можно прочитать ответ
+                        return None
             except Exception as e:
                 logging.error(f"Ошибка при загрузке файла: {e}")
+                return None
 
 
 async def create_backup() -> str | None:
