@@ -2,7 +2,11 @@ import logging
 import re
 from typing import Optional, TYPE_CHECKING, Union
 
-from fastapi_users import BaseUserManager, IntegerIDMixin, InvalidPasswordException
+from fastapi_users import (
+    BaseUserManager,
+    IntegerIDMixin,
+    InvalidPasswordException,
+)
 from fastapi_users.schemas import UC
 
 from core import settings, config
@@ -20,44 +24,41 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     verification_token_secret = settings.access_token.verification_token_secret
 
     async def on_after_register(
-        self,
-        user: User,
-        request: Optional["Request"] = None,
+            self,
+            user: User,
+            request: Optional["Request"] = None,
     ) -> None:
         logger.warning("User %r has registered.", user.id)
 
     async def on_after_forgot_password(
-        self,
-        user: User,
-        token: str,
-        request: Optional["Request"] = None,
+            self,
+            user: User,
+            token: str,
+            request: Optional["Request"] = None,
     ) -> None:
         reset_url = (
             f"http://{config.settings.run.host}"
             f":{config.settings.run.port}"
             f"/{config.settings.api.auth_url}"
-            f"/reset-password"
+            f"/reset-password?token={token}"
         )
-        password = request.session.get("password")
         context = {
             "user_email": user.email,
-            "token": token,
-            "password": password,
             "url_reset": reset_url,
         }
         await send_email(action="forgot_password", context=context)
 
     async def on_after_request_verify(
-        self,
-        user: User,
-        token: str,
-        request: Optional["Request"] = None,
+            self,
+            user: User,
+            token: str,
+            request: Optional["Request"] = None,
     ) -> None:
         verification_url = (
             f"http://{config.settings.run.host}"
             f":{config.settings.run.port}"
             f"/{config.settings.api.auth_url}"
-            f"/verify/?token={token}"
+            f"/verify?token={token}"
         )
         context = {
             "user_email": user.email,
@@ -67,9 +68,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         await send_email(action="verification", context=context)
 
     async def validate_password(
-        self,
-        password: str,
-        user: Union[UC, User],
+            self,
+            password: str,
+            user: Union[UC, User],
     ) -> None:
 
         if len(password) < 4:
