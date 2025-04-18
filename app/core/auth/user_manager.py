@@ -24,17 +24,17 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     verification_token_secret = settings.access_token.verification_token_secret
 
     async def on_after_register(
-            self,
-            user: User,
-            request: Optional["Request"] = None,
+        self,
+        user: User,
+        request: Optional["Request"] = None,
     ) -> None:
         logger.warning("User %r has registered.", user.id)
 
     async def on_after_forgot_password(
-            self,
-            user: User,
-            token: str,
-            request: Optional["Request"] = None,
+        self,
+        user: User,
+        token: str,
+        request: Optional["Request"] = None,
     ) -> None:
         reset_url = (
             f"http://{config.settings.run.host}"
@@ -49,10 +49,10 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         await send_email(action="forgot_password", context=context)
 
     async def on_after_request_verify(
-            self,
-            user: User,
-            token: str,
-            request: Optional["Request"] = None,
+        self,
+        user: User,
+        token: str,
+        request: Optional["Request"] = None,
     ) -> None:
         verification_url = (
             f"http://{config.settings.run.host}"
@@ -68,9 +68,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         await send_email(action="verification", context=context)
 
     async def validate_password(
-            self,
-            password: str,
-            user: Union[UC, User],
+        self,
+        password: str,
+        user: Union[UC, User],
     ) -> None:
 
         if len(password) < 4:
