@@ -35,13 +35,18 @@
 
             <!-- Зависимые чекбоксы -->
             <div class="mt-3">
+                <label class="form-label">Действие</label>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="checkbox1" name="new_user">
-                    <label class="form-check-label" for="checkbox1">Новый пользователь</label>
+                    <input class="form-check-input" type="radio" id="defaultAction" name="action" value="login" checked>
+                    <label class="form-check-label" for="defaultAction">Обычный вход</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="checkbox2" name="reset_password">
-                    <label class="form-check-label" for="checkbox2">Сброс пароля</label>
+                    <input class="form-check-input" type="radio" id="newUser" name="action" value="new_user">
+                    <label class="form-check-label" for="newUser">Новый пользователь</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="resetPassword" name="action" value="reset_password">
+                    <label class="form-check-label" for="resetPassword">Сброс пароля</label>
                 </div>
             </div>
             {% if message %}
@@ -55,16 +60,12 @@
 </div>
 
 <script>
-    // Получаем ссылки на чекбоксы
-    const checkbox1 = document.getElementById('checkbox1');
-    const checkbox2 = document.getElementById('checkbox2');
+    // Получаем все радио-кнопки с name="action"
+    const radios = document.querySelectorAll('input[name="action"]');
 
-    // Добавляем обработчик события для первого чекбокса
-    checkbox1.addEventListener('change', function () {
-        checkbox2.disabled = this.checked;
-    });
-    checkbox2.addEventListener('change', function () {
-        checkbox1.disabled = this.checked;
+    radios.forEach(radio => {
+        radio.addEventListener('change', function ());
+        });
     });
 </script>
 {% endblock %}

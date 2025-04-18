@@ -28,14 +28,13 @@ class AdminAuth(AuthenticationBackend):
         request: Request,
     ) -> AdminAuthResponse:
         form = await request.form()
-        is_new_user = form.get("new_user")
-        is_reset_password = form.get("reset_password")
+        action = form.get("action")
         username, password = str(form["username"]), str(form["password"])
 
-        if is_new_user:
+        if action == "new_user":
             return await self.create_new_user(username, password)
 
-        elif is_reset_password:
+        elif action == "reset_password":
             return await self.forgot_password(username, password, request)
 
         else:
