@@ -256,7 +256,10 @@ async def calendar_parser_run(
         parser = GoogleCalendarParser(session)
         today = datetime.now()
         result = await parser.load_events(
-            year=today.year, month=today.month, period=period, update=update
+            year=today.year,
+            month=today.month,
+            period=period,
+            update=update,
         )
         return result
     return None

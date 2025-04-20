@@ -9,6 +9,7 @@ from .base_schema import BaseSchema
 class EventTypeSchema(BaseModel):
     name: str
     description: str | None = None
+    rank: int
 
     class Config:
         from_attributes = True
