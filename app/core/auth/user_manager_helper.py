@@ -98,5 +98,5 @@ class UserManagerHelper:
         user_manager: "UserManager",
         user: User,
         request: Request,
-    ) -> User:
-        return await user_manager.forgot_password(user=user, request=request)
+    ) -> None:
+        await user_manager.forgot_password(user=user, request=request)

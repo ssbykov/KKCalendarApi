@@ -109,7 +109,7 @@ class AdminAuth(AuthenticationBackend):
         if not super_user:
             await self.user_manager_helper.create_user(user_create=user_create)
 
-    async def forgot_password(self, username: str, password: str, request: Request):
+    async def forgot_password(self, username: str, password: str, request: Request) -> AdminAuthResponse:
         user = await self.user_manager_helper.get_user_by_email(user_email=username)
         try:
             request.session.update({"password": password})
@@ -130,7 +130,7 @@ class AdminAuth(AuthenticationBackend):
                 error=str(e),
             )
 
-    async def create_new_user(self, username: str, password: str):
+    async def create_new_user(self, username: str, password: str) -> AdminAuthResponse:
         try:
             user_create = UserCreate(
                 email=username,

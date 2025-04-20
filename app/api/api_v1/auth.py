@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from fastapi.requests import Request
 from fastapi.templating import Jinja2Templates
 from fastapi_users.exceptions import InvalidVerifyToken, UserAlreadyVerified
+from starlette.templating import _TemplateResponse
 
 from api.dependencies.backend import authentication_backend
 from core.config import settings
@@ -45,7 +46,7 @@ async def verify_user(
 
 
 @router.get("/reset-password")
-def reset_password_form(request: Request):
+def reset_password_form(request: Request) -> _TemplateResponse:
     token = request.query_params.get("token")
     return templates.TemplateResponse(
         "reset_password.html", {"request": request, "token": token}
