@@ -29,6 +29,13 @@ class EventTypeAdmin(
     can_delete = True
     can_export = False
 
+    form_ajax_refs = {
+        "events": {
+            "fields": ("ru_name",),
+        }
+    }
+
+
     def is_visible(self, request: Request) -> bool:
         return check_superuser(request)
 

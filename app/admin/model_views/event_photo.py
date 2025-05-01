@@ -29,6 +29,7 @@ class EventPhotoAdmin(
     column_labels = {
         "name": "Название",
         "photo_data": "Файл",
+        "event": "События",
     }
     column_list = [EventPhoto.name]
     column_details_list = [EventPhoto.name, EventPhoto.photo_data]
@@ -37,6 +38,12 @@ class EventPhotoAdmin(
         "photo_data": lambda model, _: (
             Markup(photo_url(model.photo_data)) if hasattr(model, "photo_data") else ""
         ),
+    }
+
+    form_ajax_refs = {
+        "event": {
+            "fields": ("ru_name",),
+        }
     }
 
     async def on_model_change(

@@ -49,8 +49,8 @@ class EventAdmin(
         "emoji": "Эмодзи",
     }
 
-    column_list = ["id", "emoji", "type", "ru_name"]
-    column_searchable_list = [Event.en_name, Event.ru_name]
+    column_list = ["id", "ru_name", "emoji", "type"]
+    column_searchable_list = ["en_name", "ru_name"]
     column_sortable_list = ["id"]
     column_formatters_detail = {
         Event.link: lambda model, attribute: getattr(model, "link", None)
@@ -77,7 +77,7 @@ class EventAdmin(
         "days": {
             "fields": ("date",),
             "order_by": "date",
-        }
+        },
     }
 
     def list_query(self, request: Request) -> Select[Any]:
@@ -100,6 +100,13 @@ class EventAdmin(
         if user := self.get_user_not_superuser(request):
             stmt = stmt.filter(Event.user_id == user.get("id"))
         return stmt
+
+    # def form_edit_rules(self):
+    #     rules = super().form_edit_rules()
+    #     # Добавляем опцию 'None' в список выбора для поля 'photo'
+    #     photo_field = self.form.photo
+    #     photo_field.choices.insert(0, (None, 'Очистить'))
+    #     return rules
 
     async def on_model_change(
         self,
