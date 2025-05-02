@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 from starlette.requests import Request
 
 from admin.mixines import CustomNavMixin
+from admin.model_views.event_photo import photo_url
 from crud.events import EventRepository
 from database import Event, db_helper
 
@@ -58,6 +59,9 @@ class EventAdmin(
             f'<a href="{getattr(model, "link", "#")}" target="_blank">{getattr(model, "link", "No URL")}</a>'
         )
         or "",
+        Event.photo: lambda model, _: (
+            Markup(photo_url(model.photo.photo_data)) if hasattr(model, "photo") and model.photo else ""
+        ),
     }
     detail_columns_counts = {
         "days": {"count": 4, "width": 200},
@@ -100,13 +104,6 @@ class EventAdmin(
         if user := self.get_user_not_superuser(request):
             stmt = stmt.filter(Event.user_id == user.get("id"))
         return stmt
-
-    # def form_edit_rules(self):
-    #     rules = super().form_edit_rules()
-    #     # Добавляем опцию 'None' в список выбора для поля 'photo'
-    #     photo_field = self.form.photo
-    #     photo_field.choices.insert(0, (None, 'Очистить'))
-    #     return rules
 
     async def on_model_change(
         self,
