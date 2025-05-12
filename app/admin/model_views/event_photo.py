@@ -22,6 +22,8 @@ class EventPhotoAdmin(
     repo_type = EventPhotoRepository
     name_plural = "Фотографии для событий"
     name = "Фото события"
+    icon = "fa-solid fa-image"
+
     can_edit = True
     can_delete = True
     can_export = False

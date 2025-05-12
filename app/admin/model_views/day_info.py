@@ -18,6 +18,8 @@ class DayInfoAdmin(
     repo_type = DayInfoRepository
     name_plural = "Дни календаря"
     name = "Информация по дню"
+    icon = "fa-solid fa-calendar-days"
+
     column_labels = {
         "date": "Дата",
         "moon_day": "Лунный день",

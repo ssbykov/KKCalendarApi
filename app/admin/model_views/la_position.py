@@ -15,6 +15,8 @@ class LaPositionAdmin(
     repo_type = LaPositionRepository
     name_plural = "Энергия Ла"
     name = "Энергия Ла"
+    category = "Атрибуты дня"
+
     column_labels = {
         "moon_day": "Лунный день",
         "en_name": "Заголовок на английском",

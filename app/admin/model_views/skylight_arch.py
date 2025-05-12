@@ -15,6 +15,8 @@ class SkylightArchAdmin(
     repo_type = SkylightArchRepository
     name_plural = "Световые арки"
     name = "Световая арка"
+    category = "Атрибуты дня"
+
     column_labels = {
         "moon_day": "Лунный день",
         "name": "Название",

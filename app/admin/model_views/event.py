@@ -20,6 +20,8 @@ class EventAdmin(
     repo_type = EventRepository
     name_plural = "События"
     name = "Событие"
+    icon = "fa-solid fa-calendar-plus"
+
     form_create_rules = [
         "days",
         "moon_day",

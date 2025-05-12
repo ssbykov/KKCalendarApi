@@ -15,6 +15,8 @@ class EventTypeAdmin(
     repo_type = EventTypeRepository
     name_plural = "Типы событий"
     name = "Тип события"
+    icon = "fa-solid fa-bars"
+
     column_list = ["name", "rank"]
     column_details_exclude_list = [
         EventType.id,

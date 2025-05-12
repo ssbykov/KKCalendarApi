@@ -15,6 +15,8 @@ class HaircuttingAdmin(
     repo_type = HaircuttingRepository
     name_plural = "Дни для стрижки"
     name = "День для стрижки"
+    category = "Атрибуты дня"
+
     column_labels = {
         "moon_day": "Лунный день",
         "en_name": "Заголовок на английском",

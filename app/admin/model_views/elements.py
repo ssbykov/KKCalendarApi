@@ -15,6 +15,8 @@ class ElementsAdmin(
     repo_type = ElementsRepository
     name_plural = "Сочетания элементов"
     name = "Сочетание элементов"
+    category = "Атрибуты дня"
+
     column_list = [Elements.ru_name, Elements.is_positive]
     column_labels = {
         "en_name": "Заголовок на английском",

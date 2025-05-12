@@ -15,6 +15,8 @@ class UserAdmin(
     repo_type = UsersRepository
     name_plural = "Пользователи"
     name = "Пользователь"
+    icon = "fa-solid fa-user"
+
     column_list = ["id", "email", "is_verified"]
     can_edit = False
     can_delete = False

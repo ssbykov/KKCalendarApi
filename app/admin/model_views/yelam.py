@@ -15,6 +15,8 @@ class YelamAdmin(
     repo_type = YelamRepository
     name_plural = "Йелам"
     name = "Йелам"
+    category = "Атрибуты дня"
+
     column_labels = {
         "month": "Месяц",
         "en_name": "Название на английском",

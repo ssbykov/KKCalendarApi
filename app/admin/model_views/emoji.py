@@ -15,6 +15,8 @@ class EmojiAdmin(
     repo_type = EmojiRepository
     name_plural = "Эмодзи"
     name = "Эмодзи"
+    icon = "fa-solid fa-icons"
+
     column_list = ["name", "emoji"]
     column_details_exclude_list = [
         Emoji.id,

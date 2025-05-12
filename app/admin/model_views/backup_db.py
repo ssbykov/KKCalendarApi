@@ -17,6 +17,8 @@ class BackupDbAdmin(
     repo_type = BackupDbRepository
     name_plural = "Резервные копии"
     name = "Резервная копия"
+    icon = "fa-solid fa-box-archive"
+
     column_list = ["name"]
     column_labels = {
         "name": "Имя копии",
