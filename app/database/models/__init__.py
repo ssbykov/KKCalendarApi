@@ -17,6 +17,8 @@ from .access_token import AccessToken
 from .event_photo import EventPhoto
 from .emoji import Emoji
 from .backup_db import BackupDb
+from .quote import Quote
+from .lama import Lama
 
 __all__ = [
     "BaseWithId",
@@ -35,4 +37,6 @@ __all__ = [
     "EventPhoto",
     "Emoji",
     "BackupDb",
+    "Quote",
+    "Lama",
 ]

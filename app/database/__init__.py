@@ -13,6 +13,8 @@ from .models import (
     EventType,
     Emoji,
     BackupDb,
+    Quote,
+    Lama,
 )
 from .db import db_helper, init_data, SessionDep
 
@@ -46,6 +48,8 @@ __all__ = [
     "Event",
     "EventType",
     "Emoji",
+    "Quote",
+    "Lama",
     "AccessToken",
     "DayInfo",
     "YelamSchema",
