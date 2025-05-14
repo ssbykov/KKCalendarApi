@@ -28,6 +28,7 @@ from .model_views import (
     BackupDbAdmin,
     UserAdmin,
     LamaAdmin,
+    QuoteAdmin,
 )
 
 
@@ -41,7 +42,6 @@ async def init_admin(app: Any) -> None:
     )
     admin.add_view(DayInfoAdmin)
     admin.add_view(EventAdmin)
-    admin.add_view(LamaAdmin)
     admin.add_view(HaircuttingAdmin)
     admin.add_view(ElementsAdmin)
     admin.add_view(LaPositionAdmin)
@@ -50,6 +50,8 @@ async def init_admin(app: Any) -> None:
     admin.add_view(EventPhotoAdmin)
     admin.add_view(EventTypeAdmin)
     admin.add_view(EmojiAdmin)
+    admin.add_view(LamaAdmin)
+    admin.add_view(QuoteAdmin)
     admin.add_view(BackupDbAdmin)
     admin.add_view(UserAdmin)
     assert isinstance(admin.authentication_backend, AdminAuth)

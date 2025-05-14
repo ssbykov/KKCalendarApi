@@ -11,6 +11,7 @@ from .emoji import EmojiAdmin
 from .backup_db import BackupDbAdmin
 from .user import UserAdmin
 from .lama import LamaAdmin
+from .quote import QuoteAdmin
 
 __all__ = [
     "EventAdmin",
@@ -26,4 +27,5 @@ __all__ = [
     "BackupDbAdmin",
     "UserAdmin",
     "LamaAdmin",
+    "QuoteAdmin",
 ]
