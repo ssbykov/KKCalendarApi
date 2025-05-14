@@ -20,8 +20,8 @@ class EventPhotoAdmin(
     model=EventPhoto,
 ):
     repo_type = EventPhotoRepository
-    name_plural = "Фотографии для событий"
-    name = "Фото события"
+    name_plural = "Изображения"
+    name = "Изображение"
     icon = "fa-solid fa-image"
 
     can_edit = True

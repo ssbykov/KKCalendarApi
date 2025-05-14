@@ -16,6 +16,7 @@ class EventTypeAdmin(
     name_plural = "Типы событий"
     name = "Тип события"
     icon = "fa-solid fa-bars"
+    category = "Раздел событий"
 
     column_list = ["name", "rank"]
     column_details_exclude_list = [
@@ -36,7 +37,6 @@ class EventTypeAdmin(
             "fields": ("ru_name",),
         }
     }
-
 
     def is_visible(self, request: Request) -> bool:
         return check_superuser(request)

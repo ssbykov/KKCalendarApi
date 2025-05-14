@@ -16,6 +16,7 @@ class EmojiAdmin(
     name_plural = "Эмодзи"
     name = "Эмодзи"
     icon = "fa-solid fa-icons"
+    category = "Раздел событий"
 
     column_list = ["name", "emoji"]
     column_details_exclude_list = [

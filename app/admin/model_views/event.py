@@ -21,6 +21,7 @@ class EventAdmin(
     name_plural = "События"
     name = "Событие"
     icon = "fa-solid fa-calendar-plus"
+    category = "Раздел событий"
 
     form_create_rules = [
         "days",
@@ -62,7 +63,9 @@ class EventAdmin(
         )
         or "",
         Event.photo: lambda model, _: (
-            Markup(photo_url(model.photo.photo_data)) if hasattr(model, "photo") and model.photo else ""
+            Markup(photo_url(model.photo.photo_data))
+            if hasattr(model, "photo") and model.photo
+            else ""
         ),
     }
     detail_columns_counts = {
