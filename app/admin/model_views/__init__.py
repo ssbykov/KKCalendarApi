@@ -10,6 +10,7 @@ from .event_type import EventTypeAdmin
 from .emoji import EmojiAdmin
 from .backup_db import BackupDbAdmin
 from .user import UserAdmin
+from .lama import LamaAdmin
 
 __all__ = [
     "EventAdmin",
@@ -24,4 +25,5 @@ __all__ = [
     "EmojiAdmin",
     "BackupDbAdmin",
     "UserAdmin",
+    "LamaAdmin",
 ]

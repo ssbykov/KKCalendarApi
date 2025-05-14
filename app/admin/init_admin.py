@@ -28,6 +28,7 @@ from .model_views import (
     EmojiAdmin,
     BackupDbAdmin,
     UserAdmin,
+    LamaAdmin,
 )
 
 
@@ -41,6 +42,7 @@ async def init_admin(app: Any) -> None:
     )
     admin.add_view(DayInfoAdmin)
     admin.add_view(EventAdmin)
+    admin.add_view(LamaAdmin)
     admin.add_view(HaircuttingAdmin)
     admin.add_view(ElementsAdmin)
     admin.add_view(LaPositionAdmin)
