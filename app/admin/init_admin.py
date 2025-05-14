@@ -229,16 +229,19 @@ class NewAdmin(Admin):
                     context["error"] = "Данное название уже используется"
                 elif await filter_past_days_by_id(form_data_dict.get("days", [])):
                     context["error"] = "Нельзя добавить прошедшие даты"
+            elif isinstance(model_view, LamaAdmin):
+                if await model_view.check_photo(form_data_dict.get("photo", "")):
+                    context["error"] = "Данное фото уже используется"
 
-                if context.get("error"):
-                    form_data_dict["days"] = []
-                    form.process(**form_data_dict)
-                    return await self.templates.TemplateResponse(
-                        request,
-                        context["model_view"].create_template,
-                        context,
-                        status_code=400,
-                    )
+            if context.get("error"):
+                form_data_dict["days"] = []
+                form.process(**form_data_dict)
+                return await self.templates.TemplateResponse(
+                    request,
+                    context["model_view"].create_template,
+                    context,
+                    status_code=400,
+                )
             obj = await model_view.insert_model(request, form_data_dict)
 
         except Exception as e:
