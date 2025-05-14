@@ -1,11 +1,12 @@
+from markupsafe import Markup
 from sqladmin import ModelView
 from starlette.requests import Request
 
 from admin.mixines import CustomNavMixin
+from admin.model_views.event_photo import photo_url
 from admin.utils import check_superuser
 from crud.lama import LamaRepository
-from database import db_helper
-from database.models import Lama
+from database import db_helper, Lama
 
 
 class LamaAdmin(
@@ -16,7 +17,7 @@ class LamaAdmin(
     repo_type = LamaRepository
     name_plural = "Учителя"
     name = "Лама"
-    icon = "fa-solid fa-icons"
+    icon = "fa-solid fa-person"
 
     column_list = ["name"]
     column_details_exclude_list = (
@@ -33,6 +34,14 @@ class LamaAdmin(
     can_edit = True
     can_delete = True
     can_export = False
+
+    column_formatters_detail = {
+        Lama.photo: lambda model, _: (
+            Markup(photo_url(model.photo.photo_data))
+            if hasattr(model, "photo") and model.photo
+            else ""
+        ),
+    }
 
     def is_visible(self, request: Request) -> bool:
         return check_superuser(request)
