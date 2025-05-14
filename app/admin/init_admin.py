@@ -4,7 +4,6 @@ from typing import Any, cast
 
 from sqladmin import Admin
 from sqladmin.authentication import login_required
-from sqlalchemy.exc import IntegrityError
 from starlette.datastructures import URL
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
@@ -131,11 +130,6 @@ class NewAdmin(Admin):
 
         form_data_dict = self._denormalize_wtform_data(form.data, model)
         try:
-            obj = await model_view.update_model(
-                request, pk=request.path_params["pk"], data=form_data_dict
-            )
-
-        except IntegrityError:
             if isinstance(
                 model_view, EventAdmin
             ) and await model_view.get_event_by_name(form_data_dict.get("name", "")):
@@ -143,8 +137,18 @@ class NewAdmin(Admin):
                 return await self.templates.TemplateResponse(
                     request, model_view.edit_template, context, status_code=400
                 )
-            else:
-                raise
+            if isinstance(model_view, LamaAdmin) and await model_view.check_photo(
+                form_data_dict.get("photo", "")
+            ):
+                context["error"] = "Данное фото уже используется"
+                return await self.templates.TemplateResponse(
+                    request, model_view.edit_template, context, status_code=400
+                )
+
+            obj = await model_view.update_model(
+                request, pk=request.path_params["pk"], data=form_data_dict
+            )
+
         except Exception as e:
             context["error"] = str(e)
             return await self.templates.TemplateResponse(
