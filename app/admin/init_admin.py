@@ -139,13 +139,15 @@ class NewAdmin(Admin):
                 return await self.templates.TemplateResponse(
                     request, model_view.edit_template, context, status_code=400
                 )
-            if isinstance(model_view, LamaAdmin) and await model_view.check_photo(
-                form_data_dict.get("photo", "")
-            ):
-                context["error"] = "Данное фото уже используется"
-                return await self.templates.TemplateResponse(
-                    request, model_view.edit_template, context, status_code=400
-                )
+            if isinstance(model_view, LamaAdmin):
+                photo = form_data_dict.get("photo")
+                if photo and await model_view.check_photo(photo):
+                    context["error"] = "Данное фото уже используется"
+                    return await self.templates.TemplateResponse(
+                        request, model_view.edit_template, context, status_code=400
+                    )
+                if photo is None:
+                    form_data_dict["photo_id"] = None
 
             obj = await model_view.update_model(
                 request, pk=request.path_params["pk"], data=form_data_dict

@@ -50,6 +50,8 @@ class LamaAdmin(
         return check_superuser(request)
 
     async def check_photo(self, photo_id: str) -> bool:
+        if not photo_id:
+            return False
         async for session in db_helper.get_session():
             repo = self.repo_type(session)
             return await repo.check_photo(int(photo_id))
