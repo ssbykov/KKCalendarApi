@@ -556,6 +556,22 @@ files = [
 ]
 
 [[package]]
+name = "cdifflib"
+version = "1.2.9"
+description = "C implementation of parts of difflib"
+optional = false
+python-versions = ">=3.4"
+groups = ["main"]
+files = [
+    {file = "cdifflib-1.2.9-cp310-cp310-macosx_15_0_arm64.whl", hash = "sha256:24219193d1d298ead211d4b628ad2124ffa1c0676890cea8fbacdeaf66a2369b"},
+    {file = "cdifflib-1.2.9-cp311-cp311-macosx_15_0_arm64.whl", hash = "sha256:32c56f7895253b0734f42ba023a9c181b52d72f3d51afacc29d5ea8ee72e4643"},
+    {file = "cdifflib-1.2.9-cp312-cp312-macosx_15_0_arm64.whl", hash = "sha256:75a81d8a5e2b0ca055d3f7850fd0a29b488b086c91445841fa3113ac328410e0"},
+    {file = "cdifflib-1.2.9-cp313-cp313-macosx_15_0_arm64.whl", hash = "sha256:c7113c018e1d8190ce6c00318ae5afe7e99c8e4e0b4b631ee79acde74949c2e8"},
+    {file = "cdifflib-1.2.9-cp39-cp39-macosx_15_0_arm64.whl", hash = "sha256:5a17ca0fc0a38c799b60243d74eb878e2599e4b60327d36c5cd33055d561eae1"},
+    {file = "cdifflib-1.2.9.tar.gz", hash = "sha256:6286da08f72b7ddb5b40145dcb8f214ad913a86d72b1f62cc8d6cf7a92029590"},
+]
+
+[[package]]
 name = "certifi"
 version = "2025.1.31"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -3866,4 +3882,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "e93ae2d8c44bee0c0c851d81b507a26d24f242cacea32bc196c38ff81ab4c3d9"
+content-hash = "f91eb291c02786509ef7beab1af0b7f7104a76782ebcc2e47a2774ca4e3c182c"
