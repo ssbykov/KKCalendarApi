@@ -90,7 +90,7 @@ class GoogleCalendarParser:
 
         result = await self.day_info_repo.add_days(days_info, update)
         if new_events:
-            result["Новые события"] = new_events
+            result["New events"] = new_events
         return result
 
     async def _calendar_request(

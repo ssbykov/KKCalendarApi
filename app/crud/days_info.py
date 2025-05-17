@@ -198,4 +198,4 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo]):
         if update:
             await self.session.commit()
 
-        return {"Добавленные дни": new_days, "Обновленные дни": renew_days}
+        return {"New days": new_days, "Renew days": renew_days}
