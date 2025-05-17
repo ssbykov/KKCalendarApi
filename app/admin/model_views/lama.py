@@ -5,7 +5,7 @@ from starlette.requests import Request
 from admin.mixines import CustomNavMixin
 from admin.model_views.event_photo import photo_url
 from admin.utils import check_superuser
-from crud.lama import LamaRepository
+from crud.lamas import LamaRepository
 from database import db_helper, Lama
 
 
