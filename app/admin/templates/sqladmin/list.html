@@ -1,5 +1,11 @@
 {% extends "sqladmin/layout.html" %}
 {% block content %}
+{% if request.cookies.get("flash") %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ request.cookies.flash }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
 {% if request.session.get("flash_messages") %}
 <div class="alert alert-success alert-dismissible fade show" role="alert">
     {{ request.session.get("flash_messages") }}
