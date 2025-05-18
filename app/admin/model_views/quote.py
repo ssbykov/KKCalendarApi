@@ -1,9 +1,11 @@
 import io
+from difflib import SequenceMatcher
 
 import pandas as pd
 from fastapi import HTTPException
 from sqladmin import ModelView, action, expose, BaseView
 from sqladmin.templating import _TemplateResponse
+from sqlalchemy import select
 from starlette.datastructures import UploadFile
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
@@ -12,7 +14,7 @@ from admin.mixines import CustomNavMixin
 from admin.utils import check_superuser
 from crud.lamas import LamaRepository
 from crud.quotes import QuoteRepository
-from database import Quote, db_helper
+from database import Quote, db_helper, Lama
 from database.schemas.lama import LamaSchemaCreate
 from database.schemas.quote import QuoteSchemaCreate
 
@@ -46,7 +48,7 @@ class QuoteAdmin(
     @action(
         name="import_excel",
         label="Импорт из Excel",
-        add_in_detail=True,
+        add_in_detail=False,
         add_in_list=True,
     )
     async def import_excel_action(self, request: Request) -> _TemplateResponse:
@@ -61,6 +63,8 @@ class QuoteAdmin(
 
 
 class QuoteView(BaseView):
+
+    MAX_RATIO = 0.75
 
     def is_visible(self, request: Request) -> bool:
         return False
@@ -89,24 +93,49 @@ class QuoteView(BaseView):
             contents = await file.read()
             df = pd.read_excel(io.BytesIO(contents))
 
+            # Удаляем строки с пустыми авторами
+            df = df.dropna(subset=["Author"])
+
             async for session in db_helper.get_session():
                 lama_repo = LamaRepository(session)
 
-                for _, row in df.iterrows():
-                    if pd.isna(author := row.Author):
-                        continue
-                    quote = row.Quote
-                    lama = await lama_repo.get_lama_by_name(author)
-                    if lama:
-                        lama_id = lama.id
-                    else:
-                        lama_obj = LamaSchemaCreate(name=author)
-                        lama_id = await lama_repo.add_lama(lama_obj)
+                # Получаем все существующие цитаты один раз
+                result = await session.execute(select(Quote.text))
+                quotes_in_base = result.scalars().all()
 
-                    quote_obj = QuoteSchemaCreate(lama_id=lama_id, text=quote)
-                    orm_quote = quote_obj.to_orm()
-                    session.add(orm_quote)
-                    count += 1
+                # Получаем все Лам из базы за один раз
+                result = await session.execute(select(Lama))
+                lamas_in_base = result.scalars().all()
+
+                # Создаем словарь для быстрого поиска авторов
+                existing_lamas = {lama.name: lama.id for lama in lamas_in_base}
+
+                # Предварительная фильтрация дубликатов
+                def is_unique(quote, max_ratio=self.MAX_RATIO):
+                    return not any(
+                        SequenceMatcher(None, q, quote).ratio() > max_ratio
+                        for q in quotes_in_base
+                    )
+
+                # Применяем фильтрацию ко всему DataFrame
+                unique_quotes = df[df["Quote"].apply(is_unique)]
+
+                # Группируем по авторам для эффективной вставки
+                grouped = unique_quotes.groupby("Author")
+
+                count = 0
+                for author, group in grouped:
+                    if author not in existing_lamas:
+                        lama_obj = LamaSchemaCreate(name=author)
+                        existing_lamas[author] = await lama_repo.add_lama(lama_obj)
+
+                    for _, row in group.iterrows():
+                        quote_obj = QuoteSchemaCreate(
+                            lama_id=existing_lamas[author], text=row["Quote"]
+                        )
+                        session.add(quote_obj.to_orm())
+                        count += 1
+
                 await session.commit()
 
             response = RedirectResponse(
