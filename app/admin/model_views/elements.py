@@ -2,7 +2,7 @@ from sqladmin import ModelView
 from starlette.requests import Request
 
 from admin.mixines import CustomNavMixin
-from admin.utils import check_superuser
+from admin.utils import check_superuser, text_formater
 from crud.elements import ElementsRepository
 from database import Elements
 
@@ -36,6 +36,8 @@ class ElementsAdmin(
     can_delete = False
     can_export = False
     can_create = False
+
+    column_formatters_detail = text_formater(Elements)
 
     def is_visible(self, request: Request) -> bool:
         return check_superuser(request)

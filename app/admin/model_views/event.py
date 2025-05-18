@@ -8,6 +8,7 @@ from starlette.requests import Request
 
 from admin.mixines import CustomNavMixin
 from admin.model_views.event_photo import photo_url
+from admin.utils import text_formater
 from crud.events import EventRepository
 from database import Event, db_helper
 
@@ -67,7 +68,8 @@ class EventAdmin(
             if hasattr(model, "photo") and model.photo
             else ""
         ),
-    }
+    } | text_formater(Event)
+
     detail_columns_counts = {
         "days": {"count": 4, "width": 200},
     }

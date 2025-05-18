@@ -11,7 +11,7 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
 from admin.mixines import CustomNavMixin
-from admin.utils import check_superuser
+from admin.utils import check_superuser, text_formater
 from crud.lamas import LamaRepository
 from crud.quotes import QuoteRepository
 from database import Quote, db_helper, Lama
@@ -38,6 +38,9 @@ class QuoteAdmin(
     can_edit = True
     can_delete = True
     can_export = False
+
+    column_formatters_detail = text_formater(Quote)
+    column_formatters = text_formater(Quote)
 
     def is_visible(self, request: Request) -> bool:
         return check_superuser(request)
