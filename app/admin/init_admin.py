@@ -134,9 +134,11 @@ class NewAdmin(Admin):
 
         form_data_dict = self._denormalize_wtform_data(form.data, model)
         try:
-            if isinstance(
-                model_view, EventAdmin
-            ) and await model_view.get_event_by_name(form_data_dict.get("name", "")):
+            pk = request.path_params["pk"]
+            name = form_data_dict.get("name", "")
+            if isinstance(model_view, EventAdmin) and not await model_view.check_unique(
+                name, pk
+            ):
                 context["error"] = "Данное название уже используется"
                 return await self.templates.TemplateResponse(
                     request, model_view.edit_template, context, status_code=400
@@ -151,9 +153,7 @@ class NewAdmin(Admin):
                 if photo is None:
                     form_data_dict["photo_id"] = None
 
-            obj = await model_view.update_model(
-                request, pk=request.path_params["pk"], data=form_data_dict
-            )
+            obj = await model_view.update_model(request, pk=pk, data=form_data_dict)
 
         except Exception as e:
             context["error"] = str(e)

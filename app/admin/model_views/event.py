@@ -132,6 +132,10 @@ class EventAdmin(
             return await repo.get_event_by_name(name)
         return None
 
+    async def check_unique(self, name: str, pk: int | str) -> bool:
+        event = await self.get_event_by_name(name)
+        return not event or event.id == int(pk)
+
     @staticmethod
     def get_user_not_superuser(request: Request) -> Any | None:
         user = request.session.get("user")
