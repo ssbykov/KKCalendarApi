@@ -108,10 +108,10 @@ class QuoteView(BaseView):
                 lamas_in_base = result.scalars().all()
 
                 # Создаем словарь для быстрого поиска авторов
-                existing_lamas = {lama.name: lama.id for lama in lamas_in_base}
+                existing_lamas = {lama.name: lama.id for lama in lamas_in_base}  # type: ignore
 
                 # Предварительная фильтрация дубликатов
-                def is_unique(quote, max_ratio=self.MAX_RATIO):
+                def is_unique(quote: str, max_ratio: float = self.MAX_RATIO) -> bool:
                     return not any(
                         SequenceMatcher(None, q, quote).ratio() > max_ratio
                         for q in quotes_in_base
@@ -126,7 +126,7 @@ class QuoteView(BaseView):
                 count = 0
                 for author, group in grouped:
                     if author not in existing_lamas:
-                        lama_obj = LamaSchemaCreate(name=author)
+                        lama_obj = LamaSchemaCreate(name=str(author))
                         existing_lamas[author] = await lama_repo.add_lama(lama_obj)
 
                     for _, row in group.iterrows():
