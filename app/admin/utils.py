@@ -14,7 +14,7 @@ def check_superuser(request: Request) -> bool:
 
 def text_formater(
     model: Type[BaseWithId],
-) -> dict[Union[str, InstrumentedAttribute[Any]], Callable[[Any, Any], Any]]:
+) -> dict[str | InstrumentedAttribute[Any], Callable[[Any, Any], Any]]:
     formater = lambda m, f: Markup(
         f"<div style='white-space: pre-wrap; max-width: 800px;'>{getattr(m, f)}</div>"
     )

@@ -57,13 +57,13 @@ class EventAdmin(
     column_list = ["id", "ru_name", "emoji", "type"]
     column_searchable_list = ["en_name", "ru_name"]
     column_sortable_list = ["id"]
-    column_formatters_detail = {
-        Event.link: lambda model, attribute: getattr(model, "link", None)
+    column_formatters_detail = {  # type: ignore
+        "link": lambda model, attribute: getattr(model, "link", None)
         and Markup(
             f'<a href="{getattr(model, "link", "#")}" target="_blank">{getattr(model, "link", "No URL")}</a>'
         )
         or "",
-        Event.photo: lambda model, _: (
+        "photo": lambda model, _: (
             Markup(photo_url(model.photo.photo_data))
             if hasattr(model, "photo") and model.photo
             else ""
