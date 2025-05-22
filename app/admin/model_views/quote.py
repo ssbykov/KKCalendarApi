@@ -1,5 +1,6 @@
 import io
 from difflib import SequenceMatcher
+from typing import Sequence
 
 import pandas as pd
 from fastapi import HTTPException
@@ -41,6 +42,8 @@ class QuoteAdmin(
 
     column_formatters_detail = text_formater(Quote)
     column_formatters = text_formater(Quote)
+
+    column_searchable_list = ["text"]
 
     def is_visible(self, request: Request) -> bool:
         return check_superuser(request)
@@ -99,6 +102,7 @@ class QuoteView(BaseView):
             # Удаляем строки с пустыми авторами
             df = df.dropna(subset=["Author"])
 
+            rejected_rows = []
             async for session in db_helper.get_session():
                 lama_repo = LamaRepository(session)
 
@@ -114,39 +118,70 @@ class QuoteView(BaseView):
                 existing_lamas = {lama.name: lama.id for lama in lamas_in_base}  # type: ignore
 
                 # Предварительная фильтрация дубликатов
-                def is_unique(quote: str, max_ratio: float = self.MAX_RATIO) -> bool:
+                def is_unique(
+                    quote: str,
+                    existing: Sequence[str],
+                    new_quotes: set[str],
+                    max_ratio: float = self.MAX_RATIO,
+                ) -> bool:
                     return not any(
                         SequenceMatcher(None, q, quote).ratio() > max_ratio
-                        for q in quotes_in_base
+                        for q in existing
+                    ) and not any(
+                        SequenceMatcher(None, q, quote).ratio() > max_ratio
+                        for q in new_quotes
                     )
 
-                # Применяем фильтрацию ко всему DataFrame
-                unique_quotes = df[df["Quote"].apply(is_unique)]
+                new_quotes_set: set[str] = set()
+
+                # Отфильтрованные строки
+                filtered_rows = []
+
+                # Итерируем по строкам и отбираем уникальные
+                for row_number, (_, row) in enumerate(df.iterrows(), start=2):
+                    quote_text = str(row["Quote"]).strip()
+                    if is_unique(quote_text, quotes_in_base, new_quotes_set):
+                        new_quotes_set.add(quote_text)
+                        filtered_rows.append(row)
+                    else:
+                        rejected_rows.append(row_number)
+
+                # Создаем новый DataFrame из отфильтрованных строк
+                unique_quotes_df = pd.DataFrame(filtered_rows)
 
                 # Группируем по авторам для эффективной вставки
-                grouped = unique_quotes.groupby("Author")
+                if len(unique_quotes_df) > 0:
+                    grouped = unique_quotes_df.groupby("Author")
 
-                count = 0
-                for author, group in grouped:
-                    if author not in existing_lamas:
-                        lama_obj = LamaSchemaCreate(name=str(author))
-                        existing_lamas[author] = await lama_repo.add_lama(lama_obj)
+                    count = 0
+                    for author, group in grouped:
+                        if author not in existing_lamas:
+                            lama_obj = LamaSchemaCreate(name=str(author))
+                            existing_lamas[author] = await lama_repo.add_lama(lama_obj)
 
-                    for _, row in group.iterrows():
-                        quote_obj = QuoteSchemaCreate(
-                            lama_id=existing_lamas[author], text=row["Quote"]
-                        )
-                        session.add(quote_obj.to_orm())
-                        count += 1
+                        for _, row in group.iterrows():
+                            quote_parts = row["Quote"].split("\n")
+                            if author in quote_parts[-1]:
+                                new_quote = "".join(quote_parts[:-1]).strip()
+                            else:
+                                new_quote = row["Quote"].strip()
+                            quote_obj = QuoteSchemaCreate(
+                                lama_id=existing_lamas[author], text=new_quote
+                            )
+                            session.add(quote_obj.to_orm())
+                            count += 1
 
-                await session.commit()
+                    await session.commit()
 
             response = RedirectResponse(
                 url=request.url_for("admin:list", identity="quote"), status_code=303
             )
 
             response.set_cookie(
-                "flash", f"Loaded: {count} quotes", max_age=1, httponly=True
+                "flash",
+                f"Loaded: {count} quotes, rejected: {rejected_rows}",
+                max_age=1,
+                httponly=True,
             )
             return response
         except Exception as e:
