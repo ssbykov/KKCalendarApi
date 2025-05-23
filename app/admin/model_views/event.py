@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 
 from markupsafe import Markup
@@ -9,8 +10,9 @@ from starlette.requests import Request
 from admin.mixines import CustomNavMixin
 from admin.model_views.event_photo import photo_url
 from admin.utils import text_formater
+from crud.days_info import DayInfoRepository
 from crud.events import EventRepository
-from database import Event, db_helper
+from database import Event, db_helper, DayInfo
 
 
 class EventAdmin(
@@ -128,15 +130,55 @@ class EventAdmin(
             stmt = stmt.options(selectinload(relation))
         return await self._get_object_by_pk(stmt)
 
+    async def check_restrictions_create(
+        self, form_data_dict: dict, request: Request = None
+    ):
+        # 1. Получаем данные из запроса
+        pk = getattr(request, "path_params", {}).get("pk") if request else None
+        name = form_data_dict.get("name", "").strip()
+        days_in_form = form_data_dict.get("days", [])
+
+        # 2. Проверяем существование события
+        event = await self.get_event_by_name(name)
+
+        # 3. Фильтруем прошедшие дни
+        past_days_in_form = await self.filter_past_days_by_id(days_in_form)
+
+        # 4. Если событие новое (не редактирование)
+        if not event:
+            if past_days_in_form:
+                return "Нельзя изменить или добавить прошедшие даты"
+            return None
+
+        # 5. Проверка на дубликат имени (при создании или изменении другого события)
+        if not pk or pk and event.id != int(pk):
+            return "Данное название уже используется"
+
+        # 6. Получаем прошлые дни события (оптимизированно)
+        past_days_in_model = DayInfo.get_past_days_ids(event.days)
+
+        # 7. Сравниваем изменения в прошедших днях
+        if past_days_in_form != past_days_in_model:
+            return "Нельзя изменить или добавить прошедшие даты"
+
+        return None
+
+    @staticmethod
+    async def filter_past_days_by_id(day_ids: list[str]) -> list[str]:
+        past_days = []
+        for day_id in day_ids:
+            async for session in db_helper.get_session():
+                repo = DayInfoRepository(session)
+                day_info = await repo.get_day_by_id(day_id)
+                if datetime.strptime(day_info.date, "%Y-%m-%d") <= datetime.now():
+                    past_days.append(day_id)
+        return sorted(past_days)
+
     async def get_event_by_name(self, name: str) -> Event | None:
         async for session in db_helper.get_session():
             repo = self.repo_type(session)
             return await repo.get_event_by_name(name)
         return None
-
-    async def check_unique(self, name: str, pk: int | str) -> bool:
-        event = await self.get_event_by_name(name)
-        return not event or event.id == int(pk)
 
     @staticmethod
     def get_user_not_superuser(request: Request) -> Any | None:
