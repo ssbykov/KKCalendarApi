@@ -1,4 +1,5 @@
 from sqlalchemy import update, func
+from sqlalchemy.orm import selectinload
 
 from crud.mixines import GetBackNextIdMixin
 from database import SessionDep, Event, EventSchemaCreate
@@ -12,11 +13,10 @@ class EventRepository(GetBackNextIdMixin[Event]):
     model = Event
 
     async def get_event_by_name(self, name: str) -> Event | None:
-        stmt = self.main_stmt.where(func.upper(self.model.name) == func.upper(name))
-        event = await self.session.scalar(stmt)
-        if event:
-            return event
-        return None
+        stmt = self.main_stmt.where(
+            func.upper(self.model.name) == func.upper(name)
+        ).options(selectinload(Event.days))
+        return await self.session.scalar(stmt)
 
     async def ru_name_event_update(self, event_id: int, ru_name: str) -> None:
         update_stmt = (
