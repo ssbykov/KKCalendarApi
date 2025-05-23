@@ -43,16 +43,42 @@ class LamaAdmin(
         ),
     }
 
+    async def check_restrictions_create(
+        self, form_data_dict: dict, request: Request = None
+    ) -> str | None:
+        pk = getattr(request, "path_params", {}).get("pk") if request else None
+        name = form_data_dict.get("name", "").strip()
+
+        lama = await self.get_lama_by_name(name)
+        if lama:
+            if pk is None or lama.id != int(pk):
+                return "Данное название уже используется"
+
+        photo_id = form_data_dict.get("photo")
+        if photo_id is None:
+            return None
+
+        lama = await self.get_lama_by_photo(int(photo_id))
+        if lama:
+            if pk is None or lama.id != int(pk):
+                return "Данное фото уже используется"
+
+        return None
+
+    async def get_lama_by_name(self, name: str) -> Lama | None:
+        async for session in db_helper.get_session():
+            repo = self.repo_type(session)
+            return await repo.get_lama_by_name(name)
+        return None
+
+    async def get_lama_by_photo(self, photo_id: int) -> Lama | None:
+        async for session in db_helper.get_session():
+            repo = self.repo_type(session)
+            return await repo.get_lama_by_photo(photo_id)
+        return None
+
     def is_visible(self, request: Request) -> bool:
         return check_superuser(request)
 
     def is_accessible(self, request: Request) -> bool:
         return check_superuser(request)
-
-    async def check_photo(self, photo_id: str) -> bool:
-        if not photo_id:
-            return False
-        async for session in db_helper.get_session():
-            repo = self.repo_type(session)
-            return await repo.check_photo(int(photo_id))
-        return False
