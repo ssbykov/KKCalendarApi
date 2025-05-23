@@ -10,10 +10,10 @@ from starlette.requests import Request
 from starlette.responses import Response, RedirectResponse
 
 from core import settings
-from crud.days_info import DayInfoRepository
 from database import db_helper, DayInfo
 from database.backup_db import create_backup
 from .backend import AdminAuth, owner_required
+from .mixines import CustomNavMixin
 from .model_views import (
     EventAdmin,
     DayInfoAdmin,
@@ -92,7 +92,6 @@ class NewAdmin(Admin):
         """Edit model endpoint."""
 
         await self._edit(request)
-
         identity = request.path_params["identity"]
         model_view = self._find_model_view(identity)
 
@@ -114,67 +113,52 @@ class NewAdmin(Admin):
 
         form_data = await self._handle_form_data(request, model)
         form = Form(form_data)
-
-        if isinstance(model_view, EventAdmin):
-            past_days_in_model: list[str] = get_past_days_ids(model.days)
-
-            past_days_in_form = await filter_past_days_by_id(form.data.get("days", []))
-
-            if past_days_in_form != past_days_in_model:
-                context["error"] = "Нельзя изменить или добавить прошедшие даты"
-                return await self.templates.TemplateResponse(
-                    request, model_view.edit_template, context, status_code=400
-                )
+        form_data_dict = self._denormalize_wtform_data(form.data, model)
 
         if not form.validate():
-            context["form"] = form
-            return await self.templates.TemplateResponse(
-                request, model_view.edit_template, context, status_code=400
-            )
+            context["error"] = "Пожалуйста, исправьте ошибки в форме."
+            context["errors"] = form.errors
 
-        form_data_dict = self._denormalize_wtform_data(form.data, model)
-        try:
-            pk = request.path_params["pk"]
-            name = form_data_dict.get("name", "")
-            if isinstance(model_view, EventAdmin) and not await model_view.check_unique(
-                name, pk
-            ):
-                context["error"] = "Данное название уже используется"
-                return await self.templates.TemplateResponse(
-                    request, model_view.edit_template, context, status_code=400
-                )
-            if isinstance(model_view, LamaAdmin):
-                photo = form_data_dict.get("photo")
-                if photo and await model_view.check_photo(photo):
-                    context["error"] = "Данное фото уже используется"
-                    return await self.templates.TemplateResponse(
-                        request, model_view.edit_template, context, status_code=400
-                    )
-                if photo is None:
+        else:
+            try:
+                if isinstance(model_view, LamaAdmin) and not form_data_dict.get(
+                    "photo"
+                ):
                     form_data_dict["photo_id"] = None
 
-            obj = await model_view.update_model(request, pk=pk, data=form_data_dict)
+                restriction = await model_view.check_restrictions_create(
+                    form_data_dict, request
+                )
 
-        except Exception as e:
-            context["error"] = str(e)
-            return await self.templates.TemplateResponse(
-                request, model_view.edit_template, context, status_code=400
-            )
+                if restriction:
+                    context["error"] = restriction
+                else:
+                    pk = request.path_params["pk"]
+                    obj = await model_view.update_model(
+                        request, pk=pk, data=form_data_dict
+                    )
 
-        url = self.get_save_redirect_url(
-            request=request,
-            form=form_data,
-            obj=obj,
-            model_view=model_view,
+                    url = self.get_save_redirect_url(
+                        request=request,
+                        form=form_data,
+                        obj=obj,
+                        model_view=model_view,
+                    )
+                    response = RedirectResponse(url=url, status_code=302)
+
+                    if isinstance(response, RedirectResponse):
+                        if hasattr(model_view, "get_page_for_url"):
+                            if page_suffix := await model_view.get_page_for_url(
+                                request
+                            ):
+                                response.headers["location"] += page_suffix
+                        return response
+
+            except Exception as e:
+                context["error"] = str(e)
+        return await self.templates.TemplateResponse(
+            request, model_view.edit_template, context, status_code=400
         )
-        response = RedirectResponse(url=url, status_code=302)
-        if isinstance(response, RedirectResponse):
-            if hasattr(model_view, "get_page_for_url") and (
-                page_suffix := await model_view.get_page_for_url(request)
-            ):
-                response.headers["location"] += page_suffix
-                return response
-        return cast(Response, response)
 
     @owner_required
     async def delete(self, request: Request) -> Response:
@@ -224,59 +208,39 @@ class NewAdmin(Admin):
             )
 
         if not form.validate():
-            return await self.templates.TemplateResponse(
-                request, model_view.create_template, context, status_code=400
-            )
+            context["error"] = "Пожалуйста, исправьте ошибки в форме."
+            context["errors"] = form.errors
+        else:
+            form_data_dict = self._denormalize_wtform_data(form.data, model_view.model)
+            try:
 
-        form_data_dict = self._denormalize_wtform_data(form.data, model_view.model)
-        try:
-            if isinstance(model_view, EventAdmin):
-                if await model_view.get_event_by_name(form_data_dict.get("name", "")):
-                    context["error"] = "Данное название уже используется"
-                elif await filter_past_days_by_id(form_data_dict.get("days", [])):
-                    context["error"] = "Нельзя добавить прошедшие даты"
-            elif isinstance(model_view, LamaAdmin):
-                if await model_view.check_photo(form_data_dict.get("photo", "")):
-                    context["error"] = "Данное фото уже используется"
+                restriction = await cast(
+                    CustomNavMixin, model_view
+                ).check_restrictions_create(form_data_dict)
+                if restriction:
+                    raise ValueError(restriction)
 
-            if context.get("error"):
-                form_data_dict["days"] = []
-                form.process(**form_data_dict)
-                return await self.templates.TemplateResponse(
-                    request,
-                    context["model_view"].create_template,
-                    context,
-                    status_code=400,
+                obj = await model_view.insert_model(request, form_data_dict)
+                url = cast(
+                    URL,
+                    self.get_save_redirect_url(
+                        request=request,
+                        form=form_data,
+                        obj=obj,
+                        model_view=model_view,
+                    ),
                 )
-            obj = await model_view.insert_model(request, form_data_dict)
+                return RedirectResponse(url=url, status_code=302)
 
-        except Exception as e:
-            context["error"] = str(e)
-            return await self.templates.TemplateResponse(
-                request, context["model_view"].create_template, context, status_code=400
-            )
+            except Exception as e:
+                context["error"] = str(e)
+                if "days" in form_data_dict:
+                    form_data_dict["days"] = []
+                form.process(**form_data_dict)
 
-        url = cast(
-            URL,
-            self.get_save_redirect_url(
-                request=request,
-                form=form_data,
-                obj=obj,
-                model_view=model_view,
-            ),
+        return await self.templates.TemplateResponse(
+            request, model_view.create_template, context, status_code=400
         )
-        return RedirectResponse(url=url, status_code=302)
-
-
-async def filter_past_days_by_id(day_ids: list[str]) -> list[str]:
-    past_days = []
-    for day_id in day_ids:
-        async for session in db_helper.get_session():
-            repo = DayInfoRepository(session)
-            day_info = await repo.get_day_by_id(day_id)
-            if datetime.strptime(day_info.date, "%Y-%m-%d") <= datetime.now():
-                past_days.append(day_id)
-    return sorted(past_days)
 
 
 def get_past_days_ids(days: list[DayInfo]) -> list[str]:
