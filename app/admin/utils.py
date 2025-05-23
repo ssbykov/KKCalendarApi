@@ -1,4 +1,4 @@
-from typing import Callable, Type, Any, Union
+from typing import Callable, Type, Any
 
 from markupsafe import Markup
 from sqlalchemy import Text
