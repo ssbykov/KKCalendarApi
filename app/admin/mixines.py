@@ -111,3 +111,8 @@ class CustomNavMixin(Generic[T]):
             name,
             {"count": 1, "width": 500},
         )
+
+    async def check_restrictions_create(
+        self, form_data_dict: dict[str, Any], request: Request = None
+    ) -> str | None:
+        pass
