@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import String, ForeignKey, Text
@@ -46,6 +47,14 @@ class DayInfo(BaseWithId, ToDictMixin):
 
     def __str__(self) -> str:
         return f"{self.date} - {self.moon_day}"
+
+    @staticmethod
+    def get_past_days_ids(days: list["DayInfo"]) -> list[str]:
+        return sorted(
+            str(day.id)
+            for day in days
+            if datetime.strptime(day.date, "%Y-%m-%d") <= datetime.now()
+        )
 
 
 class Elements(BaseWithId):
