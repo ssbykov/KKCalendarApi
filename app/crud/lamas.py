@@ -8,11 +8,6 @@ from database.schemas.lama import LamaSchemaCreate
 class LamaRepository(GetBackNextIdMixin[Lama]):
     model = Lama
 
-    async def check_photo(self, photo_id: int) -> bool:
-        stmt = self.main_stmt.where(self.model.photo_id == photo_id)
-        result = await self.session.scalar(stmt)
-        return bool(result)
-
     async def add_lama(self, lama: LamaSchemaCreate) -> int:
         orm_lama = lama.to_orm()
         self.session.add(orm_lama)
@@ -23,6 +18,13 @@ class LamaRepository(GetBackNextIdMixin[Lama]):
 
     async def get_lama_by_name(self, name: str) -> Lama | None:
         stmt = self.main_stmt.where(func.upper(self.model.name) == func.upper(name))
+        lama = await self.session.scalar(stmt)
+        if lama:
+            return lama
+        return None
+
+    async def get_lama_by_photo(self, photo_id: int) -> Lama | None:
+        stmt = self.main_stmt.where(self.model.photo_id == photo_id)
         lama = await self.session.scalar(stmt)
         if lama:
             return lama
