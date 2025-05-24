@@ -67,10 +67,40 @@ class QuoteAdmin(
             request, name="import_excel.html", context=context
         )
 
+    async def check_restrictions_create(
+        self, form_data_dict: dict, request: Request = None
+    ) -> str | None:
+        pk = getattr(request, "path_params", {}).get("pk") if request else -1
+        quote = form_data_dict.get("text", "").strip()
+        async for session in db_helper.get_session():
+            result = await session.execute(
+                select(Quote.text).where(Quote.id != int(pk))
+            )
+            quotes_in_base = result.scalars().all()
+            if not is_quote_unique(
+                quote=quote,
+                existing=quotes_in_base,
+                new_quotes=set(),
+            ):
+                return "В базе есть цитата в совпадением более 75%"
+        return None
+
+
+def is_quote_unique(
+    quote: str,
+    existing: Sequence[str],
+    new_quotes: set[str],
+    max_ratio: float = 0.75,
+) -> bool:
+
+    return not any(
+        SequenceMatcher(None, q, quote).ratio() > max_ratio for q in existing
+    ) and not any(
+        SequenceMatcher(None, q, quote).ratio() > max_ratio for q in new_quotes
+    )
+
 
 class QuoteView(BaseView):
-
-    MAX_RATIO = 0.75
 
     def is_visible(self, request: Request) -> bool:
         return False
@@ -117,21 +147,6 @@ class QuoteView(BaseView):
                 # Создаем словарь для быстрого поиска авторов
                 existing_lamas = {lama.name: lama.id for lama in lamas_in_base}  # type: ignore
 
-                # Предварительная фильтрация дубликатов
-                def is_unique(
-                    quote: str,
-                    existing: Sequence[str],
-                    new_quotes: set[str],
-                    max_ratio: float = self.MAX_RATIO,
-                ) -> bool:
-                    return not any(
-                        SequenceMatcher(None, q, quote).ratio() > max_ratio
-                        for q in existing
-                    ) and not any(
-                        SequenceMatcher(None, q, quote).ratio() > max_ratio
-                        for q in new_quotes
-                    )
-
                 new_quotes_set: set[str] = set()
 
                 # Отфильтрованные строки
@@ -140,7 +155,11 @@ class QuoteView(BaseView):
                 # Итерируем по строкам и отбираем уникальные
                 for row_number, (_, row) in enumerate(df.iterrows(), start=2):
                     quote_text = str(row["Quote"]).strip()
-                    if is_unique(quote_text, quotes_in_base, new_quotes_set):
+                    if is_quote_unique(
+                        quote=quote_text,
+                        existing=quotes_in_base,
+                        new_quotes=new_quotes_set,
+                    ):
                         new_quotes_set.add(quote_text)
                         filtered_rows.append(row)
                     else:
