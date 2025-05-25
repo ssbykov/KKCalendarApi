@@ -13,7 +13,7 @@ from core import settings
 from database import db_helper, DayInfo
 from database.backup_db import create_backup
 from .backend import AdminAuth, owner_required
-from .mixines import CustomNavMixin
+from .custom_model_view import CustomModelView
 from .model_views import (
     EventAdmin,
     DayInfoAdmin,
@@ -215,7 +215,7 @@ class NewAdmin(Admin):
             try:
 
                 restriction = await cast(
-                    CustomNavMixin, model_view
+                    CustomModelView, model_view
                 ).check_restrictions_create(form_data_dict)
                 if restriction:
                     raise ValueError(restriction)

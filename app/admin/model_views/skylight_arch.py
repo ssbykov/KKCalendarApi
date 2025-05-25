@@ -1,15 +1,13 @@
-from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import CustomNavMixin
+from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser
 from crud.skylight_arches import SkylightArchRepository
 from database import SkylightArch
 
 
 class SkylightArchAdmin(
-    ModelView,
-    CustomNavMixin[SkylightArch],
+    CustomModelView[SkylightArch],
     model=SkylightArch,
 ):
     repo_type = SkylightArchRepository

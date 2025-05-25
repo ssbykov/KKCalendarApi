@@ -4,14 +4,14 @@ from typing import Sequence
 
 import pandas as pd
 from fastapi import HTTPException
-from sqladmin import ModelView, action, expose, BaseView
+from sqladmin import action, expose, BaseView
 from sqladmin.templating import _TemplateResponse
 from sqlalchemy import select
 from starlette.datastructures import UploadFile
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from admin.mixines import CustomNavMixin
+from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser, text_formater
 from crud.lamas import LamaRepository
 from crud.quotes import QuoteRepository
@@ -21,8 +21,7 @@ from database.schemas.quote import QuoteSchemaCreate
 
 
 class QuoteAdmin(
-    ModelView,
-    CustomNavMixin[Quote],
+    CustomModelView[Quote],
     model=Quote,
 ):
     repo_type = QuoteRepository

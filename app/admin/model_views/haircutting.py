@@ -1,15 +1,13 @@
-from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import CustomNavMixin
+from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser
 from crud.haircutting_days import HaircuttingRepository
 from database import HaircuttingDay
 
 
 class HaircuttingAdmin(
-    ModelView,
-    CustomNavMixin[HaircuttingDay],
+    CustomModelView[HaircuttingDay],
     model=HaircuttingDay,
 ):
     repo_type = HaircuttingRepository

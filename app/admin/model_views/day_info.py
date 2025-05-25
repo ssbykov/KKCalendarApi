@@ -1,8 +1,8 @@
-from sqladmin import ModelView, action
+from sqladmin import action
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from admin.mixines import CustomNavMixin
+from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser
 from crud.days_info import DayInfoRepository
 from database import DayInfo
@@ -11,8 +11,7 @@ from utils.google_calendar_parser import calendar_parser_run
 
 
 class DayInfoAdmin(
-    ModelView,
-    CustomNavMixin[DayInfo],
+    CustomModelView[DayInfo],
     model=DayInfo,
 ):
     repo_type = DayInfoRepository

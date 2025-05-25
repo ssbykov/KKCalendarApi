@@ -2,12 +2,11 @@ from datetime import datetime
 from typing import Any
 
 from markupsafe import Markup
-from sqladmin import ModelView
 from sqlalchemy import Select, select, func
 from sqlalchemy.orm import selectinload
 from starlette.requests import Request
 
-from admin.mixines import CustomNavMixin
+from admin.custom_model_view import CustomModelView
 from admin.model_views.event_photo import photo_url
 from admin.utils import text_formater
 from crud.days_info import DayInfoRepository
@@ -16,8 +15,7 @@ from database import Event, db_helper, DayInfo
 
 
 class EventAdmin(
-    ModelView,
-    CustomNavMixin[Event],
+    CustomModelView[Event],
     model=Event,
 ):
     repo_type = EventRepository

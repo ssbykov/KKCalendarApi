@@ -1,15 +1,13 @@
-from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import CustomNavMixin
+from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser
 from crud.yelams import YelamRepository
 from database import Yelam
 
 
 class YelamAdmin(
-    ModelView,
-    CustomNavMixin[Yelam],
+    CustomModelView[Yelam],
     model=Yelam,
 ):
     repo_type = YelamRepository

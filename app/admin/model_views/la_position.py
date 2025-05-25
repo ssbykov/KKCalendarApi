@@ -1,15 +1,13 @@
-from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import CustomNavMixin
+from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser
 from crud.la_positions import LaPositionRepository
 from database import LaPosition
 
 
 class LaPositionAdmin(
-    ModelView,
-    CustomNavMixin[LaPosition],
+    CustomModelView[LaPosition],
     model=LaPosition,
 ):
     repo_type = LaPositionRepository

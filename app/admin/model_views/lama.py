@@ -1,8 +1,7 @@
 from markupsafe import Markup
-from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import CustomNavMixin
+from admin.custom_model_view import CustomModelView
 from admin.model_views.event_photo import photo_url
 from admin.utils import check_superuser
 from crud.lamas import LamaRepository
@@ -10,8 +9,7 @@ from database import db_helper, Lama
 
 
 class LamaAdmin(
-    ModelView,
-    CustomNavMixin[Lama],
+    CustomModelView[Lama],
     model=Lama,
 ):
     repo_type = LamaRepository

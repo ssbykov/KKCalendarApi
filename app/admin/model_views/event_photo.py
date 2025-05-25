@@ -4,10 +4,9 @@ from typing import Any, Dict
 
 from fastapi_storages import StorageImage  # type: ignore
 from markupsafe import Markup
-from sqladmin import ModelView
 from starlette.requests import Request
 
-from admin.mixines import CustomNavMixin
+from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser
 from core import settings
 from crud.event_photos import EventPhotoRepository
@@ -15,8 +14,7 @@ from database.models import EventPhoto
 
 
 class EventPhotoAdmin(
-    ModelView,
-    CustomNavMixin[EventPhoto],
+    CustomModelView[EventPhoto],
     model=EventPhoto,
 ):
     repo_type = EventPhotoRepository

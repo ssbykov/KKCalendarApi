@@ -9,9 +9,8 @@ from crud.mixines import GetBackNextIdMixin
 from database import db_helper
 
 
-class CustomNavMixin(Generic[T]):
+class CustomModelView(ModelView, Generic[T]):
     repo_type: Type[GetBackNextIdMixin[T]]
-    model: Type[T]
     detail_columns_counts: dict[str, dict[str, int]] = {}
 
     @action(name="back", label="< Назад", add_in_detail=True, add_in_list=False)
@@ -115,4 +114,7 @@ class CustomNavMixin(Generic[T]):
     async def check_restrictions_create(
         self, form_data_dict: dict[str, Any], request: Request = None
     ) -> str | None:
+        pass
+
+    async def check_restrictions_delete(self, request: Request) -> str | None:
         pass
