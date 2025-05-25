@@ -4,6 +4,7 @@ from typing import Any, cast
 
 from sqladmin import Admin
 from sqladmin.authentication import login_required
+from sqlalchemy.exc import IntegrityError
 from starlette.datastructures import URL
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
@@ -93,7 +94,7 @@ class NewAdmin(Admin):
 
         await self._edit(request)
         identity = request.path_params["identity"]
-        model_view = self._find_model_view(identity)
+        model_view = self._find_custom_model_view(identity)
 
         model = await model_view.get_object_for_edit(request)
         if not model:
@@ -160,33 +161,44 @@ class NewAdmin(Admin):
             request, model_view.edit_template, context, status_code=400
         )
 
+    def _find_custom_model_view(self, identity: str) -> CustomModelView:
+        return cast(CustomModelView, self._find_model_view(identity))
+
     @owner_required
     async def delete(self, request: Request) -> Response:
         identity = request.path_params["identity"]
-        model_view = self._find_model_view(identity)
+        model_view = self._find_custom_model_view(identity)
 
-        if isinstance(model_view, EventAdmin):
-            event = await model_view.get_event(request)
-            if get_past_days_ids(event.days):
-                return Response(
-                    status_code=404,
-                    content="Нельзя удалить событие с прошедшими датами",
-                )
+        restriction = await model_view.check_restrictions_delete(request)
+
+        if restriction:
+            raise HTTPException(detail=restriction, status_code=409)
+
         if isinstance(model_view, BackupDbAdmin):
             backup_id = int(request.query_params["pks"])
             if backup_db := await model_view.get_by_id(backup_id):
                 file_path = os.path.join(settings.db.backups_dir, backup_db.name)
                 if os.path.exists(file_path):
                     os.remove(file_path)
-        result = await super().delete(request)
-        return cast(Response, result)
+        try:
+            result = await super().delete(request)
+            return cast(Response, result)
+        except Exception as e:
+            if isinstance(e, IntegrityError):
+                restriction = "Данная запись не может быть удалена из на нарушения целостности базы."
+            else:
+                restriction = str(e)
+            return Response(
+                status_code=409,
+                content=restriction,
+            )
 
     @login_required
     async def create(self, request: Request) -> Response:
         await self._create(request)
 
         identity = request.path_params["identity"]
-        model_view = self._find_model_view(identity)
+        model_view = self._find_custom_model_view(identity)
 
         if isinstance(model_view, BackupDbAdmin):
             await create_backup()
@@ -214,9 +226,7 @@ class NewAdmin(Admin):
             form_data_dict = self._denormalize_wtform_data(form.data, model_view.model)
             try:
 
-                restriction = await cast(
-                    CustomModelView, model_view
-                ).check_restrictions_create(form_data_dict)
+                restriction = await model_view.check_restrictions_create(form_data_dict)
                 if restriction:
                     raise ValueError(restriction)
 

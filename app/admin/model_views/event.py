@@ -128,6 +128,12 @@ class EventAdmin(
             stmt = stmt.options(selectinload(relation))
         return await self._get_object_by_pk(stmt)
 
+    async def check_restrictions_delete(self, request: Request) -> str | None:
+        event = await self.get_event(request)
+        if DayInfo.get_past_days_ids(event.days):
+            return "Нельзя удалить событие с прошедшими датами"
+        return None
+
     async def check_restrictions_create(
         self, form_data_dict: dict, request: Request = None
     ):
