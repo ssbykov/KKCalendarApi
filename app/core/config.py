@@ -44,6 +44,7 @@ class ApiV1Prefix(BaseModel):
     days: str = "/days"
     auth: str = "/auth"
     users: str = "/users"
+    quotes: str = "/quotes"
 
 
 class ApiPrefix(BaseModel):
