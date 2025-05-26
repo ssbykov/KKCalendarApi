@@ -31,7 +31,8 @@ class EventPhotoAdmin(
         "photo_data": "Файл",
         "event": "События",
     }
-    column_list = [EventPhoto.name]
+    column_list = ["name"]
+    column_searchable_list = ["name"]
     column_details_list = [EventPhoto.name, EventPhoto.photo_data]
 
     column_formatters_detail = {
