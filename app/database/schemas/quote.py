@@ -3,11 +3,19 @@ from typing import Type
 from pydantic import Field
 
 from database import BaseSchema, BaseWithId, Quote
+from database.schemas.lama import LamaSchemaCreate
 
 
-class QuoteSchemaCreate(BaseSchema):
+class QuoteSchemaBase(BaseSchema):
     base_class: Type["BaseWithId"] = Field(default=Quote, exclude=True)
     text: str
-    lama_id: int
 
     model_config = {"from_attributes": True}
+
+
+class QuoteSchemaCreate(QuoteSchemaBase):
+    lama_id: int
+
+
+class QuoteSchema(QuoteSchemaBase):
+    lama: LamaSchemaCreate
