@@ -105,4 +105,6 @@ class QuoteView(BaseView):
         run_async.delay(contents)
 
         request.session["success"] = f"Импорт запущен. Проверьте статус позже."
-        return RedirectResponse(url="/admin/quote", status_code=303)
+        return RedirectResponse(
+            url=request.url_for("admin:list", identity="quote"), status_code=303
+        )
