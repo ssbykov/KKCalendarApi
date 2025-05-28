@@ -2,7 +2,9 @@ from typing import Type
 
 from pydantic import Field
 
-from database import BaseSchema, Lama, BaseWithId
+from .base_schema import BaseSchema
+
+from database import Lama, BaseWithId
 
 
 class LamaSchemaCreate(BaseSchema):
