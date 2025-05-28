@@ -1,8 +1,3 @@
-import io
-from difflib import SequenceMatcher
-from typing import Sequence
-
-import pandas as pd
 from fastapi import HTTPException
 from sqladmin import action, expose, BaseView
 from sqladmin.templating import _TemplateResponse
@@ -13,11 +8,9 @@ from starlette.responses import RedirectResponse
 
 from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser, text_formater
-from crud.lamas import LamaRepository
 from crud.quotes import QuoteRepository
-from database import Quote, db_helper, Lama
-from database.schemas.lama import LamaSchemaCreate
-from database.schemas.quote import QuoteSchemaCreate
+from database import Quote, db_helper
+from tasks.quoters import run_async, is_quote_unique
 
 
 class QuoteAdmin(
@@ -85,20 +78,6 @@ class QuoteAdmin(
         return None
 
 
-def is_quote_unique(
-    quote: str,
-    existing: Sequence[str],
-    new_quotes: set[str],
-    max_ratio: float = 0.75,
-) -> bool:
-
-    return not any(
-        SequenceMatcher(None, q, quote).ratio() > max_ratio for q in existing
-    ) and not any(
-        SequenceMatcher(None, q, quote).ratio() > max_ratio for q in new_quotes
-    )
-
-
 class QuoteView(BaseView):
 
     def is_visible(self, request: Request) -> bool:
@@ -110,100 +89,20 @@ class QuoteView(BaseView):
         form = await request.form()
         file = form["file"]
 
-        try:
-            count: int = 0
+        if not file:
+            raise HTTPException(status_code=400, detail="Файл не загружен")
 
-            if not file:
-                raise HTTPException(status_code=400, detail="Файл не загружен")
+        if not isinstance(file, UploadFile):
+            raise HTTPException(status_code=400, detail="Некорректный формат файла")
 
-            if not isinstance(file, UploadFile):
-                raise HTTPException(status_code=400, detail="Некорректный формат файла")
+        if not file.filename or not isinstance(file.filename, str):
+            raise HTTPException(status_code=400, detail="Имя файла отсутствует")
 
-            if not file.filename or not isinstance(file.filename, str):
-                raise HTTPException(status_code=400, detail="Имя файла отсутствует")
+        if not file.filename.endswith((".xlsx", ".xls")):
+            raise ValueError("Требуется файл Excel (.xlsx или .xls)")
 
-            if not file.filename.endswith((".xlsx", ".xls")):
-                raise ValueError("Требуется файл Excel (.xlsx или .xls)")
+        contents = await file.read()
+        run_async.delay(contents)
 
-            contents = await file.read()
-            df = pd.read_excel(io.BytesIO(contents))
-
-            # Удаляем строки с пустыми авторами
-            df = df.dropna(subset=["Author"])
-
-            rejected_rows = []
-            async for session in db_helper.get_session():
-                lama_repo = LamaRepository(session)
-
-                # Получаем все существующие цитаты один раз
-                result = await session.execute(select(Quote.text))
-                quotes_in_base = result.scalars().all()
-
-                # Получаем все Лам из базы за один раз
-                result = await session.execute(select(Lama))
-                lamas_in_base = result.scalars().all()
-
-                # Создаем словарь для быстрого поиска авторов
-                existing_lamas = {lama.name: lama.id for lama in lamas_in_base}  # type: ignore
-
-                new_quotes_set: set[str] = set()
-
-                # Отфильтрованные строки
-                filtered_rows = []
-
-                # Итерируем по строкам и отбираем уникальные
-                for row_number, (_, row) in enumerate(df.iterrows(), start=2):
-                    quote_text = str(row["Quote"]).strip()
-                    if is_quote_unique(
-                        quote=quote_text,
-                        existing=quotes_in_base,
-                        new_quotes=new_quotes_set,
-                    ):
-                        new_quotes_set.add(quote_text)
-                        filtered_rows.append(row)
-                    else:
-                        rejected_rows.append(row_number)
-
-                # Создаем новый DataFrame из отфильтрованных строк
-                unique_quotes_df = pd.DataFrame(filtered_rows)
-
-                # Группируем по авторам для эффективной вставки
-                if len(unique_quotes_df) > 0:
-                    grouped = unique_quotes_df.groupby("Author")
-
-                    count = 0
-                    for author, group in grouped:
-                        if author not in existing_lamas:
-                            lama_obj = LamaSchemaCreate(name=str(author))
-                            existing_lamas[author] = await lama_repo.add_lama(lama_obj)
-
-                        for _, row in group.iterrows():
-                            quote_parts = row["Quote"].split("\n")
-                            if author in quote_parts[-1]:
-                                new_quote = "".join(quote_parts[:-1]).strip()
-                            else:
-                                new_quote = row["Quote"].strip()
-                            quote_obj = QuoteSchemaCreate(
-                                lama_id=existing_lamas[author], text=new_quote
-                            )
-                            session.add(quote_obj.to_orm())
-                            count += 1
-
-                    await session.commit()
-
-            response = RedirectResponse(
-                url=request.url_for("admin:list", identity="quote"), status_code=303
-            )
-
-            response.set_cookie(
-                "flash",
-                f"Loaded: {count} quotes, rejected: {rejected_rows}",
-                max_age=1,
-                httponly=True,
-            )
-            return response
-        except Exception as e:
-            request.session["error"] = str(e)
-            return RedirectResponse(
-                url="/admin/quote/action/import-excel", status_code=303
-            )
+        request.session["success"] = f"Импорт запущен. Проверьте статус позже."
+        return RedirectResponse(url="/admin/quote", status_code=303)
