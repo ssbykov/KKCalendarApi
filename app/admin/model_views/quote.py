@@ -102,9 +102,15 @@ class QuoteView(BaseView):
             raise ValueError("Требуется файл Excel (.xlsx или .xls)")
 
         contents = await file.read()
-        run_process_import.delay(contents)
+        task_import = run_process_import.delay(contents)
 
-        request.session["success"] = f"Импорт запущен. Проверьте статус позже."
-        return RedirectResponse(
+        response = RedirectResponse(
             url=request.url_for("admin:list", identity="quote"), status_code=303
         )
+        response.set_cookie(
+            "flash",
+            f"The import is running. Check the status later. Translate the issue ID {task_import.id}",
+            max_age=1,
+            httponly=True,
+        )
+        return response
