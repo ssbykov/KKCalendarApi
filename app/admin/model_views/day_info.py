@@ -4,7 +4,7 @@ from starlette.responses import RedirectResponse
 
 from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser
-from crud.days_info import DayInfoRepository
+from database.crud.days_info import DayInfoRepository
 from database import DayInfo
 from database.backup_db import create_backup
 from utils.google_calendar_parser import calendar_parser_run

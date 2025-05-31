@@ -2,8 +2,8 @@ from typing import Type
 
 from pydantic import Field
 
-from database import BaseSchema, BaseWithId, Quote
-from database.schemas.lama import LamaSchemaCreate
+from app.database import BaseSchema, BaseWithId, Quote
+from app.database.schemas.lama import LamaSchemaCreate
 
 
 class QuoteSchemaBase(BaseSchema):

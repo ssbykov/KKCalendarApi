@@ -3,7 +3,7 @@ from typing import Sequence, Annotated
 from fastapi import APIRouter, Depends
 
 from core import settings
-from crud.quotes import QuoteRepository, get_quote_repository
+from database.crud.quotes import QuoteRepository, get_quote_repository
 from database import Quote
 from database.schemas.quote import QuoteSchema
 

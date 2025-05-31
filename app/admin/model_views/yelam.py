@@ -2,7 +2,7 @@ from starlette.requests import Request
 
 from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser
-from crud.yelams import YelamRepository
+from database.crud.yelams import YelamRepository
 from database import Yelam
 
 

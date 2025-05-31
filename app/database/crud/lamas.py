@@ -1,8 +1,8 @@
 from sqlalchemy import func
 
-from crud.mixines import GetBackNextIdMixin
-from database import Lama
-from database.schemas.lama import LamaSchemaCreate
+from app.database.crud.mixines import GetBackNextIdMixin
+from app.database import Lama
+from app.database.schemas.lama import LamaSchemaCreate
 
 
 class LamaRepository(GetBackNextIdMixin[Lama]):

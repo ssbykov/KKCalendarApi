@@ -1,7 +1,7 @@
 import os
 import sys
 
-from crud.backup_db import BackupDbRepository
+from .crud.backup_db import BackupDbRepository
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
@@ -11,7 +11,7 @@ from fastapi import Depends
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
-from core import settings
+from app.core import settings
 from .models import *
 from .schemas import (
     BaseSchema,

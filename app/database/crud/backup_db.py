@@ -2,9 +2,9 @@ from pathlib import Path
 
 from sqlalchemy import select
 
-from core import settings
-from crud.mixines import GetBackNextIdMixin
-from database import BackupDb
+from app.core import settings
+from app.database.crud.mixines import GetBackNextIdMixin
+from app.database import BackupDb
 
 
 class BackupDbRepository(GetBackNextIdMixin[BackupDb]):

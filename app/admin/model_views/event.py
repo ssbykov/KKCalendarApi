@@ -9,8 +9,8 @@ from starlette.requests import Request
 from admin.custom_model_view import CustomModelView
 from admin.model_views.event_photo import photo_url
 from admin.utils import text_formater
-from crud.days_info import DayInfoRepository
-from crud.events import EventRepository
+from database.crud.days_info import DayInfoRepository
+from database.crud.events import EventRepository
 from database import Event, db_helper, DayInfo
 
 

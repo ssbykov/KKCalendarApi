@@ -8,7 +8,7 @@ from starlette.responses import RedirectResponse
 
 from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser, text_formater
-from crud.quotes import QuoteRepository
+from database.crud.quotes import QuoteRepository
 from database import Quote, db_helper
 from tasks.quoters import run_async, is_quote_unique
 

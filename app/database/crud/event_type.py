@@ -1,4 +1,4 @@
-from crud.mixines import GetBackNextIdMixin
+from database.crud.mixines import GetBackNextIdMixin
 from database import EventType
 
 

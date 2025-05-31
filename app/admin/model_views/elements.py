@@ -2,7 +2,7 @@ from starlette.requests import Request
 
 from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser, text_formater
-from crud.elements import ElementsRepository
+from database.crud.elements import ElementsRepository
 from database import Elements
 
 

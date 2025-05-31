@@ -6,12 +6,11 @@ from typing import Any
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 
 from core import settings
-from crud.days_info import DayInfoRepository
-from crud.events import EventRepository
-from crud.users import UsersRepository
+from database.crud.days_info import DayInfoRepository
+from database.crud.events import EventRepository
+from database.crud.users import UsersRepository
 from database import SessionDep, db_helper
 from database.schemas import DayInfoSchemaCreate, EventSchemaCreate
 from utils.translator import translate

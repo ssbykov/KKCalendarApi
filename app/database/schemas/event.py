@@ -2,7 +2,7 @@ from typing import Type
 
 from pydantic import Field, BaseModel
 
-from database import Event, BaseWithId
+from app.database import Event, BaseWithId
 from .base_schema import BaseSchema
 
 

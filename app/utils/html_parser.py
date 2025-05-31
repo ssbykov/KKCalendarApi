@@ -5,9 +5,9 @@ from bs4 import BeautifulSoup as bs
 from fake_headers import Headers  # type: ignore
 
 from core import settings
-from crud.days_info import DayInfoRepository
-from crud.events import EventRepository
-from crud.users import UsersRepository
+from database.crud.days_info import DayInfoRepository
+from database.crud.events import EventRepository
+from database.crud.users import UsersRepository
 from database import SessionDep
 from database.schemas import DayInfoSchemaCreate, EventSchemaCreate
 from utils.translator import translate

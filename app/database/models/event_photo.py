@@ -1,7 +1,7 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from core.custom_types import ImageType
+from app.core.custom_types import ImageType
 from . import BaseWithId
 
 

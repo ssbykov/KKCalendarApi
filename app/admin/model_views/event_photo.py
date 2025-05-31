@@ -9,7 +9,7 @@ from starlette.requests import Request
 from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser
 from core import settings
-from crud.event_photos import EventPhotoRepository
+from database.crud.event_photos import EventPhotoRepository
 from database.models import EventPhoto
 
 

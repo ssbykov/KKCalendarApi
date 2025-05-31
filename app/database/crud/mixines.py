@@ -13,7 +13,7 @@ from sqlalchemy import select, Select, String, func, Integer, Boolean, Date, Dat
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from core.type_vars import T
+from app.core.type_vars import T
 
 
 class GetBackNextIdMixin(ABC, Generic[T]):

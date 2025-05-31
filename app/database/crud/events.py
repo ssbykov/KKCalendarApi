@@ -1,7 +1,7 @@
 from sqlalchemy import update, func
 from sqlalchemy.orm import selectinload
 
-from crud.mixines import GetBackNextIdMixin
+from database.crud.mixines import GetBackNextIdMixin
 from database import SessionDep, Event, EventSchemaCreate
 
 

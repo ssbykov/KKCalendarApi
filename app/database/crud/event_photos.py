@@ -3,7 +3,7 @@ from pathlib import Path
 from starlette.exceptions import HTTPException
 from starlette.responses import FileResponse
 
-from crud.mixines import GetBackNextIdMixin
+from database.crud.mixines import GetBackNextIdMixin
 from database import SessionDep
 from database.models import EventPhoto
 

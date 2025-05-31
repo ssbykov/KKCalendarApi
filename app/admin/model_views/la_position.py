@@ -2,7 +2,7 @@ from starlette.requests import Request
 
 from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser
-from crud.la_positions import LaPositionRepository
+from database.crud.la_positions import LaPositionRepository
 from database import LaPosition
 
 

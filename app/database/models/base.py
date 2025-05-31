@@ -3,7 +3,7 @@ from typing import Any
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 
-from core import settings
+from app.core import settings
 
 
 class Base(DeclarativeBase):

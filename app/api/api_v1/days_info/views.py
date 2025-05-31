@@ -5,8 +5,8 @@ from starlette.exceptions import HTTPException
 from starlette.responses import FileResponse
 from typing_extensions import Sequence
 
-from crud.days_info import DayInfoRepository, get_day_info_repository
-from crud.event_photos import EventPhotoRepository, get_event_photos_repository
+from database.crud.days_info import DayInfoRepository, get_day_info_repository
+from database.crud.event_photos import EventPhotoRepository, get_event_photos_repository
 from database import DayInfo, DayInfoSchema
 
 router = APIRouter()

@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from crud.mixines import GetBackNextIdMixin
+from database.crud.mixines import GetBackNextIdMixin
 from database.models import User
 
 

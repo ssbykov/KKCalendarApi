@@ -4,7 +4,7 @@ from starlette.requests import Request
 from admin.custom_model_view import CustomModelView
 from admin.model_views.event_photo import photo_url
 from admin.utils import check_superuser
-from crud.lamas import LamaRepository
+from database.crud.lamas import LamaRepository
 from database import db_helper, Lama
 
 

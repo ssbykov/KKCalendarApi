@@ -5,17 +5,19 @@ from typing import Sequence
 
 from sqlalchemy import select
 
-from core.celery_worker import celery_app
-from crud.lamas import LamaRepository
-from database import db_helper, Quote, Lama
-from database.schemas.lama import LamaSchemaCreate
-from database.schemas.quote import QuoteSchemaCreate
+from app.celery_worker import celery_app
+from app.database.crud.lamas import LamaRepository
+from app.database import db_helper, Quote, Lama
+from app.database.schemas.lama import LamaSchemaCreate
+from app.database.schemas.quote import QuoteSchemaCreate
 import pandas as pd
 
 
 @celery_app.task(name="tasks.process_import")
 def run_async(file_bytes: bytes):
-    return asyncio.run(process_import(file_bytes))
+    import asyncio
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(process_import(file_bytes))
 
 
 async def process_import(file_bytes: bytes) -> str:

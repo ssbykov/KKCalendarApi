@@ -15,7 +15,7 @@ except ImportError:  # pragma: no cover
 
 from fastapi_storages.base import StorageImage  # type: ignore
 
-from core import settings
+from app.core import settings
 
 
 class ImageType(_ImageType):  # type: ignore[misc]

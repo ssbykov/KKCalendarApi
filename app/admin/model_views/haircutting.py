@@ -2,7 +2,7 @@ from starlette.requests import Request
 
 from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser
-from crud.haircutting_days import HaircuttingRepository
+from database.crud.haircutting_days import HaircuttingRepository
 from database import HaircuttingDay
 
 

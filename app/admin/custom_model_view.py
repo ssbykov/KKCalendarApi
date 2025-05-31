@@ -5,7 +5,7 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
 from core.type_vars import T
-from crud.mixines import GetBackNextIdMixin
+from database.crud.mixines import GetBackNextIdMixin
 from database import db_helper
 
 

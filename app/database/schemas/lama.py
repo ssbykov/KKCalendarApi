@@ -4,7 +4,7 @@ from pydantic import Field
 
 from .base_schema import BaseSchema
 
-from database import Lama, BaseWithId
+from app.database import Lama, BaseWithId
 
 
 class LamaSchemaCreate(BaseSchema):

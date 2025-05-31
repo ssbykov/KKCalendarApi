@@ -2,7 +2,7 @@ from sqlalchemy import select, not_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from crud.mixines import GetBackNextIdMixin
+from database.crud.mixines import GetBackNextIdMixin
 from database import Quote, SessionDep
 
 

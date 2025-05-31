@@ -1,7 +1,7 @@
 import asyncio
 
 from admin.utils import check_superuser
-from crud.backup_db import BackupDbRepository
+from database.crud.backup_db import BackupDbRepository
 from database import db_helper
 from database.backup_db import restore_database_from_dump
 from database.models.backup_db import BackupDb

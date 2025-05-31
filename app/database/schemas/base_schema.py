@@ -2,7 +2,7 @@ from typing import Type
 
 from pydantic import BaseModel, Field
 
-from database import BaseWithId
+from app.database import BaseWithId
 
 
 class BaseSchema(BaseModel):
