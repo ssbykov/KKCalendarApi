@@ -5,7 +5,7 @@ FROM python:3.11-slim as builder
 
 # 1. Сначала устанавливаем curl и системные зависимости
 RUN apt-get update && \
-    apt-get install -y curl && \
+    apt-get install -y curl gcc python3-dev build-essential && \
     rm -rf /var/lib/apt/lists/*
 
 # 2. Установка Poetry
