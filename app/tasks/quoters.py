@@ -14,8 +14,9 @@ import pandas as pd
 
 
 @celery_app.task(name="tasks.process_import")
-def run_async(file_bytes: bytes):
+def run_process_import(file_bytes: bytes):
     import asyncio
+
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(process_import(file_bytes))
 

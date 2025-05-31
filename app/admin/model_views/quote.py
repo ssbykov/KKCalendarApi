@@ -10,7 +10,7 @@ from admin.custom_model_view import CustomModelView
 from admin.utils import check_superuser, text_formater
 from database.crud.quotes import QuoteRepository
 from database import Quote, db_helper
-from tasks.quoters import run_async, is_quote_unique
+from tasks.quoters import is_quote_unique, run_process_import
 
 
 class QuoteAdmin(
@@ -102,7 +102,7 @@ class QuoteView(BaseView):
             raise ValueError("Требуется файл Excel (.xlsx или .xls)")
 
         contents = await file.read()
-        run_async.delay(contents)
+        run_process_import.delay(contents)
 
         request.session["success"] = f"Импорт запущен. Проверьте статус позже."
         return RedirectResponse(
