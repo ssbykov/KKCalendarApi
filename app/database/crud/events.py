@@ -16,7 +16,8 @@ class EventRepository(GetBackNextIdMixin[Event]):
         stmt = self.main_stmt.where(
             func.upper(self.model.name) == func.upper(name)
         ).options(selectinload(Event.days))
-        return await self.session.scalar(stmt)
+        result: Event | None = await self.session.scalar(stmt)
+        return result
 
     async def ru_name_event_update(self, event_id: int, ru_name: str) -> None:
         update_stmt = (

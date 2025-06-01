@@ -14,7 +14,7 @@ from app.database.schemas.quote import QuoteSchemaCreate
 TASK_NAME = "tasks.process_import"
 
 
-@celery_app.task(name=TASK_NAME)
+@celery_app.task(name=TASK_NAME)  # type: ignore
 def run_process_import(file_bytes: bytes) -> Any:
     import asyncio
 

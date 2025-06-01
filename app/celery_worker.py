@@ -1,6 +1,6 @@
 import redis
 from celery import Celery  # type: ignore
-from celery.result import AsyncResult
+from celery.result import AsyncResult  # type: ignore
 
 from app.core import settings
 

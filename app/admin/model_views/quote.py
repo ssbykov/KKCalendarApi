@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqladmin import action, expose, BaseView
 from sqladmin.templating import _TemplateResponse
-from sqlalchemy import select
+from sqlalchemy import select, true
 from starlette.datastructures import UploadFile
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
@@ -58,10 +58,12 @@ class QuoteAdmin(
     ) -> str | None:
         pk = getattr(request, "path_params", {}).get("pk") if request else -1
         quote = form_data_dict.get("text", "").strip()
+        if not quote:
+            return "Текст цитаты не может быть пустым"
         async for session in db_helper.get_session():
-            result = await session.execute(
-                select(Quote.text).where(Quote.id != int(pk))
-            )
+            condition = Quote.id != pk if pk != -1 else true()
+            stmt = select(Quote.text).where(condition)
+            result = await session.execute(stmt)
             quotes_in_base = result.scalars().all()
             if not is_quote_unique(
                 quote=quote,

@@ -68,7 +68,9 @@ class EventAdmin(
             if hasattr(model, "photo") and model.photo
             else ""
         ),
-    } | text_formater(Event)
+    } | text_formater(
+        Event
+    )  # type:ignore
 
     detail_columns_counts = {
         "days": {"count": 4, "width": 200},
