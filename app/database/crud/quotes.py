@@ -2,8 +2,8 @@ from sqlalchemy import select, not_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from database.crud.mixines import GetBackNextIdMixin
-from database import Quote, SessionDep
+from app.database.crud.mixines import GetBackNextIdMixin
+from app.database import Quote, SessionDep
 
 
 def get_quote_repository(session: SessionDep) -> "QuoteRepository":
@@ -18,7 +18,9 @@ class QuoteRepository(GetBackNextIdMixin[Quote]):
         super().__init__(session)
         self.session = session
 
-    async def get_random_quote(self, excluded_ids: list[int] | None = None) -> Quote:
+    async def get_random_quote(
+        self, excluded_ids: list[int] | None = None
+    ) -> Quote | None:
         if excluded_ids is None:
             excluded_ids = []
         stmt = (
