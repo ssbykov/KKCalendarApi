@@ -1,9 +1,9 @@
 from starlette.requests import Request
 
-from admin.custom_model_view import CustomModelView
-from admin.utils import check_superuser, text_formater
-from database.crud.elements import ElementsRepository
-from database import Elements
+from app.admin.custom_model_view import CustomModelView
+from app.admin.utils import check_superuser, text_formater
+from app.database.crud.elements import ElementsRepository
+from app.database import Elements
 
 
 class ElementsAdmin(

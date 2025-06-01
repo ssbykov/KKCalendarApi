@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
-from database.crud.mixines import GetBackNextIdMixin
-from database.models import User
+from app.database.crud.mixines import GetBackNextIdMixin
+from app.database.models import User
 
 
 class UsersRepository(GetBackNextIdMixin[User]):

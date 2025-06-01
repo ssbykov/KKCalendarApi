@@ -1,9 +1,9 @@
 from starlette.requests import Request
 
-from admin.custom_model_view import CustomModelView
-from admin.utils import check_superuser
-from database.crud.users import UsersRepository
-from database.models import User
+from app.admin.custom_model_view import CustomModelView
+from app.admin.utils import check_superuser
+from app.database.crud.users import UsersRepository
+from app.database.models import User
 
 
 class UserAdmin(

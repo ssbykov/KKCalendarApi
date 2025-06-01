@@ -3,9 +3,9 @@ from pathlib import Path
 from starlette.exceptions import HTTPException
 from starlette.responses import FileResponse
 
-from database.crud.mixines import GetBackNextIdMixin
-from database import SessionDep
-from database.models import EventPhoto
+from app.database.crud.mixines import GetBackNextIdMixin
+from app.database import SessionDep
+from app.database.models import EventPhoto
 
 
 def get_event_photos_repository(session: SessionDep) -> "EventPhotoRepository":

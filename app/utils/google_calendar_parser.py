@@ -7,13 +7,13 @@ from typing import Any
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
-from core import settings
-from database.crud.days_info import DayInfoRepository
-from database.crud.events import EventRepository
-from database.crud.users import UsersRepository
-from database import SessionDep, db_helper
-from database.schemas import DayInfoSchemaCreate, EventSchemaCreate
-from utils.translator import translate
+from app.core import settings
+from app.database.crud.days_info import DayInfoRepository
+from app.database.crud.events import EventRepository
+from app.database.crud.users import UsersRepository
+from app.database import SessionDep, db_helper
+from app.database.schemas import DayInfoSchemaCreate, EventSchemaCreate
+from app.utils.translator import translate
 
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 

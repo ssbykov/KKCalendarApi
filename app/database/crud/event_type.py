@@ -1,5 +1,5 @@
-from database.crud.mixines import GetBackNextIdMixin
-from database import EventType
+from app.database.crud.mixines import GetBackNextIdMixin
+from app.database import EventType
 
 
 class EventTypeRepository(GetBackNextIdMixin[EventType]):

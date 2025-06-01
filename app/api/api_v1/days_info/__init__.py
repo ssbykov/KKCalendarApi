@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from core import settings
+from app.core import settings
 from .views import router as days_info_router
 
 router = APIRouter(

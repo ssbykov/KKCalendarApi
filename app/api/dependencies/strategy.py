@@ -5,11 +5,11 @@ from fastapi_users.authentication.strategy.db import (
     DatabaseStrategy,
 )
 
-from api.dependencies.access_tokens import get_access_token_db
-from core import settings
+from app.api.dependencies.access_tokens import get_access_token_db
+from app.core import settings
 
 if TYPE_CHECKING:
-    from database import AccessToken
+    from app.database import AccessToken
     from fastapi_users.authentication.strategy import (
         AccessTokenDatabase,
     )

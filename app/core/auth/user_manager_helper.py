@@ -5,12 +5,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_users.exceptions import UserNotExists
 from starlette.requests import Request
 
-from api.dependencies.access_tokens import get_access_token_db
-from api.dependencies.user_manager import get_user_manager
-from api.dependencies.users import get_user_db
-from database import db_helper
-from database.models import User
-from database.schemas.user import UserCreate
+from app.api.dependencies.access_tokens import get_access_token_db
+from app.api.dependencies.user_manager import get_user_manager
+from app.api.dependencies.users import get_user_db
+from app.database import db_helper
+from app.database.models import User
+from app.database.schemas.user import UserCreate
 
 get_async_session_context = contextlib.asynccontextmanager(db_helper.get_session)
 get_user_db_context = contextlib.asynccontextmanager(get_user_db)
@@ -18,7 +18,7 @@ get_user_manager_context = contextlib.asynccontextmanager(get_user_manager)
 get_access_token_db_context = contextlib.asynccontextmanager(get_access_token_db)
 
 if TYPE_CHECKING:
-    from core.auth.user_manager import UserManager
+    from app.core.auth.user_manager import UserManager
 
 
 def with_user_manager(func: Callable[..., Any]) -> Callable[..., Any]:

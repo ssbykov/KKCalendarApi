@@ -1,9 +1,9 @@
 from starlette.requests import Request
 
-from admin.custom_model_view import CustomModelView
-from admin.utils import check_superuser
-from database.crud.skylight_arches import SkylightArchRepository
-from database import SkylightArch
+from app.admin.custom_model_view import CustomModelView
+from app.admin.utils import check_superuser
+from app.database.crud.skylight_arches import SkylightArchRepository
+from app.database import SkylightArch
 
 
 class SkylightArchAdmin(

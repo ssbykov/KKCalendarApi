@@ -1,8 +1,8 @@
 from sqlalchemy import update, func
 from sqlalchemy.orm import selectinload
 
-from database.crud.mixines import GetBackNextIdMixin
-from database import SessionDep, Event, EventSchemaCreate
+from app.database.crud.mixines import GetBackNextIdMixin
+from app.database import SessionDep, Event, EventSchemaCreate
 
 
 def get_event_repository(session: SessionDep) -> "EventRepository":

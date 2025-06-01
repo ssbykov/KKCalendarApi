@@ -8,11 +8,11 @@ from typing import TYPE_CHECKING
 
 import aiohttp
 
-from core import settings
-from database import db_helper
+from app.core import settings
+from app.database import db_helper
 
 if TYPE_CHECKING:
-    from core.config import DbSettings
+    from app.core.config import DbSettings
 
 
 def generate_dump_name(db_name: str) -> str:

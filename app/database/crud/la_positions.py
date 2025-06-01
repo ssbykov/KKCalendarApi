@@ -1,5 +1,5 @@
-from database.crud.mixines import GetBackNextIdMixin
-from database import LaPosition
+from app.database.crud.mixines import GetBackNextIdMixin
+from app.database import LaPosition
 
 
 class LaPositionRepository(GetBackNextIdMixin[LaPosition]):

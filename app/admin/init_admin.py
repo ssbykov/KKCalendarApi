@@ -10,9 +10,9 @@ from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import Response, RedirectResponse
 
-from core import settings
-from database import db_helper, DayInfo
-from database.backup_db import create_backup
+from app.core import settings
+from app.database import db_helper, DayInfo
+from app.database.backup_db import create_backup
 from .backend import AdminAuth, owner_required
 from .custom_model_view import CustomModelView
 from .model_views import (
@@ -161,8 +161,8 @@ class NewAdmin(Admin):
             request, model_view.edit_template, context, status_code=400
         )
 
-    def _find_custom_model_view(self, identity: str) -> CustomModelView:
-        return cast(CustomModelView, self._find_model_view(identity))
+    def _find_custom_model_view(self, identity: str) -> CustomModelView[Any]:
+        return cast(CustomModelView[Any], self._find_model_view(identity))
 
     @owner_required
     async def delete(self, request: Request) -> Response:

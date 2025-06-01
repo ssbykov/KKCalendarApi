@@ -3,9 +3,9 @@ from typing import Any
 from apscheduler.schedulers.asyncio import AsyncIOScheduler  # type: ignore
 from apscheduler.triggers.cron import CronTrigger  # type: ignore
 
-from core import settings
-from utils.email_sender import send_email
-from utils.google_calendar_parser import calendar_parser_run
+from app.core import settings
+from app.utils.email_sender import send_email
+from app.utils.google_calendar_parser import calendar_parser_run
 
 scheduler = AsyncIOScheduler()
 

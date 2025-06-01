@@ -5,7 +5,7 @@ from sqlalchemy import Text
 from sqlalchemy.orm import InstrumentedAttribute
 from starlette.requests import Request
 
-from database import BaseWithId
+from app.database import BaseWithId
 
 
 def check_superuser(request: Request) -> bool:

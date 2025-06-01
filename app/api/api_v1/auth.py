@@ -6,10 +6,10 @@ from fastapi.templating import Jinja2Templates
 from fastapi_users.exceptions import InvalidVerifyToken, UserAlreadyVerified
 from starlette.templating import _TemplateResponse
 
-from api.dependencies.backend import authentication_backend
-from core.config import settings
-from database.schemas.user import UserRead, UserCreate
-from utils.email_sender import send_email
+from app.api.dependencies.backend import authentication_backend
+from app.core.config import settings
+from app.database.schemas.user import UserRead, UserCreate
+from app.utils.email_sender import send_email
 from .fastapi_users import fastapi_users
 from ..dependencies.user_manager import get_user_manager
 
@@ -21,7 +21,7 @@ router = APIRouter(
 )
 
 if TYPE_CHECKING:
-    from core.auth.user_manager import UserManager
+    from app.core.auth.user_manager import UserManager
 
 
 @router.get("/verify")

@@ -2,12 +2,12 @@ from sqladmin import action
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from admin.custom_model_view import CustomModelView
-from admin.utils import check_superuser
-from database.crud.days_info import DayInfoRepository
-from database import DayInfo
-from database.backup_db import create_backup
-from utils.google_calendar_parser import calendar_parser_run
+from app.admin.custom_model_view import CustomModelView
+from app.admin.utils import check_superuser
+from app.database.crud.days_info import DayInfoRepository
+from app.database import DayInfo
+from app.database.backup_db import create_backup
+from app.utils.google_calendar_parser import calendar_parser_run
 
 
 class DayInfoAdmin(

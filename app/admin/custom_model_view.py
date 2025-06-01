@@ -4,9 +4,9 @@ from sqladmin import action, ModelView
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from core.type_vars import T
-from database.crud.mixines import GetBackNextIdMixin
-from database import db_helper
+from app.core.type_vars import T
+from app.database.crud.mixines import GetBackNextIdMixin
+from app.database import db_helper
 
 
 class CustomModelView(ModelView, Generic[T]):
@@ -112,7 +112,7 @@ class CustomModelView(ModelView, Generic[T]):
         )
 
     async def check_restrictions_create(
-        self, form_data_dict: dict[str, Any], request: Request = None
+        self, form_data_dict: dict[str, Any], request: Request | None = None
     ) -> str | None:
         pass
 

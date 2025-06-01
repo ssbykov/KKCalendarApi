@@ -3,11 +3,11 @@ from typing import AsyncGenerator, TYPE_CHECKING
 from fastapi import Depends
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 
-from api.dependencies.users import get_user_db
-from core.auth.user_manager import UserManager
+from app.api.dependencies.users import get_user_db
+from app.core.auth.user_manager import UserManager
 
 if TYPE_CHECKING:
-    from database.models import User
+    from app.database.models import User
 
 
 async def get_user_manager(

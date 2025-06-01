@@ -1,7 +1,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
 
-from core import settings
+from app.core import settings
 
 
 def init_logger(log_file: str = settings.logger.filename) -> None:

@@ -1,9 +1,9 @@
 from starlette.requests import Request
 
-from admin.custom_model_view import CustomModelView
-from admin.utils import check_superuser
-from database.crud.yelams import YelamRepository
-from database import Yelam
+from app.admin.custom_model_view import CustomModelView
+from app.admin.utils import check_superuser
+from app.database.crud.yelams import YelamRepository
+from app.database import Yelam
 
 
 class YelamAdmin(

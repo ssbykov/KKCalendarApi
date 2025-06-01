@@ -2,13 +2,13 @@ import contextlib
 from datetime import datetime, timedelta, timezone
 from typing import Callable, Any, TYPE_CHECKING
 
-from api.dependencies.access_tokens import get_access_token_db
-from api.dependencies.backend import authentication_backend
-from core import settings
-from database import db_helper
+from app.api.dependencies.access_tokens import get_access_token_db
+from app.api.dependencies.backend import authentication_backend
+from app.core import settings
+from app.database import db_helper
 
 if TYPE_CHECKING:
-    from database.models import User
+    from app.database.models import User
 
 get_async_session_context = contextlib.asynccontextmanager(db_helper.get_session)
 get_access_token_db_context = contextlib.asynccontextmanager(get_access_token_db)

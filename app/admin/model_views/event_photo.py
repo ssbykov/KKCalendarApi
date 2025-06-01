@@ -6,11 +6,11 @@ from fastapi_storages import StorageImage  # type: ignore
 from markupsafe import Markup
 from starlette.requests import Request
 
-from admin.custom_model_view import CustomModelView
-from admin.utils import check_superuser
-from core import settings
-from database.crud.event_photos import EventPhotoRepository
-from database.models import EventPhoto
+from app.admin.custom_model_view import CustomModelView
+from app.admin.utils import check_superuser
+from app.core import settings
+from app.database.crud.event_photos import EventPhotoRepository
+from app.database.models import EventPhoto
 
 
 class EventPhotoAdmin(

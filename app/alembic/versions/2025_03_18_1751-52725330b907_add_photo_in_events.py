@@ -10,7 +10,6 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-from core.custom_types import ImageType
 
 
 # revision identifiers, used by Alembic.

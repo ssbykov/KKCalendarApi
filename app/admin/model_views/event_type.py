@@ -1,9 +1,9 @@
 from starlette.requests import Request
 
-from admin.custom_model_view import CustomModelView
-from admin.utils import check_superuser
-from database.crud.event_type import EventTypeRepository
-from database.models import EventType
+from app.admin.custom_model_view import CustomModelView
+from app.admin.utils import check_superuser
+from app.database.crud.event_type import EventTypeRepository
+from app.database.models import EventType
 
 
 class EventTypeAdmin(

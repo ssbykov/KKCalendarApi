@@ -9,9 +9,9 @@ from fastapi_users import (
 )
 from fastapi_users.schemas import UC
 
-from core import settings, config
-from database.models import User
-from utils.email_sender import send_email
+from app.core import settings, config
+from app.database.models import User
+from app.utils.email_sender import send_email
 
 logger = logging.getLogger(__name__)
 

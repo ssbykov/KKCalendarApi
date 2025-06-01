@@ -6,12 +6,12 @@ from sqlalchemy import Select, select, func
 from sqlalchemy.orm import selectinload
 from starlette.requests import Request
 
-from admin.custom_model_view import CustomModelView
-from admin.model_views.event_photo import photo_url
-from admin.utils import text_formater
-from database.crud.days_info import DayInfoRepository
-from database.crud.events import EventRepository
-from database import Event, db_helper, DayInfo
+from app.admin.custom_model_view import CustomModelView
+from app.admin.model_views.event_photo import photo_url
+from app.admin.utils import text_formater
+from app.database.crud.days_info import DayInfoRepository
+from app.database.crud.events import EventRepository
+from app.database import Event, db_helper, DayInfo
 
 
 class EventAdmin(
@@ -57,7 +57,7 @@ class EventAdmin(
     column_list = ["id", "ru_name", "emoji", "type"]
     column_searchable_list = ["en_name", "ru_name"]
     column_sortable_list = ["id"]
-    column_formatters_detail = {  # type: ignore
+    column_formatters_detail = {
         "link": lambda model, attribute: getattr(model, "link", None)
         and Markup(
             f'<a href="{getattr(model, "link", "#")}" target="_blank">{getattr(model, "link", "No URL")}</a>'
@@ -135,8 +135,8 @@ class EventAdmin(
         return None
 
     async def check_restrictions_create(
-        self, form_data_dict: dict, request: Request = None
-    ):
+        self, form_data_dict: dict[str, Any], request: Request | None = None
+    ) -> str | None:
         # 1. Получаем данные из запроса
         pk = getattr(request, "path_params", {}).get("pk") if request else None
         name = form_data_dict.get("name", "").strip()

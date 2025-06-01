@@ -1,5 +1,5 @@
-from database.crud.mixines import GetBackNextIdMixin
-from database import SkylightArch
+from app.database.crud.mixines import GetBackNextIdMixin
+from app.database import SkylightArch
 
 
 class SkylightArchRepository(GetBackNextIdMixin[SkylightArch]):

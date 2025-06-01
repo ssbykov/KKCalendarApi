@@ -10,11 +10,11 @@ from sqladmin.authentication import AuthenticationBackend
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
 
-from core import settings
-from core.auth.access_tokens_helper import AccessTokensHelper
-from core.auth.user_manager_helper import UserManagerHelper
-from database.schemas.admin_auth_response import AdminAuthResponse
-from database.schemas.user import UserCreate
+from app.core import settings
+from app.core.auth.access_tokens_helper import AccessTokensHelper
+from app.core.auth.user_manager_helper import UserManagerHelper
+from app.database.schemas.admin_auth_response import AdminAuthResponse
+from app.database.schemas.user import UserCreate
 
 
 class AdminAuth(AuthenticationBackend):
@@ -109,7 +109,9 @@ class AdminAuth(AuthenticationBackend):
         if not super_user:
             await self.user_manager_helper.create_user(user_create=user_create)
 
-    async def forgot_password(self, username: str, password: str, request: Request) -> AdminAuthResponse:
+    async def forgot_password(
+        self, username: str, password: str, request: Request
+    ) -> AdminAuthResponse:
         user = await self.user_manager_helper.get_user_by_email(user_email=username)
         try:
             request.session.update({"password": password})

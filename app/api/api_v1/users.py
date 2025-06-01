@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from core import settings
-from database.schemas.user import UserUpdate, UserRead
+from app.core import settings
+from app.database.schemas.user import UserUpdate, UserRead
 from .fastapi_users import fastapi_users
 
 router = APIRouter(

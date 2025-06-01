@@ -1,5 +1,5 @@
-from database.crud.mixines import GetBackNextIdMixin
-from database import HaircuttingDay
+from app.database.crud.mixines import GetBackNextIdMixin
+from app.database import HaircuttingDay
 
 
 class HaircuttingRepository(GetBackNextIdMixin[HaircuttingDay]):

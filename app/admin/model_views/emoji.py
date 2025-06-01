@@ -1,9 +1,9 @@
 from starlette.requests import Request
 
-from admin.custom_model_view import CustomModelView
-from admin.utils import check_superuser
-from database.crud.emoji import EmojiRepository
-from database.models import Emoji
+from app.admin.custom_model_view import CustomModelView
+from app.admin.utils import check_superuser
+from app.database.crud.emoji import EmojiRepository
+from app.database.models import Emoji
 
 
 class EmojiAdmin(

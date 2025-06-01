@@ -1,11 +1,11 @@
 from markupsafe import Markup
 from starlette.requests import Request
 
-from admin.custom_model_view import CustomModelView
-from admin.model_views.event_photo import photo_url
-from admin.utils import check_superuser
-from database.crud.lamas import LamaRepository
-from database import db_helper, Lama
+from app.admin.custom_model_view import CustomModelView
+from app.admin.model_views.event_photo import photo_url
+from app.admin.utils import check_superuser
+from app.database.crud.lamas import LamaRepository
+from app.database import db_helper, Lama
 
 
 class LamaAdmin(
@@ -43,7 +43,7 @@ class LamaAdmin(
     }
 
     async def check_restrictions_create(
-        self, form_data_dict: dict, request: Request = None
+        self, form_data_dict: dict[str, str], request: Request | None = None
     ) -> str | None:
         pk = getattr(request, "path_params", {}).get("pk") if request else None
         name = form_data_dict.get("name", "").strip()

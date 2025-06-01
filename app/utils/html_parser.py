@@ -4,13 +4,13 @@ import requests
 from bs4 import BeautifulSoup as bs
 from fake_headers import Headers  # type: ignore
 
-from core import settings
-from database.crud.days_info import DayInfoRepository
-from database.crud.events import EventRepository
-from database.crud.users import UsersRepository
-from database import SessionDep
-from database.schemas import DayInfoSchemaCreate, EventSchemaCreate
-from utils.translator import translate
+from app.core import settings
+from app.database.crud.days_info import DayInfoRepository
+from app.database.crud.events import EventRepository
+from app.database.crud.users import UsersRepository
+from app.database import SessionDep
+from app.database.schemas import DayInfoSchemaCreate, EventSchemaCreate
+from app.utils.translator import translate
 
 
 class HtmlParser:

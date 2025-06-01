@@ -5,7 +5,7 @@ from typing import Any
 
 from jinja2 import Template
 
-from core import settings
+from app.core import settings
 
 TEMPLATE_DICT = {
     "verification": {
