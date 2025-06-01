@@ -1,8 +1,25 @@
-from celery import Celery
+import redis
+from celery import Celery  # type: ignore
+from celery.result import AsyncResult
+
+from app.core import settings
+
+HOST = settings.db.redis_host
+PORT = 6379
+
+redis_client = redis.Redis(host=HOST, port=PORT)
 
 celery_app = Celery(
-    "kkcalendar", broker="redis://redis:6379/0", backend="redis://redis:6379/0"
+    "kkcalendar", broker=f"redis://{HOST}:{PORT}", backend=f"redis://{HOST}:{PORT}"
 )
 
 celery_app.autodiscover_tasks(["app.tasks"])
 import app.tasks
+
+
+def check_job_status(name: str) -> AsyncResult | None:
+    task_id = redis_client.get(name)
+    if not task_id:
+        return None
+
+    return AsyncResult(task_id)
