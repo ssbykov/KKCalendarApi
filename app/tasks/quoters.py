@@ -1,20 +1,21 @@
-import asyncio
 import io
 from difflib import SequenceMatcher
-from typing import Sequence
+from typing import Sequence, Any
 
+import pandas as pd
 from sqlalchemy import select
 
 from app.celery_worker import celery_app
-from app.database.crud.lamas import LamaRepository
 from app.database import db_helper, Quote, Lama
+from app.database.crud.lamas import LamaRepository
 from app.database.schemas.lama import LamaSchemaCreate
 from app.database.schemas.quote import QuoteSchemaCreate
-import pandas as pd
+
+TASK_NAME = "tasks.process_import"
 
 
-@celery_app.task(name="tasks.process_import")
-def run_process_import(file_bytes: bytes):
+@celery_app.task(name=TASK_NAME)
+def run_process_import(file_bytes: bytes) -> Any:
     import asyncio
 
     loop = asyncio.get_event_loop()
@@ -88,12 +89,7 @@ async def process_import(file_bytes: bytes) -> str:
 
             await session.commit()
 
-    print(
-        f"Импорт завершен. Загружено: {count}, пропущено: {len(rejected_rows)} строк."
-    )
-    return (
-        f"Импорт завершен. Загружено: {count}, пропущено: {len(rejected_rows)} строк."
-    )
+    return f"Информация по последнему импорту: загружено: {count}, отклонено: {len(rejected_rows)} цитат."
 
 
 def is_quote_unique(
