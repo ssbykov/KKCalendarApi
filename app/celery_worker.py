@@ -1,3 +1,6 @@
+from dataclasses import field, dataclass
+from typing import Callable, Any
+
 import redis
 from celery import Celery, Task  # type: ignore
 from celery.result import AsyncResult  # type: ignore
@@ -25,3 +28,9 @@ def check_job_status(name: str) -> AsyncResult | None:
         redis_client.delete(name)
 
     return task
+
+
+@dataclass
+class CeleryTask:
+    name: str
+    func: Callable[..., Any]

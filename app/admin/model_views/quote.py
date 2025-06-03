@@ -11,7 +11,7 @@ from app.admin.utils import check_superuser, text_formater
 from app.celery_worker import redis_client, check_job_status
 from app.database import Quote, db_helper
 from app.database.crud.quotes import QuoteRepository
-from app.tasks.quoters import TASK_NAME
+from app.tasks.quoters import import_task
 from tasks import run_process_import
 from utils.quoters_import import is_quote_unique
 
@@ -104,11 +104,10 @@ class QuoteView(BaseView):
         if not file.filename.endswith((".xlsx", ".xls")):
             raise ValueError("Требуется файл Excel (.xlsx или .xls)")
 
-        contents = await file.read()
-
-        task_import = check_job_status(TASK_NAME)
-        if task_import and task_import.status == "SUCCESS" or not task_import:
-            task_import = run_process_import.delay(contents)
+        task = check_job_status(import_task.name)
+        if task and task.status == "SUCCESS" or not task:
+            content = await file.read()
+            task_import = run_process_import.delay(content)
             redis_client.set(run_process_import.name, task_import.id)
 
         return RedirectResponse(
@@ -122,7 +121,7 @@ async def get_template(model: BaseView, request: Request) -> _TemplateResponse:
     default_template = "import_excel.html"
 
     # Получаем статус задачи, если есть
-    task_import = check_job_status(TASK_NAME)
+    task_import = check_job_status(import_task.name)
     status = getattr(task_import, "status", None)
 
     # Определяем шаблон (если статус не в словаре — используем default)
