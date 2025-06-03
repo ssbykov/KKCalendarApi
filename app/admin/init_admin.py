@@ -12,7 +12,6 @@ from starlette.responses import Response, RedirectResponse
 
 from app.core import settings
 from app.database import db_helper, DayInfo
-from app.database.backup_db import create_backup
 from .backend import AdminAuth, owner_required
 from .custom_model_view import CustomModelView
 from .model_views import (
@@ -199,9 +198,12 @@ class NewAdmin(Admin):
 
         identity = request.path_params["identity"]
         model_view = self._find_custom_model_view(identity)
+        context = {
+            "model_view": model_view,
+        }
 
         if isinstance(model_view, BackupDbAdmin):
-            await create_backup()
+            request.session["flash_messages"] = await model_view.create_backup()
             url = request.url_for("admin:list", identity=identity)
             return RedirectResponse(url=url, status_code=302)
 
@@ -209,10 +211,7 @@ class NewAdmin(Admin):
         form_data = await self._handle_form_data(request)
         form = Form(form_data)
 
-        context = {
-            "model_view": model_view,
-            "form": form,
-        }
+        context["form"] = form
 
         if request.method == "GET":
             return await self.templates.TemplateResponse(
