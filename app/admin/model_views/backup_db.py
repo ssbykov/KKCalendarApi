@@ -1,18 +1,21 @@
 import asyncio
 
-from sqladmin import ModelView, action
+from sqladmin import action
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
+from admin.custom_model_view import CustomModelView
 from app.admin.utils import check_superuser
 from app.database import db_helper
 from app.database.backup_db import restore_database_from_dump
 from app.database.crud.backup_db import BackupDbRepository
 from app.database.models.backup_db import BackupDb
+from celery_worker import redis_client, check_job_status
+from tasks.create_backup import run_process_backup, backup_task
 
 
 class BackupDbAdmin(
-    ModelView,
+    CustomModelView[BackupDb],
     model=BackupDb,
 ):
     repo_type = BackupDbRepository
@@ -57,3 +60,17 @@ class BackupDbAdmin(
                     asyncio.create_task(restore_database_from_dump(backup.name))
                     return RedirectResponse(url="/admin/logout")
         return RedirectResponse(request.url_for("admin:list", identity=self.identity))
+
+    @staticmethod
+    async def create_backup() -> str | None:
+        task = check_job_status(backup_task.name)
+        status_dict = {
+            "PENDING": "Предыдущий бэкап не закончен...",
+            "FAILURE": f"Ошибка: {type(getattr(task, 'result', None))}, {task.status}",
+        }
+        if task and task.status == "SUCCESS" or not task:
+            task_import = run_process_backup.delay()
+            redis_client.set(run_process_backup.name, task_import.id)
+            return None
+
+        return status_dict.get(task.status)
