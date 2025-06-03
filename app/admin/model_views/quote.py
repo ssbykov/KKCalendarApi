@@ -11,7 +11,9 @@ from app.admin.utils import check_superuser, text_formater
 from app.celery_worker import redis_client, check_job_status
 from app.database import Quote, db_helper
 from app.database.crud.quotes import QuoteRepository
-from app.tasks.quoters import is_quote_unique, run_process_import, TASK_NAME
+from app.tasks.quoters import TASK_NAME
+from tasks import run_process_import
+from utils.quoters_import import is_quote_unique
 
 
 class QuoteAdmin(
@@ -116,25 +118,34 @@ class QuoteView(BaseView):
 
 
 async def get_template(model: BaseView, request: Request) -> _TemplateResponse:
-    templates_map = {
-        None: "import_excel.html",
-        "PENDING": "import_process.html",
-        "SUCCESS": "import_excel.html",
-        "FAILURE": "import_error.html",
-    }
+    # Шаблон по умолчанию
+    default_template = "import_excel.html"
 
+    # Получаем статус задачи, если есть
     task_import = check_job_status(TASK_NAME)
-    template = templates_map.get(
-        getattr(task_import, "status", None), "import_excel.html"
-    )
+    status = getattr(task_import, "status", None)
+
+    # Определяем шаблон (если статус не в словаре — используем default)
+    templates_map = {
+        "PENDING": "import_process.html",
+        "SUCCESS": default_template,
+        "FAILURE": default_template,
+    }
+    template = templates_map.get(status, default_template)
+
+    # Сообщения для разных статусов
+    flash_messages = {
+        "PENDING": "Идет загрузка...",
+        "SUCCESS": getattr(task_import, "info", ""),
+    }
+    error_messages = {
+        "FAILURE": f"Ошибка загрузки: {type(getattr(task_import, 'result', None))}, {status}",
+    }
 
     context = {
         "request": request,
-        "flash_message": (
-            "Идет загрузка..."
-            if task_import and task_import.status == "PENDING"
-            else getattr(task_import, "info", None)
-        ),
+        "flash_message": flash_messages.get(status, ""),
+        "error_message": error_messages.get(status, ""),
     }
 
     return await model.templates.TemplateResponse(
