@@ -39,7 +39,7 @@ class Event(BaseWithId, ToDictMixin):
         ForeignKey("users.id"),
         nullable=True,
     )
-    user = relationship("User", backref=backref("user", lazy="dynamic"))
+    user = relationship("User", backref=backref("user", lazy="select"))
 
     def __str__(self) -> str:
         return self.ru_name
