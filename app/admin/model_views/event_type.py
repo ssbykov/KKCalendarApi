@@ -16,10 +16,8 @@ class EventTypeAdmin(
     icon = "fa-solid fa-bars"
     category = "Раздел событий"
 
-    column_list = ["name", "rank"]
-    column_details_exclude_list = [
-        EventType.id,
-    ]
+    column_list = ("name", "rank")
+    column_details_exclude_list = ("id",)
     column_labels = {
         "name": "Название",
         "desc": "Описание",

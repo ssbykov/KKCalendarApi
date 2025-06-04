@@ -20,12 +20,12 @@ class LaPositionAdmin(
         "en_name": "Заголовок на английском",
         "ru_name": "Заголовок на русском",
     }
-    column_list = [LaPosition.moon_day, LaPosition.ru_name]
-    column_details_list = [
-        LaPosition.moon_day,
-        LaPosition.en_name,
-        LaPosition.ru_name,
-    ]
+    column_list = ("moon_day", "ru_name")
+    column_details_list = (
+        "moon_day",
+        "en_name",
+        "ru_name",
+    )
     can_edit = False
     can_delete = False
     can_export = False

@@ -31,21 +31,21 @@ class DayInfoAdmin(
         "yelam": "Йелам",
         "events": "События дня",
     }
-    column_list = [DayInfo.date, DayInfo.events, DayInfo.moon_day]
+    column_list = ("date", "events", "moon_day")
     page_size = 25
-    column_searchable_list = [DayInfo.date, DayInfo.moon_day]
-    column_details_list = [
-        DayInfo.date,
-        DayInfo.moon_day,
-        DayInfo.elements,
-        DayInfo.la,
-        DayInfo.haircutting,
-        DayInfo.arch,
-        DayInfo.yelam,
-        DayInfo.events,
-    ]
-    column_default_sort = (DayInfo.date, True)
-    column_sortable_list = [DayInfo.date]
+    column_searchable_list = ["date", "moon_day"]
+    column_details_list = (
+        "date",
+        "moon_day",
+        "elements",
+        "la",
+        "haircutting",
+        "arch",
+        "yelam",
+        "events",
+    )
+    column_default_sort = ("date", True)
+    column_sortable_list = ("date",)
 
     can_create = False
     can_delete = False

@@ -16,10 +16,8 @@ class EmojiAdmin(
     icon = "fa-solid fa-icons"
     category = "Раздел событий"
 
-    column_list = ["name", "emoji"]
-    column_details_exclude_list = [
-        Emoji.id,
-    ]
+    column_list = ("name", "emoji")
+    column_details_exclude_list = ("id",)
     column_labels = {
         "name": "Название",
         "emoji": "Эмодзи",

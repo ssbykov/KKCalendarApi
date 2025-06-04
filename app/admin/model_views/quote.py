@@ -12,6 +12,7 @@ from app.celery_worker import redis_client, check_job_status
 from app.database import Quote, db_helper
 from app.database.crud.quotes import QuoteRepository
 from app.tasks.quoters import import_task
+from app.database import Lama
 from tasks import run_process_import
 from utils.quoters_import import is_quote_unique
 
@@ -25,8 +26,9 @@ class QuoteAdmin(
     name = "Цитата"
     icon = "fa-solid fa-quote-left"
 
-    column_list = ["lama", "text"]
+    column_list = ("lama", "text")
     column_details_exclude_list = ("id", "lama_id")
+    column_searchable_list = ("lama.name", "text")
     column_labels = {
         "text": "Цитата",
         "lama": "Автор",
@@ -37,8 +39,6 @@ class QuoteAdmin(
 
     column_formatters_detail = text_formater(Quote)
     column_formatters = text_formater(Quote)
-
-    column_searchable_list = ["text"]
 
     def is_visible(self, request: Request) -> bool:
         return check_superuser(request)

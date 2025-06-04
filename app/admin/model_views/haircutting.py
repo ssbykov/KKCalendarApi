@@ -21,13 +21,13 @@ class HaircuttingAdmin(
         "ru_name": "Заголовок на русском",
         "is_inauspicious": "Благоприятность",
     }
-    column_list = ["moon_day", "ru_name"]
-    column_details_list = [
-        HaircuttingDay.moon_day,
-        HaircuttingDay.en_name,
-        HaircuttingDay.ru_name,
-        HaircuttingDay.is_inauspicious,
-    ]
+    column_list = ("moon_day", "ru_name")
+    column_details_list = (
+        "moon_day",
+        "en_name",
+        "ru_name",
+        "is_inauspicious",
+    )
     can_edit = False
     can_delete = False
     can_export = False

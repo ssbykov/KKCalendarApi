@@ -17,8 +17,8 @@ class LamaAdmin(
     name = "Лама"
     icon = "fa-solid fa-person"
 
-    column_list = ["name"]
-    column_searchable_list = ["name"]
+    column_list = ("name",)
+    column_searchable_list = ("name",)
     column_details_exclude_list = (
         "id",
         "photo_id",

@@ -54,9 +54,9 @@ class EventAdmin(
         "emoji": "Эмодзи",
     }
 
-    column_list = ["id", "ru_name", "emoji", "type"]
-    column_searchable_list = ["en_name", "ru_name"]
-    column_sortable_list = ["id"]
+    column_list = ("id", "ru_name", "emoji", "type")
+    column_searchable_list = ("en_name", "ru_name")
+    column_sortable_list = ("id",)
     column_formatters_detail = {
         "link": lambda model, attribute: getattr(model, "link", None)
         and Markup(
@@ -160,7 +160,7 @@ class EventAdmin(
         if not pk or pk and event.id != int(pk):
             return "Данное название уже используется"
 
-        # 6. Получаем прошлые дни события (оптимизированно)
+        # 6. Получаем прошлые дни события (оптимизировано)
         past_days_in_model = DayInfo.get_past_days_ids(event.days)
 
         # 7. Сравниваем изменения в прошедших днях

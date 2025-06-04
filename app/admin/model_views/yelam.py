@@ -20,12 +20,12 @@ class YelamAdmin(
         "en_name": "Название на английском",
         "ru_name": "Название на русском",
     }
-    column_list = ["month", "ru_name"]
-    column_details_list = [
-        Yelam.month,
-        Yelam.ru_name,
-        Yelam.en_name,
-    ]
+    column_list = ("month", "ru_name")
+    column_details_list = (
+        "month",
+        "ru_name",
+        "en_name",
+    )
     can_edit = False
     can_delete = False
     can_export = False

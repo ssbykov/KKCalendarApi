@@ -15,7 +15,7 @@ class ElementsAdmin(
     name = "Сочетание элементов"
     category = "Атрибуты дня"
 
-    column_list = [Elements.ru_name, Elements.is_positive]
+    column_list = ("ru_name", "is_positive")
     column_labels = {
         "en_name": "Заголовок на английском",
         "ru_name": "Заголовок на русском",
@@ -23,13 +23,13 @@ class ElementsAdmin(
         "en_text": "Описание на русском",
         "is_positive": "Позитивный",
     }
-    column_details_list = [
-        Elements.en_name,
-        Elements.ru_name,
-        Elements.en_text,
-        Elements.ru_text,
-        Elements.is_positive,
-    ]
+    column_details_list = (
+        "en_name",
+        "ru_name",
+        "en_text",
+        "ru_text",
+        "is_positive",
+    )
     can_edit = False
     can_delete = False
     can_export = False

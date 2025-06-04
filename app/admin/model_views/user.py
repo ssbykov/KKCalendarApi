@@ -15,12 +15,35 @@ class UserAdmin(
     name = "Пользователь"
     icon = "fa-solid fa-user"
 
-    column_list = ["id", "email", "is_verified"]
-    can_edit = False
-    can_delete = False
+    column_labels = {
+        "created_at": "Создан",
+        "updated_at": "Изменен",
+        "elements": "Элементы",
+        "la": "Энергия Ла",
+        "haircutting": "Стрижка",
+        "arch": "Световая арка",
+        "yelam": "Йелам",
+        "events": "События дня",
+    }
+
+    column_list = (
+        "id",
+        "email",
+        "is_verified",
+    )
+    column_details_exclude_list = (
+        "user",
+        "hashed_password",
+    )
+    form_excluded_columns = (
+        "user",
+        "hashed_password",
+        "created_at",
+        "updated_at",
+    )
+
     can_export = False
     can_create = False
-    can_view_details = False
 
     def is_visible(self, request: Request) -> bool:
         return check_superuser(request)

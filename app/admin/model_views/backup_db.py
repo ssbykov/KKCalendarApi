@@ -23,7 +23,7 @@ class BackupDbAdmin(
     name = "Резервная копия"
     icon = "fa-solid fa-box-archive"
 
-    column_list = ["name"]
+    column_list = ("name",)
     column_labels = {
         "name": "Имя копии",
     }
