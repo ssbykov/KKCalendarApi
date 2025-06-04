@@ -7,9 +7,10 @@ from fastapi_users.exceptions import InvalidVerifyToken, UserAlreadyVerified
 from starlette.templating import _TemplateResponse
 
 from app.api.dependencies.backend import authentication_backend
+from app.core import config
 from app.core.config import settings
 from app.database.schemas.user import UserRead, UserCreate
-from app.utils.email_sender import send_email
+from app.tasks import run_process_mail
 from .fastapi_users import fastapi_users
 from ..dependencies.user_manager import get_user_manager
 
@@ -30,14 +31,18 @@ async def verify_user(
 ) -> str:
     try:
         user = await user_manager.verify(token=token)
+        url = (
+            f"http://{config.settings.run.host}"
+            f":{config.settings.run.port}"
+            f"/admin/login"
+        )
         context = {
             "user_email": user.email,
             "token": token,
+            "url": url,
         }
-        await send_email(
-            action="verify_confirmation",
-            context=context,
-        )
+        run_process_mail.delay(None, context=context, action="verify_confirmation")
+
         return f"Пользователь {user.email} верифицирован."
     except InvalidVerifyToken:
         return "Невалидный токен"

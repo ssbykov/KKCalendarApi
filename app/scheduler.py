@@ -1,25 +1,21 @@
-from typing import Any
-
 from apscheduler.schedulers.asyncio import AsyncIOScheduler  # type: ignore
 from apscheduler.triggers.cron import CronTrigger  # type: ignore
+from celery import chain
 
 from app.core import settings
-from app.utils.email_sender import send_email
-from app.utils.google_calendar_parser import calendar_parser_run
+from app.tasks.calendar_parser import run_process_parser
+from app.tasks.send_email import run_process_mail
 
 scheduler = AsyncIOScheduler()
 
 
 async def check_calendar_update() -> None:
-    result = await calendar_parser_run(period=12, update=False)
-    context: dict[str, Any] = {
+    parser_task = run_process_parser.s(period=12, update=False)
+    context = {
         "user_email": settings.super_user.email,
-        "update_result": result,
     }
-    await send_email(
-        action="check_update",
-        context=context,
-    )
+    send_mail_task = run_process_mail.s(context=context, action="check_update")
+    chain(parser_task, send_mail_task)()
 
 
 async def startup_scheduler() -> None:

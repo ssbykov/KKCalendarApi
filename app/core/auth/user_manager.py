@@ -11,7 +11,7 @@ from fastapi_users.schemas import UC
 
 from app.core import settings, config
 from app.database.models import User
-from app.utils.email_sender import send_email
+from app.tasks import run_process_mail
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             "user_email": user.email,
             "url_reset": reset_url,
         }
-        await send_email(action="forgot_password", context=context)
+        run_process_mail.delay(None, context=context, action="forgot_password")
 
     async def on_after_request_verify(
         self,
@@ -65,7 +65,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             "token": token,
             "url_verification": verification_url,
         }
-        await send_email(action="verification", context=context)
+        run_process_mail.delay(None, context=context, action="verification")
 
     async def validate_password(
         self,
