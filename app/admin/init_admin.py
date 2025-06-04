@@ -251,6 +251,16 @@ class NewAdmin(Admin):
             request, model_view.create_template, context, status_code=400
         )
 
+    @login_required
+    async def list(self, request: Request) -> Response:
+        identity = request.path_params["identity"]
+        model_view = self._find_custom_model_view(identity)
+        if isinstance(model_view, DayInfoAdmin):
+            result = model_view.get_update_status()
+            request.session["flash_messages"] = result
+        response = await super().list(request)
+        return response
+
 
 def get_past_days_ids(days: list[DayInfo]) -> list[str]:
     return sorted(
