@@ -1,13 +1,15 @@
+from celery import chain
 from sqladmin import action
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
 from app.admin.custom_model_view import CustomModelView
 from app.admin.utils import check_superuser
-from app.database.crud.days_info import DayInfoRepository
+from app.celery_worker import check_job_status, redis_client
 from app.database import DayInfo
-from app.database.backup_db import create_backup
-from app.utils.google_calendar_parser import calendar_parser_run
+from app.database.crud.days_info import DayInfoRepository
+from app.tasks.calendar_parser import parser_task, run_process_parser
+from tasks import run_process_backup
 
 
 class DayInfoAdmin(
@@ -63,7 +65,31 @@ class DayInfoAdmin(
         confirmation_message=f"Перед выполнением действия будет создана резервная копия базы данных. Продолжить?",
     )
     async def update_db(self, request: Request) -> RedirectResponse:
-        await create_backup()
-        result = await calendar_parser_run(period=12, update=True)
-        request.session["flash_messages"] = result
+        task = check_job_status(parser_task.name)
+
+        if task and task.status == "SUCCESS" or not task:
+            backup_task = run_process_backup.s()
+            new_parser_task = run_process_parser.si(period=12, update=True)
+            result = chain(backup_task, new_parser_task)()
+            redis_client.set(run_process_parser.name, result.id)
+
+        request.session["flash_messages"] = self.get_update_status()
         return RedirectResponse(request.url_for("admin:list", identity=self.identity))
+
+    @staticmethod
+    def get_update_status() -> str | None:
+        name = parser_task.name
+        task = check_job_status(name)
+        if not task:
+            return None
+        status = task.status
+        status_dict = {
+            "PENDING": "Идет обновление...",
+            "FAILURE": f"Ошибка: {type(getattr(task, 'result', None))}, {status}",
+            "SUCCESS": f"Результат последнего обновления: {task.result}",
+        }
+
+        if status == "SUCCESS":
+            redis_client.delete(name)
+
+        return status_dict.get(status)
