@@ -30,7 +30,7 @@ class CustomModelView(ModelView, Generic[T]):
             return referer
         async for session in db_helper.get_session():
             repo = self.repo_type(session)
-            if column := self.get_sort_column():
+            if column := self._get_default_sort()[0]:
                 sort_column = column[0]
                 current_val = getattr(
                     await repo.get_by_id(int(current_id)), sort_column
@@ -67,7 +67,7 @@ class CustomModelView(ModelView, Generic[T]):
             current_id = request.path_params["pk"]
             repo = self.repo_type(session)
 
-            if column := self.get_sort_column():
+            if column := self._get_default_sort()[0]:
                 is_desc = column[1]
                 sort_column = column[0]
                 current_val = getattr(
@@ -94,16 +94,6 @@ class CustomModelView(ModelView, Generic[T]):
         item_position = await self.get_item_position(request)
         page = item_position.get("page")
         return f"?page={page}"
-
-    def get_sort_column(self) -> Tuple[Any, bool] | None:
-        if column := cast(ModelView, self).column_default_sort:
-            if isinstance(column, list):
-                return column[0][0].key, column[0][1]
-            if isinstance(column, tuple):
-                return column[0].key, column[1]
-            else:
-                return column, False
-        return None
 
     def get_detail_columns_count(self, name: str) -> dict[str, int]:
         return self.detail_columns_counts.get(
