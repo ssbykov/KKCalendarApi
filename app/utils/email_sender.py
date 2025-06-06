@@ -30,7 +30,7 @@ TEMPLATES_DIR = "utils/email_templates/"
 
 
 async def send_email(context: dict[str, Any], action: str | None = None) -> None:
-    if not (action_dict := TEMPLATE_DICT.get(action)):
+    if not action or not (action_dict := TEMPLATE_DICT.get(action)):
         return
     if not (user_email := context.get("user_email")):
         return

@@ -7,7 +7,7 @@ parser_task = CeleryTask("tasks.parser", calendar_parser_run)
 
 
 @celery_app.task(name=parser_task.name)  # type: ignore
-def run_process_parser(*args, **kwargs) -> Any:
+def run_process_parser(*args: Any, **kwargs: Any) -> Any:
     import asyncio
 
     loop = asyncio.get_event_loop()

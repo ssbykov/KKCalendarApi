@@ -1,4 +1,4 @@
-from celery import chain
+from celery import chain  # type: ignore
 from sqladmin import action
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
@@ -9,7 +9,7 @@ from app.celery_worker import check_job_status, redis_client
 from app.database import DayInfo
 from app.database.crud.days_info import DayInfoRepository
 from app.tasks.calendar_parser import parser_task, run_process_parser
-from tasks import run_process_backup
+from app.tasks import run_process_backup
 
 
 class DayInfoAdmin(

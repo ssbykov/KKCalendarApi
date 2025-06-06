@@ -1,6 +1,6 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler  # type: ignore
 from apscheduler.triggers.cron import CronTrigger  # type: ignore
-from celery import chain
+from celery import chain  # type: ignore
 
 from app.core import settings
 from app.tasks.calendar_parser import run_process_parser

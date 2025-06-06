@@ -8,7 +8,7 @@ import_task = CeleryTask("tasks.import", process_import)
 
 
 @celery_app.task(name=import_task.name)  # type: ignore
-def run_process_import(*args) -> Any:
+def run_process_import(*args: Any) -> Any:
     import asyncio
 
     loop = asyncio.get_event_loop()

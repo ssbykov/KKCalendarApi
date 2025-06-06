@@ -4,14 +4,14 @@ from sqladmin import action
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from admin.custom_model_view import CustomModelView
+from app.admin.custom_model_view import CustomModelView
 from app.admin.utils import check_superuser
 from app.database import db_helper
 from app.database.backup_db import restore_database_from_dump
 from app.database.crud.backup_db import BackupDbRepository
 from app.database.models.backup_db import BackupDb
-from celery_worker import redis_client, check_job_status
-from tasks.create_backup import run_process_backup, backup_task
+from app.celery_worker import redis_client, check_job_status
+from app.tasks.create_backup import run_process_backup, backup_task
 
 
 class BackupDbAdmin(

@@ -70,7 +70,7 @@ class NewAdmin(Admin):
         self,
         app: Starlette,
         engine: ENGINE_TYPE | None = None,
-        session_maker: sessionmaker | async_sessionmaker | None = None,
+        session_maker: sessionmaker | async_sessionmaker | None = None,  # type: ignore
         base_url: str = "/admin",
         title: str = "Admin",
         logo_url: str | None = None,
@@ -264,7 +264,7 @@ class NewAdmin(Admin):
 
         identity = request.path_params["identity"]
         model_view = self.find_custom_model_view(identity)
-        context = {
+        context: dict[str, Any] = {
             "model_view": model_view,
         }
 
@@ -318,7 +318,7 @@ class NewAdmin(Admin):
         )
 
     @login_required
-    async def list(self, request: Request) -> Response:
+    async def list(self, request: Request) -> Any:
         identity = request.path_params["identity"]
         model_view = self.find_custom_model_view(identity)
         if isinstance(model_view, DayInfoAdmin):

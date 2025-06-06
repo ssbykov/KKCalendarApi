@@ -12,9 +12,8 @@ from app.celery_worker import redis_client, check_job_status
 from app.database import Quote, db_helper
 from app.database.crud.quotes import QuoteRepository
 from app.tasks.quoters import import_task
-from app.database import Lama
-from tasks import run_process_import
-from utils.quoters_import import is_quote_unique
+from app.tasks import run_process_import
+from app.utils.quoters_import import is_quote_unique
 
 
 class QuoteAdmin(
@@ -122,7 +121,7 @@ async def get_template(model: BaseView, request: Request) -> _TemplateResponse:
 
     # Получаем статус задачи, если есть
     task_import = check_job_status(import_task.name)
-    status = getattr(task_import, "status", None)
+    status = getattr(task_import, "status", "")
 
     # Определяем шаблон (если статус не в словаре — используем default)
     templates_map = {
