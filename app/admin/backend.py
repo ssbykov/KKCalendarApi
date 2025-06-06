@@ -1,11 +1,10 @@
 import functools
 import inspect
-from typing import Callable, Any, cast
+from typing import Callable, Any
 
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_users import InvalidPasswordException
 from pydantic import ValidationError, EmailStr
-from sqladmin import ModelView
 from sqladmin.authentication import AuthenticationBackend
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
@@ -179,7 +178,7 @@ def owner_required(func: Callable[..., Any]) -> Callable[..., Any]:
         view, request = args[0], args[1]
         is_owner = await check_owner(view=view, request=request)
         if not is_owner and not request.session.get("user").get("is_superuser"):
-            raise HTTPException(status_code=404)
+            raise HTTPException(status_code=403)
 
         if inspect.iscoroutinefunction(func):
             return await func(*args, **kwargs)
@@ -189,12 +188,10 @@ def owner_required(func: Callable[..., Any]) -> Callable[..., Any]:
 
 
 async def check_owner(view: Any, request: Request) -> bool:
-    identity = request.path_params.get("identity")
     if not (object_id := request.path_params.get("pk")):
         object_id = request.query_params.get("pks")
-    if model_views := [v for v in view.views if v.identity == identity]:
-        model_view = cast(ModelView, model_views[0])
-    else:
+    model_view = view.find_custom_model_view(request.path_params["identity"])
+    if not model_view:
         return False
     obj = await model_view.get_object_for_details(object_id)
     user = request.session.get("user", {})
