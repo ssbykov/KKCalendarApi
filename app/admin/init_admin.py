@@ -1,14 +1,19 @@
 import os
 from datetime import datetime
-from typing import Any, cast
+from typing import Any, cast, Sequence, Awaitable
 
 from sqladmin import Admin
-from sqladmin.authentication import login_required
+from sqladmin._types import ENGINE_TYPE
+from sqladmin.authentication import login_required, AuthenticationBackend
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.orm import sessionmaker
+from starlette.applications import Starlette
 from starlette.datastructures import URL
 from starlette.exceptions import HTTPException
+from starlette.middleware import Middleware
 from starlette.requests import Request
-from starlette.responses import Response, RedirectResponse
+from starlette.responses import Response, RedirectResponse, JSONResponse
 
 from app.core import settings
 from app.database import db_helper, DayInfo
@@ -61,6 +66,67 @@ async def init_admin(app: Any) -> None:
 
 
 class NewAdmin(Admin):
+    def __init__(
+        self,
+        app: Starlette,
+        engine: ENGINE_TYPE | None = None,
+        session_maker: sessionmaker | async_sessionmaker | None = None,
+        base_url: str = "/admin",
+        title: str = "Admin",
+        logo_url: str | None = None,
+        favicon_url: str | None = None,
+        middlewares: Sequence[Middleware] | None = None,
+        debug: bool = False,
+        templates_dir: str = "templates",
+        authentication_backend: AuthenticationBackend | None = None,
+    ) -> None:
+
+        super().__init__(
+            app=app,
+            engine=engine,
+            session_maker=session_maker,
+            base_url=base_url,
+            title=title,
+            logo_url=logo_url,
+            favicon_url=favicon_url,
+            templates_dir=templates_dir,
+            middlewares=middlewares,
+            authentication_backend=authentication_backend,
+        )
+        from starlette.exceptions import HTTPException as StarletteHTTPException
+
+        async def http_exception(
+            request: Request, exc: Exception
+        ) -> Response | Awaitable[Response]:
+            assert isinstance(exc, (StarletteHTTPException, HTTPException))
+            status_code = getattr(exc, "status_code", 500)
+            detail = getattr(exc, "detail", "Internal Server Error")
+
+            # Если AJAX-запрос — возвращаем JSON, иначе шаблон
+            is_ajax = (
+                request.headers.get("x-requested-with") == "XMLHttpRequest"
+                or request.headers.get("accept") == "application/json"
+                or request.method == "DELETE"
+            )
+
+            if is_ajax:
+                # Для AJAX — возвращаем JSON со специальным полем для редиректа
+                return JSONResponse(
+                    status_code=status_code,
+                    content={"detail": detail},
+                )
+
+            # Для других ошибок — тоже используем шаблон
+            context = {
+                "status_code": status_code,
+                "message": detail,
+            }
+            return await self.templates.TemplateResponse(
+                request, "sqladmin/error.html", context, status_code=status_code
+            )
+
+        self.admin.exception_handlers = {HTTPException: http_exception}
+
     async def login(self, request: Request) -> Response:
         assert isinstance(self.authentication_backend, AdminAuth)
 
@@ -78,7 +144,7 @@ class NewAdmin(Admin):
         await db_helper.synch_backups()
         return RedirectResponse(request.url_for("admin:index"), status_code=302)
 
-    @owner_required
+    @login_required
     async def details(self, request: Request) -> Response:
         result = await super().details(request)
         if isinstance(result, RedirectResponse):
@@ -93,7 +159,7 @@ class NewAdmin(Admin):
 
         await self._edit(request)
         identity = request.path_params["identity"]
-        model_view = self._find_custom_model_view(identity)
+        model_view = self.find_custom_model_view(identity)
 
         model = await model_view.get_object_for_edit(request)
         if not model:
@@ -160,13 +226,13 @@ class NewAdmin(Admin):
             request, model_view.edit_template, context, status_code=400
         )
 
-    def _find_custom_model_view(self, identity: str) -> CustomModelView[Any]:
+    def find_custom_model_view(self, identity: str) -> CustomModelView[Any]:
         return cast(CustomModelView[Any], self._find_model_view(identity))
 
     @owner_required
     async def delete(self, request: Request) -> Response:
         identity = request.path_params["identity"]
-        model_view = self._find_custom_model_view(identity)
+        model_view = self.find_custom_model_view(identity)
 
         restriction = await model_view.check_restrictions_delete(request)
 
@@ -197,7 +263,7 @@ class NewAdmin(Admin):
         await self._create(request)
 
         identity = request.path_params["identity"]
-        model_view = self._find_custom_model_view(identity)
+        model_view = self.find_custom_model_view(identity)
         context = {
             "model_view": model_view,
         }
@@ -254,7 +320,7 @@ class NewAdmin(Admin):
     @login_required
     async def list(self, request: Request) -> Response:
         identity = request.path_params["identity"]
-        model_view = self._find_custom_model_view(identity)
+        model_view = self.find_custom_model_view(identity)
         if isinstance(model_view, DayInfoAdmin):
             result = model_view.get_update_status()
             request.session["flash_messages"] = result
