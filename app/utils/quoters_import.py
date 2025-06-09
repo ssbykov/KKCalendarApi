@@ -1,5 +1,4 @@
 import io
-from difflib import SequenceMatcher
 from typing import Sequence
 
 import pandas as pd
@@ -13,65 +12,69 @@ from app.database.schemas.quote import QuoteSchemaCreate
 TASK_NAME = "tasks.process_import"
 
 
+from collections import defaultdict
+from difflib import SequenceMatcher
+
+
 async def process_import(file_bytes: bytes) -> str:
-
     df = pd.read_excel(io.BytesIO(file_bytes))
-
-    # Удаляем строки с пустыми авторами
     df = df.dropna(subset=["Author"])
 
     rejected_rows = []
     count = 0
+
     async for session in db_helper.get_session():
         lama_repo = LamaRepository(session)
 
-        # Получаем все существующие цитаты один раз
-        result = await session.execute(select(Quote.text))
-        quotes_in_base = result.scalars().all()
+        # Загружаем все цитаты с привязкой к автору
+        result = await session.execute(select(Lama.id, Lama.name))
+        lamas_in_base = result.all()
+        existing_lamas = {name: id_ for id_, name in lamas_in_base}
 
-        # Получаем все Лам из базы за один раз
-        result = await session.execute(select(Lama))
-        lamas_in_base = result.scalars().all()
+        # Получаем все цитаты, сгруппированные по автору
+        result = await session.execute(select(Quote.text, Lama.name).join(Lama))
+        quotes_by_author: dict[str, list[str]] = defaultdict(list)
+        for text, author_name in result.all():
+            quotes_by_author[author_name].append(text)
 
-        # Создаем словарь для быстрого поиска авторов
-        existing_lamas = {lama.name: lama.id for lama in lamas_in_base}  # type: ignore
-
-        new_quotes_set: set[str] = set()
-
-        # Отфильтрованные строки
+        # Словарь для новых цитат по авторам
+        new_quotes_by_author: dict[str, set[str]] = defaultdict(set)
         filtered_rows = []
 
-        # Итерируем по строкам и отбираем уникальные
         for row_number, (_, row) in enumerate(df.iterrows(), start=2):
+            author = str(row["Author"]).strip()
             quote_text = str(row["Quote"]).strip()
+
             if is_quote_unique(
                 quote=quote_text,
-                existing=quotes_in_base,
-                new_quotes=new_quotes_set,
+                existing=quotes_by_author.get(author, []),
+                new_quotes=new_quotes_by_author[author],
             ):
-                new_quotes_set.add(quote_text)
+                new_quotes_by_author[author].add(quote_text)
                 filtered_rows.append(row)
             else:
                 rejected_rows.append(row_number)
 
-        # Создаем новый DataFrame из отфильтрованных строк
         unique_quotes_df = pd.DataFrame(filtered_rows)
 
-        # Группируем по авторам для эффективной вставки
+        # Группируем и сохраняем
         if len(unique_quotes_df) > 0:
             grouped = unique_quotes_df.groupby("Author")
 
-            for author, group in grouped:
+            for author, group in grouped:  # type:ignore
+                author = str(author).strip()
+
                 if author not in existing_lamas:
-                    lama_obj = LamaSchemaCreate(name=str(author))
+                    lama_obj = LamaSchemaCreate(name=author)
                     existing_lamas[author] = await lama_repo.add_lama(lama_obj)
 
                 for _, row in group.iterrows():
-                    quote_parts = row["Quote"].split("\n")
+                    quote_parts = str(row["Quote"]).split("\n")
                     if author in quote_parts[-1]:
                         new_quote = "".join(quote_parts[:-1]).strip()
                     else:
                         new_quote = row["Quote"].strip()
+
                     quote_obj = QuoteSchemaCreate(
                         lama_id=existing_lamas[author], text=new_quote
                     )
@@ -85,11 +88,10 @@ async def process_import(file_bytes: bytes) -> str:
 
 def is_quote_unique(
     quote: str,
-    existing: Sequence[str],
+    existing: list[str] | Sequence[str],
     new_quotes: set[str],
     max_ratio: float = 0.75,
 ) -> bool:
-
     return not any(
         SequenceMatcher(None, q, quote).ratio() > max_ratio for q in existing
     ) and not any(

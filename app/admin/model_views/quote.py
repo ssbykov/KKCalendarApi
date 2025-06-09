@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqladmin import action, expose, BaseView
 from sqladmin.templating import _TemplateResponse
-from sqlalchemy import select, true
+from sqlalchemy import select, true, and_
 from starlette.datastructures import UploadFile
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
@@ -11,8 +11,8 @@ from app.admin.utils import check_superuser, text_formater
 from app.celery_worker import redis_client, check_job_status
 from app.database import Quote, db_helper
 from app.database.crud.quotes import QuoteRepository
-from app.tasks.quoters import import_task
 from app.tasks import run_process_import
+from app.tasks.quoters import import_task
 from app.utils.quoters_import import is_quote_unique
 
 
@@ -57,21 +57,33 @@ class QuoteAdmin(
     async def check_restrictions_create(
         self, form_data_dict: dict[str, str], request: Request | None = None
     ) -> str | None:
-        pk = getattr(request, "path_params", {}).get("pk") if request else -1
+        pk = int(getattr(request, "path_params", {}).get("pk", -1)) if request else -1
         quote = form_data_dict.get("text", "").strip()
+        lama_id = form_data_dict.get("lama")
+
         if not quote:
             return "Текст цитаты не может быть пустым"
+        if not lama_id:
+            return "Не указан автор цитаты"
+
         async for session in db_helper.get_session():
-            condition = Quote.id != pk if pk != -1 else true()
-            stmt = select(Quote.text).where(condition)
+            # Сравниваем только с другими цитатами этого автора
+            stmt = select(Quote.text).where(
+                and_(
+                    Quote.lama_id == int(lama_id),
+                    Quote.id != pk if pk != -1 else true(),
+                )
+            )
             result = await session.execute(stmt)
-            quotes_in_base = result.scalars().all()
+            quotes_by_author = result.scalars().all()
+
             if not is_quote_unique(
                 quote=quote,
-                existing=quotes_in_base,
+                existing=quotes_by_author,
                 new_quotes=set(),
             ):
-                return "В базе есть цитата в совпадением более 75%"
+                return "В базе уже есть цитата этого автора с совпадением более 75%"
+
         return None
 
 
