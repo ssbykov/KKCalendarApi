@@ -26,7 +26,7 @@ TEMPLATE_DICT = {
     },
 }
 
-TEMPLATES_DIR = "utils/email_templates/"
+TEMPLATES_DIR = "app/utils/email_templates/"
 
 
 async def send_email(context: dict[str, Any], action: str | None = None) -> None:
