@@ -1,4 +1,4 @@
-from dataclasses import field, dataclass
+from dataclasses import dataclass
 from typing import Callable, Any
 
 import redis
@@ -24,7 +24,8 @@ def check_job_status(name: str) -> AsyncResult | None:
     if not task_id:
         return None
     task = AsyncResult(task_id)
-    if task.status == "FAILURE":
+
+    if not task or task.status == "FAILURE":
         redis_client.delete(name)
 
     return task
