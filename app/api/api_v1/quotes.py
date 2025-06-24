@@ -16,12 +16,13 @@ router.include_router(
 )
 
 
-@router.get("/quote", response_model=QuoteSchema)
+@router.post("/quote", response_model=QuoteSchema)
 async def get_random_quote(
+    excluded_ids: list[int],
     repo: Annotated[QuoteRepository, Depends(get_quote_repository)],
 ) -> Quote | str:
     try:
-        quote = await repo.get_random_quote()
+        quote = await repo.get_random_quote(excluded_ids)
         return quote or "Нет цитат"
     except Exception as e:
         return f"Произошла ошибка: {e}"
