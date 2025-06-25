@@ -34,6 +34,7 @@ from .model_views import (
     UserAdmin,
     LamaAdmin,
     QuoteAdmin,
+    AdvertisementAdmin,
 )
 from .model_views.quote import QuoteView
 
@@ -61,6 +62,7 @@ async def init_admin(app: Any) -> None:
     admin.add_view(BackupDbAdmin)
     admin.add_view(UserAdmin)
     admin.add_view(QuoteView)
+    admin.add_view(AdvertisementAdmin)
     assert isinstance(admin.authentication_backend, AdminAuth)
     await admin.authentication_backend.create_superuser()
 

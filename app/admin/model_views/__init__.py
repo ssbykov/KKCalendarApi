@@ -12,6 +12,7 @@ from .backup_db import BackupDbAdmin
 from .user import UserAdmin
 from .lama import LamaAdmin
 from .quote import QuoteAdmin
+from .advertisement import AdvertisementAdmin
 
 __all__ = [
     "EventAdmin",
@@ -28,4 +29,5 @@ __all__ = [
     "UserAdmin",
     "LamaAdmin",
     "QuoteAdmin",
+    "AdvertisementAdmin",
 ]
