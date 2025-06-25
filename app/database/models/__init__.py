@@ -19,6 +19,7 @@ from .emoji import Emoji
 from .backup_db import BackupDb
 from .quote import Quote
 from .lama import Lama
+from .task import Advertisement, TaskScheduler
 
 __all__ = [
     "BaseWithId",
@@ -39,4 +40,6 @@ __all__ = [
     "BackupDb",
     "Quote",
     "Lama",
+    "Advertisement",
+    "TaskScheduler",
 ]

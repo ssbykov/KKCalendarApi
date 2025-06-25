@@ -15,6 +15,8 @@ from .models import (
     BackupDb,
     Quote,
     Lama,
+    Advertisement,
+    TaskScheduler,
 )
 from .db import db_helper, init_data, SessionDep
 
@@ -50,6 +52,8 @@ __all__ = [
     "Emoji",
     "Quote",
     "Lama",
+    "Advertisement",
+    "TaskScheduler",
     "AccessToken",
     "DayInfo",
     "YelamSchema",
