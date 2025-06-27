@@ -6,6 +6,7 @@ from .days_info import router as days_info_router
 from .auth import router as auth_router
 from .users import router as users_router
 from .quotes import router as quotes_router
+from .tasks import router as tasks_router
 
 http_bearer = HTTPBearer(auto_error=False)
 
@@ -20,3 +21,4 @@ router.include_router(router=auth_router)
 router.include_router(router=days_info_router)
 router.include_router(router=users_router)
 router.include_router(router=quotes_router)
+router.include_router(router=tasks_router)
