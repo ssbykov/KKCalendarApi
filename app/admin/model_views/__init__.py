@@ -13,6 +13,7 @@ from .user import UserAdmin
 from .lama import LamaAdmin
 from .quote import QuoteAdmin
 from .advertisement import AdvertisementAdmin
+from .task import TaskAdmin
 
 __all__ = [
     "EventAdmin",
@@ -30,4 +31,5 @@ __all__ = [
     "LamaAdmin",
     "QuoteAdmin",
     "AdvertisementAdmin",
+    "TaskAdmin",
 ]
