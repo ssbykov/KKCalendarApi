@@ -23,7 +23,10 @@ class TaskScheduler(BaseWithId):
     timezone: Mapped[str] = mapped_column(String(50), default="Europe/Moscow")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    advertisement = relationship("Advertisement", back_populates="schedules")
+    advertisement = relationship("Advertisement", backref="schedules")
+
+    def __str__(self) -> str:
+        return f"Время: {self.hour}:{self.minute:02d}, {self.days}"
 
 
 class Advertisement(BaseWithId):
@@ -39,4 +42,5 @@ class Advertisement(BaseWithId):
     caption: Mapped[str] = mapped_column(Text)
     ids: Mapped[dict] = mapped_column(JSON)
 
-    schedules = relationship("TaskScheduler", back_populates="advertisement")
+    def __str__(self) -> str:
+        return self.name
