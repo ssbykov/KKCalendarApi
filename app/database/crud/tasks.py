@@ -16,8 +16,12 @@ class TaskRepository(GetBackNextIdMixin[TaskScheduler]):
     model = TaskScheduler
 
     async def get_tasks(self) -> Sequence[TaskScheduler]:
-        stmt = select(self.model).options(
-            selectinload(self.model.advertisement),
+        stmt = (
+            select(self.model)
+            .options(
+                selectinload(self.model.advertisement),
+            )
+            .where(self.model.is_active == True)
         )
         result = await self.session.execute(stmt)
         return result.scalars().all()
