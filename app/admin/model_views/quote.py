@@ -31,6 +31,7 @@ class QuoteAdmin(
     column_labels = {
         "text": "Цитата",
         "lama": "Автор",
+        "created_at": "Добавлена",
     }
     can_edit = True
     can_delete = True
