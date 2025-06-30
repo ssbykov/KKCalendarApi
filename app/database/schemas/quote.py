@@ -18,4 +18,5 @@ class QuoteSchemaCreate(QuoteSchemaBase):
 
 
 class QuoteSchema(QuoteSchemaBase):
+    id: int
     lama: LamaSchemaCreate
