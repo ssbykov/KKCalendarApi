@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 
 from app.core import settings
 from app.database import Quote
@@ -16,13 +17,17 @@ router.include_router(
 )
 
 
+class ExcludedIdsRequest(BaseModel):
+    excluded_ids: list[int]
+
+
 @router.post("/", response_model=QuoteSchema)
 async def get_random_quote(
-    excluded_ids: list[int],
+    body: ExcludedIdsRequest,
     repo: Annotated[QuoteRepository, Depends(get_quote_repository)],
 ) -> Quote | str:
     try:
-        quote = await repo.get_random_quote(excluded_ids)
+        quote = await repo.get_random_quote(body.excluded_ids)
         return quote or "Нет цитат"
     except Exception as e:
         return f"Произошла ошибка: {e}"
