@@ -46,6 +46,12 @@ class Event(BaseWithId, ToDictMixin):
 
 
 class EventType(BaseWithId):
+    """
+    The name of the database table backing this class.
+
+    This is set by the `__tablename__` attribute, and is used by SQLAlchemy to
+    locate the table in the database.
+    """
     __tablename__ = "event_types"
     name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
     desc: Mapped[str] = mapped_column(String(100), nullable=True)

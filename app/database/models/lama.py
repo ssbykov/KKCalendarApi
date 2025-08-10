@@ -5,6 +5,17 @@ from . import BaseWithId
 
 
 class Lama(BaseWithId):
+    """
+    Модель для представления записи "Лама" в базе данных.
+
+    Атрибуты:
+        id: Уникальный идентификатор (наследуется от BaseWithId).
+        name: Название ламы. Обязательное поле, максимальная длина — 200 символов. Уникальное значение.
+        description: Описание ламы. Необязательное поле, может быть текстом произвольной длины.
+        photo_id: Идентификатор связанной фотографии из таблицы `event_photos`. Может быть null.
+        photo: Связь с моделью `EventPhoto`. Отношение "один к одному", обратная связь не настраивается.
+    """
+
     __tablename__ = "lamas"
     name: Mapped[str] = mapped_column(String(200), nullable=False, unique=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)

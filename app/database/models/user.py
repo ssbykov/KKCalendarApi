@@ -12,6 +12,26 @@ if TYPE_CHECKING:
 
 
 class User(BaseWithId, SQLAlchemyBaseUserTable[int]):  # type: ignore[misc]
+    """
+    Модель пользователя для аутентификации и управления доступом.
+
+    Наследуется от `BaseWithId` и `SQLAlchemyBaseUserTable`, предоставляя базовую
+    функциональность для работы с пользователями в FastAPI Users.
+
+    Атрибуты:
+        id: Уникальный идентификатор пользователя (наследуется от BaseWithId).
+        email: Электронная почта пользователя. Обязательное поле.
+        is_active: Флаг активности пользователя.
+        is_superuser: Флаг суперпользователя.
+        is_verified: Флаг подтверждения электронной почты.
+        created_at: Дата и время создания пользователя.
+        updated_at: Дата и время последнего обновления информации о пользователе.
+
+    Методы:
+        get_db: Возвращает объект SQLAlchemyUserDatabase для взаимодействия с БД.
+        __str__: Возвращает email пользователя как строковое представление.
+        model_dump: Возвращает словарь с основными полями пользователя.
+    """
     __tablename__ = "users"
 
     created_at: Mapped[datetime] = mapped_column(
