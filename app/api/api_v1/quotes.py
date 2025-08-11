@@ -31,3 +31,14 @@ async def get_random_quote(
         return quote or "Нет цитат"
     except Exception as e:
         return f"Произошла ошибка: {e}"
+
+
+@router.get("/count", response_model=int)
+async def get_quotes_count(
+    repo: Annotated[QuoteRepository, Depends(get_quote_repository)],
+) -> int:
+    try:
+        count = await repo.get_count_items()
+        return count
+    except Exception as e:
+        return 0
