@@ -52,8 +52,10 @@ class GetBackNextIdMixin(ABC, Generic[T]):
         obj_list = result.scalars().all()
         return obj_list
 
-    async def get_count_items(self, conditions: List[bool]) -> int:
-        query = select(func.count(self.model.id)).where(*conditions)  # type: ignore
+    async def get_count_items(self, conditions: Optional[List[bool]] = None) -> int:
+        query = select(func.count(self.model.id))
+        if conditions:
+            query = query.where(*conditions)  # применяем условия, если они есть
         result = await self.session.execute(query)
         return result.scalar_one_or_none() or 0
 
