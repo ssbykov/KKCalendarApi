@@ -1,7 +1,7 @@
 from typing import Sequence, Any, Dict
 
 from fastapi import HTTPException
-from sqlalchemy import select, insert, delete
+from sqlalchemy import select, insert, delete, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -78,8 +78,12 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo]):
         raise ValueError("Элементы не найдены")
 
     async def get_elements_by_name(self, elements_name: str) -> Elements:
+        parts_name = elements_name.split("-")
+        another_name = f"{parts_name[1]}-{parts_name[0]}"
         result = await self.session.execute(
-            select(Elements).where(Elements.en_name == elements_name)
+            select(Elements).where(
+                or_(Elements.en_name == elements_name, Elements.en_name == another_name)
+            )
         )
         if elements := result.scalar():
             return elements
