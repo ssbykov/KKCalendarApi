@@ -10,5 +10,5 @@ class YandexToken(Base):
     id = Column(String, primary_key=True, default="main")
     access_token = Column(String, nullable=False)
     refresh_token = Column(String, nullable=False)
-    expires_at = Column(DateTime, nullable=True)
-    updated_at = Column(DateTime, default=datetime.now(timezone.utc))
+    expires_at = Column(DateTime(timezone=True), nullable=True)
+    updated_at = Column(DateTime(timezone=True), default=datetime.now(timezone.utc))
