@@ -17,6 +17,7 @@ from .models import (
     Lama,
     Advertisement,
     TaskScheduler,
+    YandexToken,
 )
 from .db import db_helper, init_data, SessionDep
 
@@ -55,6 +56,7 @@ __all__ = [
     "Advertisement",
     "TaskScheduler",
     "AccessToken",
+    "YandexToken",
     "DayInfo",
     "YelamSchema",
     "HaircuttingSchema",

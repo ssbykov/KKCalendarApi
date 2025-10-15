@@ -20,6 +20,7 @@ from .backup_db import BackupDb
 from .quote import Quote
 from .lama import Lama
 from .task import Advertisement, TaskScheduler
+from .yandex_token import YandexToken
 
 __all__ = [
     "BaseWithId",
@@ -42,4 +43,5 @@ __all__ = [
     "Lama",
     "Advertisement",
     "TaskScheduler",
+    "YandexToken",
 ]
