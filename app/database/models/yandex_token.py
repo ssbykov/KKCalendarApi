@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Column, String, DateTime
 
@@ -10,5 +10,5 @@ class YandexToken(Base):
     id = Column(String, primary_key=True, default="main")
     access_token = Column(String, nullable=False)
     refresh_token = Column(String, nullable=False)
-    expires_at = Column(DateTime, nullable=True)  # когда истекает access_token
-    updated_at = Column(DateTime, default=datetime.now())
+    expires_at = Column(DateTime, nullable=True)
+    updated_at = Column(DateTime, default=datetime.now(timezone.utc))
