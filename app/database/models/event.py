@@ -5,19 +5,19 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 
 from . import BaseWithId
 from .init_data import EVENTS
-from .mixines import ToDictMixin
+from .mixines import ToDictMixin, PropertyAliasMixin
 
 if TYPE_CHECKING:
     from .day_info import DayInfo
 
 
-class Event(BaseWithId, ToDictMixin):
+class Event(BaseWithId, ToDictMixin, PropertyAliasMixin):
     init_data = EVENTS
 
     __tablename__ = "events"
 
     name: Mapped[str] = mapped_column(nullable=False, unique=True)
-    moon_day: Mapped[str] = mapped_column(String(20), nullable=True)
+    moon_date: Mapped[str] = mapped_column(String(20), nullable=True)
     en_name: Mapped[str] = mapped_column(nullable=False)
     ru_name: Mapped[str] = mapped_column(nullable=False)
     en_text: Mapped[str] = mapped_column(Text, nullable=True)
@@ -52,6 +52,7 @@ class EventType(BaseWithId):
     This is set by the `__tablename__` attribute, and is used by SQLAlchemy to
     locate the table in the database.
     """
+
     __tablename__ = "event_types"
     name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
     desc: Mapped[str] = mapped_column(String(100), nullable=True)
