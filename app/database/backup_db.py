@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING
 
 from app.core import settings
 from app.database import db_helper
-from database.crud.yandex_tokens import YandexTokensRepository
-from database.yandex_disk import create_yadisk_instance
+from app.database.crud.yandex_tokens import YandexTokensRepository
+from app.database.yandex_disk import create_yadisk_instance
 
 if TYPE_CHECKING:
     from app.core.config import DbSettings
