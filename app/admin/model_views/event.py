@@ -43,7 +43,7 @@ class EventAdmin(
         "days": "Даты события",
         "name": "Название",
         "user": "Пользователь",
-        "moon_day": "Лунные дни",
+        "moon_date": "Лунные дни",
         "en_name": "Заголовок на английском",
         "en_text": "Описание на английском",
         "ru_name": "Заголовок на русском",
@@ -84,6 +84,7 @@ class EventAdmin(
         Event.photo_id,
         Event.type_id,
         Event.emoji_id,
+        Event.day_property,
     ]
 
     form_ajax_refs = {
