@@ -4,7 +4,7 @@ from datetime import datetime, timezone, timedelta
 
 import aiohttp
 
-from core import settings
+from app.core import settings
 
 
 class YaDisk:
