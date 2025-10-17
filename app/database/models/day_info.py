@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 
 from .base import BaseWithId
 from .init_data import ELEMENTS, LA, ARCHES, YELAM, HAIRCUTTING_DAYS
-from .mixines import ToDictMixin
+from .mixines import ToDictMixin, PropertyAliasMixin
 
 if TYPE_CHECKING:
     from .event import Event
@@ -80,7 +80,7 @@ class DayInfo(BaseWithId, ToDictMixin):
         )
 
 
-class Elements(BaseWithId):
+class Elements(BaseWithId, PropertyAliasMixin):
     """
     Модель для хранения информации о стихиях (элементах).
 
@@ -108,7 +108,7 @@ class Elements(BaseWithId):
         return self.ru_name
 
 
-class LaPosition(BaseWithId):
+class LaPosition(BaseWithId, PropertyAliasMixin):
     """
     Модель для хранения информации о позиции LA (Light Aspect).
 
@@ -132,7 +132,7 @@ class LaPosition(BaseWithId):
         return self.ru_name
 
 
-class SkylightArch(BaseWithId):
+class SkylightArch(BaseWithId, PropertyAliasMixin):
     """
     Модель для хранения информации о арках света (Skylight Arch).
 
@@ -158,7 +158,7 @@ class SkylightArch(BaseWithId):
         return self.ru_desc
 
 
-class Yelam(BaseWithId):
+class Yelam(BaseWithId, PropertyAliasMixin):
     """
     Модель для хранения информации о Yelam (Эзотерический месяц).
 
@@ -182,7 +182,7 @@ class Yelam(BaseWithId):
         return self.ru_name
 
 
-class HaircuttingDay(BaseWithId):
+class HaircuttingDay(BaseWithId, PropertyAliasMixin):
     """
     Модель для хранения информации о днях стрижки волос.
 

@@ -1,8 +1,7 @@
 from typing import Any
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.inspection import inspect
-from sqlalchemy.orm import ColumnProperty
+from sqlalchemy.orm import declared_attr, synonym
 
 Base = declarative_base()
 
@@ -27,3 +26,24 @@ class ToDictMixin:
         }
 
         return data_dict
+
+
+class PropertyAliasMixin:
+    """Mixin создаёт псевдоним `day_property` на одно из существующих полей."""
+
+    @declared_attr
+    def day_property(cls):
+        if hasattr(cls, "moon_day"):
+            target_field = "moon_day"
+        elif hasattr(cls, "name"):
+            target_field = "name"
+        elif hasattr(cls, "month"):
+            target_field = "month"
+        elif hasattr(cls, "en_name"):
+            target_field = "en_name"
+        else:
+            raise AttributeError(
+                f"{cls.__name__} должен содержать одно из полей: moon_day, month или en_name"
+            )
+        # создаём безопасный ORM-синоним без предупреждений
+        return synonym(target_field)
