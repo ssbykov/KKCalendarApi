@@ -14,6 +14,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
 from app.core.type_vars import T
+from app.database.models.base import BaseWithId
+from app.database.models.mixines import PropertyAliasMixin
 
 
 class GetBackNextIdMixin(ABC, Generic[T]):
@@ -51,6 +53,14 @@ class GetBackNextIdMixin(ABC, Generic[T]):
         result = await self.session.execute(self.main_stmt)
         obj_list = result.scalars().all()
         return obj_list
+
+    async def get_all_dict(self) -> dict[str, dict[str, Any]]:
+        obj_list = await self.get_all()
+        return {
+            obj.day_property: obj.id
+            for obj in obj_list
+            if isinstance(obj, (BaseWithId, PropertyAliasMixin))
+        }
 
     async def get_count_items(self, conditions: Optional[List[bool]] = None) -> int:
         query = select(func.count(self.model.id))
