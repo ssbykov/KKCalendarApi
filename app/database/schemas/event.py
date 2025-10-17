@@ -25,7 +25,7 @@ class EmojiSchema(BaseModel):
 
 class EventSchemaBase(BaseSchema):
     name: str
-    moon_day: str | None = None
+    moon_date: str | None = None
     en_name: str
     ru_name: str
     en_text: str | None = None
