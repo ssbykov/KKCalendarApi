@@ -8,8 +8,8 @@ from app.admin.utils import check_superuser
 from app.celery_worker import check_job_status, redis_client
 from app.database import DayInfo
 from app.database.crud.days_info import DayInfoRepository
-from app.tasks.calendar_parser import parser_task, run_process_parser
 from app.tasks import run_process_backup
+from app.tasks.calendar_parser import parser_task, run_process_parser
 
 
 class DayInfoAdmin(

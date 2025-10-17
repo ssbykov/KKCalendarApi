@@ -19,7 +19,7 @@ async def check_calendar_update() -> None:
 
 
 async def startup_scheduler() -> None:
-    # Настраиваем задачу на выполнение каждый день в 7 утра по Москве
+    # Настраиваем задачу на выполнение каждый день в заданное время
     scheduler.add_job(
         check_calendar_update,
         CronTrigger(
