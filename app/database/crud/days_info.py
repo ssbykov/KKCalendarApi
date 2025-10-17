@@ -1,24 +1,18 @@
 from typing import Sequence, Any, Dict
 
 from fastapi import HTTPException
-from sqlalchemy import select, insert, delete, or_
+from sqlalchemy import select, insert, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.database.crud.mixines import GetBackNextIdMixin
 from app.database import (
     DayInfo,
-    Elements,
-    HaircuttingDay,
-    LaPosition,
-    Yelam,
-    SkylightArch,
-    BaseWithId,
     SessionDep,
     Event,
     DayInfoEvent,
     DayInfoSchemaCreate,
 )
+from app.database.crud.mixines import GetBackNextIdMixin
 
 
 def get_day_info_repository(session: SessionDep) -> "DayInfoRepository":
@@ -42,20 +36,6 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo]):
             selectinload(self.model.events).joinedload(Event.type),
         )
 
-    @staticmethod
-    async def _get_id(
-        session: AsyncSession, model: type[BaseWithId], condition: Any
-    ) -> int:
-        """Общий метод для получения ID объекта по условию."""
-        stmt = select(model).where(condition)
-        result = await session.scalar(stmt)
-        if not result:
-            raise ValueError("Параметр не найден!")
-        return result.id
-
-    async def get_day_by_date(self, day: str) -> DayInfo:
-        return await self._get_day_by(self.model.date == day)
-
     async def get_day_by_id(self, day_id: str) -> DayInfo:
         return await self._get_day_by(self.model.id == int(day_id))
 
@@ -70,44 +50,6 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo]):
         if day_info:
             return day_info
         raise HTTPException(status_code=404, detail=f"День не найден")
-
-    async def get_elements(self) -> Sequence[Elements]:
-        result = await self.session.execute(select(Elements))
-        if elements := result.scalars().all():
-            return elements
-        raise ValueError("Элементы не найдены")
-
-    async def get_elements_by_name(self, elements_name: str) -> Elements:
-        parts_name = elements_name.split("-")
-        another_name = f"{parts_name[1]}-{parts_name[0]}"
-        result = await self.session.execute(
-            select(Elements).where(
-                or_(Elements.en_name == elements_name, Elements.en_name == another_name)
-            )
-        )
-        if elements := result.scalar():
-            return elements
-        raise ValueError("Элементы не найдены")
-
-    async def get_haircutting_day_id(self, moon_day: int | str) -> int:
-        return await self._get_id(
-            self.session, HaircuttingDay, HaircuttingDay.moon_day == int(moon_day)
-        )
-
-    async def get_la_id(self, moon_day: int | str) -> int:
-        return await self._get_id(
-            self.session, LaPosition, LaPosition.moon_day == int(moon_day)
-        )
-
-    async def get_yelam_day_id(self, moon: str) -> int:
-        month = moon[:-1] if not moon[-1].isdigit() else moon
-        return await self._get_id(self.session, Yelam, Yelam.month == int(month))
-
-    async def get_arch_id(self, moon_day: str | int) -> int:
-        day = int(str(moon_day)[-1])
-        return await self._get_id(
-            self.session, SkylightArch, SkylightArch.moon_day == day
-        )
 
     async def add_days(
         self, days_info: list[DayInfoSchemaCreate], update: bool = True
