@@ -8,10 +8,15 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
 from app.core import settings
-from app.database.crud.days_info import DayInfoRepository
-from app.database.crud.events import EventRepository
-from app.database.crud.users import UsersRepository
 from app.database import SessionDep, db_helper
+from app.database.crud.days_info import DayInfoRepository
+from app.database.crud.elements import ElementsRepository
+from app.database.crud.events import EventRepository
+from app.database.crud.haircutting_days import HaircuttingRepository
+from app.database.crud.la_positions import LaPositionRepository
+from app.database.crud.skylight_arches import SkylightArchRepository
+from app.database.crud.users import UsersRepository
+from app.database.crud.yelams import YelamRepository
 from app.database.schemas import DayInfoSchemaCreate, EventSchemaCreate
 from app.utils.translator import translate
 
@@ -23,7 +28,7 @@ class GoogleCalendarParser:
     MONTHS_TAG = "CjVfdc"
     DAY_TAG = "n8H08c UVNKR"
     URL_PATTERN = r"➡️ [^\s]+|🌐 [^\s]+|https?://[^\s]+"
-    FILTER_WORDS = (
+    FILTER_WORDS_IN_EVENTS = (
         "🌑",
         "🌕",
         "100x",
@@ -32,6 +37,14 @@ class GoogleCalendarParser:
         "100000x",
         "1000000x",
         "10000000x",
+        "10,000,000x",
+    )
+    FILTER_WORDS_OUT_EVENTS = (
+        "Yelam",
+        "haircutting day",
+        "LA:",
+        "): Do",
+        "): No",
     )
 
     DUCHEN_EVENTS = {
@@ -51,6 +64,26 @@ class GoogleCalendarParser:
         self.session = session
         self.day_info_repo = DayInfoRepository(self.session)
         self.event_repo = EventRepository(self.session)
+        self._elements = None  # Кеш справочника элементов
+        self._archs = None
+        self._las = None
+        self._haircuttings = None
+        self._yelams = None
+        self._events = None
+
+    async def initialize_caches(self):
+        elements_repo = ElementsRepository(self.session)
+        arch_repo = SkylightArchRepository(self.session)
+        la_repo = LaPositionRepository(self.session)
+        haircutting_repo = HaircuttingRepository(self.session)
+        yelam_repo = YelamRepository(self.session)
+
+        self._events = await self.event_repo.get_all_dict()
+        self._elements = await elements_repo.get_all_dict()
+        self._archs = await arch_repo.get_all_dict()
+        self._las = await la_repo.get_all_dict()
+        self._haircuttings = await haircutting_repo.get_all_dict()
+        self._yelams = await yelam_repo.get_all_dict()
 
     async def load_events(
         self, year: int, month: int, period: int, update: bool
@@ -60,12 +93,25 @@ class GoogleCalendarParser:
         user_id = await user_repo.get_user_id(settings.super_user.email)
         days_info = []
         events_for_translate = {}
-        new_events = []
+        new_events = set()
         for day in calendar_days_info:
             summary = day.get("summary", "").split(" ⋅ ")
             descriptions = day.get("description", "").split("\n\n")
 
-            head_events = summary[1:-5].copy()
+            for item in reversed(summary):
+                if "haircutting day" not in item:
+                    last = summary.pop()
+                    summary.insert(1, last)
+                else:
+                    break
+
+            new_summary = [
+                event
+                for event in summary
+                if all([word not in event for word in self.FILTER_WORDS_OUT_EVENTS])
+            ]
+
+            head_events = new_summary[1:-1].copy()
             body_events = self._extract_body_events(descriptions)
             parsed_events = self._events_filter(head_events, body_events)
 
@@ -73,12 +119,16 @@ class GoogleCalendarParser:
                 parsed_events=parsed_events, user_id=user_id, update=update
             )
             events_for_translate.update(to_translate)
-            new_events.extend(new)
+            new_events |= new
 
-            day_info = await self._build_day_info(summary, day, processed)
+            day_info = await self._build_day_info(
+                summary=new_summary,
+                day=day,
+                events=processed,
+            )
             days_info.append(day_info)
 
-        if update and events_for_translate:
+        if events_for_translate:
             translated_events = translate(
                 "|".join(events_for_translate.values())
             ).split("|")
@@ -89,7 +139,7 @@ class GoogleCalendarParser:
 
         result = await self.day_info_repo.add_days(days_info, update)
         if new_events:
-            result["New events"] = new_events
+            result["New events"] = list(new_events)
         return result
 
     async def _calendar_request(
@@ -131,9 +181,9 @@ class GoogleCalendarParser:
 
     async def _handle_events(
         self, parsed_events: list[dict[str, str]], user_id: int, update: bool
-    ) -> tuple[list[int], list[str], dict[int, str]]:
+    ) -> tuple[list[int], set[str], dict[int, str]]:
         processed_event_ids = []
-        new_events = []
+        new_events = set()
         events_for_translate = {}
 
         for event in parsed_events:
@@ -141,14 +191,10 @@ class GoogleCalendarParser:
                 (d for d in self.DUCHEN_EVENTS if d in event["name"]), event["name"]
             )
             event["name"] = event_name
-
-            existing = await self.event_repo.get_event_by_name(event_name)
-            if not existing:
-                new_events.append(event_name)
-
-            if existing:
-                processed_event_ids.append(existing.id)
+            if existing_id := self._events.get(event_name):
+                processed_event_ids.append(existing_id)
             else:
+                new_events.add(event_name)
                 ru_text = translate(event["text"]) if event["text"] else ""
                 schema = EventSchemaCreate(
                     name=event_name,
@@ -161,29 +207,31 @@ class GoogleCalendarParser:
                 )
                 if update:
                     new_id = await self.event_repo.add_event(schema)
+                    events_for_translate[new_id] = event_name
                 else:
                     new_id = -1
-                events_for_translate[new_id] = event_name
                 processed_event_ids.append(new_id)
+                self._events[event_name] = new_id
 
         return processed_event_ids, new_events, events_for_translate
 
     async def _build_day_info(
         self, summary: list[str], day: dict[str, Any], events: list[int]
     ) -> DayInfoSchemaCreate:
-        moon, moon_day = summary[0].strip(".").split(".")
-        moon = moon.strip()
+        moon, moon_day = map(int, summary[0].strip(".").split("."))
 
-        elements_name = summary[-5]
-        elements = await self.day_info_repo.get_elements_by_name(elements_name)
+        el1, el2 = summary[-1].split("-")
+        elements_id = self._elements.get(f"{el1}-{el2}") or self._elements.get(
+            f"{el2}-{el1}"
+        )
         return DayInfoSchemaCreate(
             date=day.get("start", {}).get("date", ""),
             moon_day=f"{moon_day}.{moon}",
-            elements_id=elements.id,
-            arch_id=await self.day_info_repo.get_arch_id(moon_day),
-            la_id=await self.day_info_repo.get_la_id(moon_day),
-            haircutting_id=await self.day_info_repo.get_haircutting_day_id(moon_day),
-            yelam_id=await self.day_info_repo.get_yelam_day_id(moon),
+            elements_id=elements_id,
+            arch_id=self._archs.get(moon_day % 10),
+            la_id=self._las.get(moon_day),
+            haircutting_id=self._haircuttings.get(moon_day),
+            yelam_id=self._yelams.get(moon),
             events=events,
         )
 
@@ -194,7 +242,7 @@ class GoogleCalendarParser:
         buffer_body_events = body_events.copy()
         len_body_events = len(body_events)
         for head_event in head_events:
-            if head_event not in self.FILTER_WORDS:
+            if head_event not in self.FILTER_WORDS_IN_EVENTS:
                 event = {"name": head_event, "text": "", "link": ""}
                 for idx, body_event in enumerate(body_events):
                     if head_event in body_event:
@@ -253,6 +301,7 @@ async def calendar_parser_run(
 ) -> dict[str, list[str]] | None:
     async for session in db_helper.get_session():
         parser = GoogleCalendarParser(session)
+        await parser.initialize_caches()
         today = datetime.now()
         result = await parser.load_events(
             year=today.year,
