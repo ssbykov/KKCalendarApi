@@ -8,10 +8,10 @@ from starlette.requests import Request
 
 from app.admin.custom_model_view import CustomModelView
 from app.admin.model_views.event_photo import photo_url
-from app.admin.utils import text_formater
+from app.admin.utils import text_formater, check_superuser
+from app.database import Event, db_helper, DayInfo
 from app.database.crud.days_info import DayInfoRepository
 from app.database.crud.events import EventRepository
-from app.database import Event, db_helper, DayInfo
 
 
 class EventAdmin(
@@ -55,7 +55,7 @@ class EventAdmin(
     }
 
     column_list = ("id", "ru_name", "emoji", "type")
-    column_searchable_list = ("en_name", "ru_name")
+    column_searchable_list = ("name", "en_name", "ru_name")
     column_sortable_list = ("id",)
     column_formatters_detail = {
         "link": lambda model, attribute: getattr(model, "link", None)
@@ -146,27 +146,26 @@ class EventAdmin(
         days_in_form = form_data_dict.get("days", [])
 
         # 2. Проверяем существование события
-        event = await self.get_event_by_name(name)
 
         # 3. Фильтруем прошедшие дни
         past_days_in_form = await self.filter_past_days_by_id(days_in_form)
 
         # 4. Если событие новое (не редактирование)
-        if not event:
+        if not pk:
             if past_days_in_form:
                 return "Нельзя изменить или добавить прошедшие даты"
             return None
 
         # 5. Проверка на дубликат имени (при создании или изменении другого события)
-        if not pk or pk and event.id != int(pk):
-            return "Данное название уже используется"
+        if event := await self.get_event_by_name(name):
+            if event.id != int(pk) and name == event.name:
+                return "Данное название уже используется"
+            past_days_in_model = DayInfo.get_past_days_ids(event.days)
 
-        # 6. Получаем прошлые дни события (оптимизировано)
-        past_days_in_model = DayInfo.get_past_days_ids(event.days)
-
-        # 7. Сравниваем изменения в прошедших днях
-        if past_days_in_form != past_days_in_model:
-            return "Нельзя изменить или добавить прошедшие даты"
+            # 6. Сравниваем изменения в прошедших днях
+            is_super_user = check_superuser(request)
+            if past_days_in_form != past_days_in_model and not is_super_user:
+                return "Нельзя изменить или добавить прошедшие даты"
 
         return None
 
