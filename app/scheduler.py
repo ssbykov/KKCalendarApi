@@ -5,6 +5,7 @@ from celery import chain  # type: ignore
 from app.core import settings
 from app.tasks.calendar_parser import run_process_parser
 from app.tasks.send_email import run_process_mail
+from app.core import settings
 
 scheduler = AsyncIOScheduler()
 
@@ -23,9 +24,9 @@ async def startup_scheduler() -> None:
     scheduler.add_job(
         check_calendar_update,
         CronTrigger(
-            hour=9,
-            minute=0,
-            timezone="Europe/Moscow",  # Указываем московский часовой пояс
+            hour=settings.scheduler.hour,
+            minute=settings.scheduler.minute,
+            timezone=settings.scheduler.timezone,
         ),
         misfire_grace_time=60,  # Допустимое время задержки (секунды)
     )

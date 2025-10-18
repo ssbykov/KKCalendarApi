@@ -33,6 +33,12 @@ class SuperUser(BaseModel):
     password: str
 
 
+class SchedulerConfig(BaseModel):
+    hour: int
+    minute: int
+    timezone: str = "Europe/Moscow"
+
+
 class AccessToken(BaseModel):
     lifetime_seconds: int = 3600
     reset_password_token_secret: str
@@ -123,6 +129,7 @@ class Settings(BaseSettings):
     calendar: CalendarSettings
     yandex_disk: YandexDiskSettings
     run: RunConfig
+    scheduler: SchedulerConfig
 
 
 # noinspection PyArgumentList
