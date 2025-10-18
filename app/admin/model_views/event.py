@@ -133,7 +133,8 @@ class EventAdmin(
 
     async def check_restrictions_delete(self, request: Request) -> str | None:
         event = await self.get_event(request)
-        if DayInfo.get_past_days_ids(event.days):
+        is_super_user = check_superuser(request)
+        if DayInfo.get_past_days_ids(event.days) and not is_super_user:
             return "Нельзя удалить событие с прошедшими датами"
         return None
 
