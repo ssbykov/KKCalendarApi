@@ -1,8 +1,10 @@
 import logging
 import os
+import ssl
 from datetime import datetime, timezone, timedelta
 
 import aiohttp
+import certifi
 
 from app.core import settings
 
@@ -23,6 +25,7 @@ class YaDisk:
             "Authorization": "OAuth {}".format(self.token),
         }
         self.folder_name = "db_backup"
+        self.ssl_context = ssl.create_default_context(cafile=certifi.where())
 
     async def initialize(self):
         try:
@@ -65,7 +68,9 @@ class YaDisk:
                 "client_id": self.client_id,
                 "client_secret": self.client_secret,
             }
-            async with session.post(self.TOKEN_REFRESH_URL, data=data) as response:
+            async with session.post(
+                self.TOKEN_REFRESH_URL, data=data, ssl=self.ssl_context
+            ) as response:
                 new_data = await response.json()
                 if "access_token" in new_data and "refresh_token" in new_data:
                     # Сохраняем новые токены в базу
@@ -93,6 +98,7 @@ class YaDisk:
             async with session.get(
                 self.TOKEN_INFO_URL,
                 headers=self.headers,
+                ssl=self.ssl_context,
             ) as response:
                 if response.status == 200:
                     return True
@@ -111,7 +117,10 @@ class YaDisk:
             return
         try:
             async with session.put(
-                self.API_URL, headers=self.headers, params={"path": self.folder_name}
+                self.API_URL,
+                headers=self.headers,
+                params={"path": self.folder_name},
+                ssl=self.ssl_context,
             ) as response:
                 if response.status not in (201, 409):
                     raise Exception(f"Статус: {response.status}")
@@ -127,7 +136,10 @@ class YaDisk:
         params = {"path": f"{self.folder_name}/{file_name}", "overwrite": "true"}
         try:
             async with session.get(
-                upload_url, headers=self.headers, params=params
+                upload_url,
+                headers=self.headers,
+                params=params,
+                ssl=self.ssl_context,
             ) as response:
                 if response.status != 200:
                     raise Exception(f"Статус: {response.status}")
@@ -146,7 +158,9 @@ class YaDisk:
             file_path = os.path.join(settings.db.backups_dir, file_name)
             try:
                 with open(file_path, "rb") as f:
-                    async with session.put(upload_url, data=f) as response:
+                    async with session.put(
+                        upload_url, data=f, ssl=self.ssl_context
+                    ) as response:
                         if response.status != 201:
                             raise Exception(f"Статус:{response.status}")
                         return None
