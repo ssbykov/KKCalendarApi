@@ -76,7 +76,7 @@ class EmailSettings(BaseModel):
 
 
 class CalendarSettings(BaseModel):
-    secret_file: str
+    secret_file: str = ROOT.parent / "secret.json"
     calendar_id: str
 
 

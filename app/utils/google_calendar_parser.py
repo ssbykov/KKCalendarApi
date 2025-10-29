@@ -56,7 +56,8 @@ class GoogleCalendarParser:
 
     def __init__(self, session: SessionDep):
         self.calendar_id = settings.calendar.calendar_id
-        account_info = json.loads(settings.calendar.secret_file)
+        with open(settings.calendar.secret_file, "r", encoding="utf-8") as f:
+            account_info = json.load(f)
         self.creds = service_account.Credentials.from_service_account_info(
             account_info, scopes=SCOPES
         )  # type: ignore

@@ -93,3 +93,4 @@ ENV/
 # Other files to ignore #
 sftp-config.json  # sftp configuration file
 /chat_ids.json
+/secret.json
