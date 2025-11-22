@@ -43,8 +43,8 @@ class GoogleCalendarParser:
         "Yelam",
         "haircutting day",
         "LA:",
-        "): Do",
-        "): No",
+        ": Do no",
+        ": No memorial",
     )
 
     DUCHEN_EVENTS = {
@@ -121,12 +121,15 @@ class GoogleCalendarParser:
             )
             events_for_translate.update(to_translate)
             new_events |= new
-
-            day_info = await self._build_day_info(
-                summary=new_summary,
-                day=day,
-                events=processed,
-            )
+            try:
+                day_info = await self._build_day_info(
+                    summary=new_summary,
+                    day=day,
+                    events=processed,
+                )
+            except Exception as error:
+                logging.error(f"Во время обработки дня {day} произошла ошибка: {error}")
+                continue
             days_info.append(day_info)
 
         if events_for_translate:
