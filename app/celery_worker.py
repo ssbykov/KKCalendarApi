@@ -19,16 +19,16 @@ celery_app = Celery(
 celery_app.autodiscover_tasks(["app.tasks"])
 
 
-def check_job_status(task_name: str) -> AsyncResult | None:
-    task_id = redis_client.get(task_name)
+def check_job_status(name: str) -> AsyncResult | None:
+    task_id = redis_client.get(name)
     if not task_id:
         return None
-    task = AsyncResult(task_id.decode())
 
-    if not task or task.status == "FAILURE":
-        redis_client.delete(task_name)
-
-    return task
+    task = AsyncResult(task_id)
+    # Если задача в конечном статусе — удаляем ключ
+    if task.status in ("SUCCESS", "FAILURE"):
+        redis_client.delete(name)
+    return task if task.status not in ("SUCCESS", "FAILURE") else None
 
 
 @dataclass
