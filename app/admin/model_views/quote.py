@@ -26,7 +26,7 @@ class QuoteAdmin(
     icon = "fa-solid fa-quote-left"
 
     column_list = ("lama", "text")
-    column_details_exclude_list = ("id", "lama_id")
+    column_details_exclude_list = ("lama_id",)
     column_searchable_list = ("lama.name", "text")
     column_labels = {
         "text": "Цитата",
