@@ -21,7 +21,7 @@ class TaskAdmin(
         "advertisement": "Сообщение",
         "hour": "Часы",
         "minute": "Минуты",
-        "days": "Дни недели",
+        "days": "Дни недели/месяца",
         "timezone": "Зона",
     }
 
