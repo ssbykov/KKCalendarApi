@@ -3,7 +3,7 @@ from typing import Any
 from app.celery_worker import celery_app, CeleryTask
 from app.utils.http_calendar_parser import calendar_parser_run
 
-web_parser_task = CeleryTask("tasks.parser", calendar_parser_run)
+web_parser_task = CeleryTask("tasks.website_parser", calendar_parser_run)
 
 
 @celery_app.task(name=web_parser_task.name)  # type: ignore
