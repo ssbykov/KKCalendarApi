@@ -10,6 +10,7 @@ from app.database import DayInfo
 from app.database.crud.days_info import DayInfoRepository
 from app.tasks import run_process_backup
 from app.tasks.calendar_parser import parser_task, run_process_parser
+from app.tasks.website_parser import web_parser_task, run_website_process_parser
 
 
 class DayInfoAdmin(
@@ -76,9 +77,49 @@ class DayInfoAdmin(
         request.session["flash_messages"] = self.get_update_status()
         return RedirectResponse(request.url_for("admin:list", identity=self.identity))
 
+    @action(
+        name="load_web_new_data",
+        label="Загрузить данные с сайта",
+        add_in_detail=False,
+        add_in_list=True,
+        confirmation_message=f"Перед выполнением действия будет создана резервная копия базы данных. Продолжить?",
+    )
+    # async def update_db_from_website(self, request: Request) -> RedirectResponse:
+    #     """
+    #     Запуск парсера данных с сайта karmakagyucalendar.org напрямую (без Celery)
+    #     """
+    #
+    #     # Запускаем парсер напрямую
+    #     await calendar_parser_run(update=True)
+    #
+    #     request.session["flash_messages"] = {
+    #         "success": ["Парсер сайта успешно выполнен"]
+    #     }
+    #
+    #     return RedirectResponse(request.url_for("admin:list", identity=self.identity))
+    async def update_db_from_website(self, request: Request) -> RedirectResponse:
+        """
+        Запуск парсера данных с сайта karmakagyucalendar.org
+        """
+        task = check_job_status(web_parser_task.name)
+
+        # Проверяем статус существующей задачи
+        if task and task.status == "SUCCESS" or not task:
+            # Создаем резервную копию перед обновлением
+            backup_task = run_process_backup.s()
+
+            new_parser_task = run_website_process_parser.si(update=True)
+
+            result = chain(backup_task, new_parser_task)()
+            redis_client.set(run_website_process_parser.name, result.id)
+
+        request.session["flash_messages"] = self.get_update_status()
+
+        return RedirectResponse(request.url_for("admin:list", identity=self.identity))
+
     @staticmethod
     def get_update_status() -> str | None:
-        name = parser_task.name
+        name = web_parser_task.name
         task = check_job_status(name)
         if not task:
             return None
