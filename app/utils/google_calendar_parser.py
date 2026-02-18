@@ -37,6 +37,7 @@ class GoogleCalendarParser:
         "100000x",
         "1000000x",
         "10000000x",
+        "100,000x",
         "10,000,000x",
     )
     FILTER_WORDS_OUT_EVENTS = (
