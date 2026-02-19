@@ -100,11 +100,16 @@ class GoogleCalendarParser:
             summary = day.get("summary", "").split(" ⋅ ")
             descriptions = day.get("description", "").split("\n\n")
 
-            for item in reversed(summary):
-                if "haircutting day" not in item:
-                    last = summary.pop()
-                    summary.insert(1, last)
-                else:
+            needle = "haircutting day"
+
+            for idx, item in enumerate(summary):
+                if needle in item:
+                    # если элемент не последний
+                    if idx < len(summary) - 1:
+                        tail = summary[idx + 1 :]  # всё после haircutting day
+                        del summary[idx + 1 :]  # вырезаем хвост
+                        # вставляем хвост между 0 и 1
+                        summary[1:1] = tail
                     break
 
             new_summary = [
