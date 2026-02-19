@@ -139,9 +139,9 @@ class GoogleCalendarParser:
             days_info.append(day_info)
 
         if events_for_translate:
-            translated_events = translate(
-                "|".join(events_for_translate.values())
-            ).split("|")
+            translated_events = {
+                key: translate(value) for key, value in events_for_translate.items()
+            }
             for event_id, ru_name in zip(
                 events_for_translate.keys(), translated_events
             ):

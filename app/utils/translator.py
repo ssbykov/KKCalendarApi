@@ -15,10 +15,11 @@ def translate(text: str) -> str:
             translator="yandex",
             headers=headers,
         )
-        if isinstance(translated_text, str):
-            return translated_text
-        else:
-            return str(translated_text)  # Преобразуем в строку, если это необходимо
+        return (
+            translated_text
+            if isinstance(translated_text, str)
+            else str(translated_text)
+        )
     except Exception as e:
         logging.error(f"Translation failed: {e}")
         return text
