@@ -94,7 +94,6 @@ class GoogleCalendarParser:
         user_repo = UsersRepository(self.session)
         user_id = await user_repo.get_user_id(settings.super_user.email)
         days_info = []
-        events_for_translate = {}
         new_events = set()
         for day in calendar_days_info:
             summary = day.get("summary", "").split(" ⋅ ")
@@ -125,7 +124,6 @@ class GoogleCalendarParser:
             processed, new, to_translate = await self._handle_events(
                 parsed_events=parsed_events, user_id=user_id, update=update
             )
-            events_for_translate.update(to_translate)
             new_events |= new
             try:
                 day_info = await self._build_day_info(
@@ -137,15 +135,6 @@ class GoogleCalendarParser:
                 logging.error(f"Во время обработки дня {day} произошла ошибка: {error}")
                 continue
             days_info.append(day_info)
-
-        if events_for_translate:
-            translated_events = {
-                key: translate(value) for key, value in events_for_translate.items()
-            }
-            for event_id, ru_name in zip(
-                events_for_translate.keys(), translated_events
-            ):
-                await self.event_repo.ru_name_event_update(event_id, ru_name)
 
         result = await self.day_info_repo.add_days(days_info, update)
         if new_events:

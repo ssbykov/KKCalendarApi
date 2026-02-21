@@ -11,6 +11,7 @@ from app.database.crud.days_info import DayInfoRepository
 from app.tasks import run_process_backup
 from app.tasks.calendar_parser import parser_task, run_process_parser
 from app.tasks.website_parser import web_parser_task, run_website_process_parser
+from utils.google_calendar_parser import calendar_parser_run
 
 
 class DayInfoAdmin(
@@ -66,6 +67,8 @@ class DayInfoAdmin(
         confirmation_message=f"Перед выполнением действия будет создана резервная копия базы данных. Продолжить?",
     )
     async def update_db(self, request: Request) -> RedirectResponse:
+        # запуск без celery
+        # await calendar_parser_run(period=12, update=True)
         task = check_job_status(parser_task.name)
 
         if task and task.status == "SUCCESS" or not task:
