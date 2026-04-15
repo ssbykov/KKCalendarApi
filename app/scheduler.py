@@ -5,7 +5,6 @@ from celery import chain  # type: ignore
 from app.core import settings
 from app.tasks.calendar_parser import run_process_parser
 from app.tasks.send_email import run_process_mail
-from app.core import settings
 
 scheduler = AsyncIOScheduler()
 
