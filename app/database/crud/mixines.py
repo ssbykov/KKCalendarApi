@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, date
 from typing import (
     Any,
     Optional,
@@ -37,24 +37,37 @@ class GetBackNextIdMixin(ABC, Generic[T]):
         sort_column: str = "id",
         is_next: bool = True,
     ) -> Optional[int]:
-        column = getattr(self.model, sort_column)
+        # 1. Сбрасываем старую сортировку, чтобы не было конфликтов, и делаем подзапрос
+        subq = list_query.order_by(None).subquery()
 
-        condition, order_by = (
-            (column > current_val, column.asc())
-            if is_next
-            else (column < current_val, column.desc())
+        # 2. Берем нужные колонки прямо из подзапроса, а не из self.model
+        sort_col = subq.c[sort_column]
+        id_col = subq.c["id"]
+
+        # 3. Конвертируем значение в нужный тип базы данных
+        typed_val = convert_to_column_type(current_val, sort_col.type)
+
+        # 4. Формируем логику next/prev
+        condition = sort_col > typed_val if is_next else sort_col < typed_val
+        order_by = sort_col.asc() if is_next else sort_col.desc()
+
+        # 5. Собираем чистый запрос без дублирования алиасов
+        stmt = (
+            select(id_col)
+            .select_from(subq)
+            .where(condition)
+            .order_by(order_by)
+            .limit(1)
         )
-        stmt = list_query.where(condition).order_by(order_by).limit(1)
 
-        result = await self.session.scalar(stmt)
-        return result.id if result else None
+        return await self.session.scalar(stmt)
 
     async def get_all(self) -> Sequence[T]:
         result = await self.session.execute(self.main_stmt)
         obj_list = result.scalars().all()
         return obj_list
 
-    async def get_all_dict(self) -> dict[str, dict[str, Any]]:
+    async def get_all_dict(self) -> dict[Any, int]:
         obj_list = await self.get_all()
         return {
             obj.day_property: obj.id
@@ -65,7 +78,7 @@ class GetBackNextIdMixin(ABC, Generic[T]):
     async def get_count_items(self, conditions: Optional[List[bool]] = None) -> int:
         query = select(func.count(self.model.id))
         if conditions:
-            query = query.where(*conditions)  # применяем условия, если они есть
+            query = query.where(*conditions)
         result = await self.session.execute(query)
         return result.scalar_one_or_none() or 0
 
@@ -96,8 +109,7 @@ class GetBackNextIdMixin(ABC, Generic[T]):
         )
 
         query = select(subquery.c.row_num).where(
-            subquery.c[column]
-            == convert_to_column_type(target_val, column_type=column_type)
+            subquery.c[column] == convert_to_column_type(target_val, column_type)
         )
 
         result = await self.session.execute(query)
@@ -109,7 +121,8 @@ class GetBackNextIdMixin(ABC, Generic[T]):
         return result.scalar_one_or_none()
 
 
-def convert_to_column_type(variable: Any, column_type: Type[Any]) -> Any:
+def convert_to_column_type(variable: Any, column_type: Any) -> Any:
+    # Типы SQLAlchemy прилетают как экземпляры (например Integer()), так что Type[Any] заменен на Any
     if isinstance(column_type, Integer):
         return int(variable)
     elif isinstance(column_type, String):
@@ -117,6 +130,8 @@ def convert_to_column_type(variable: Any, column_type: Type[Any]) -> Any:
     elif isinstance(column_type, Boolean):
         return bool(variable)
     elif isinstance(column_type, Date) or isinstance(column_type, DateTime):
-        return datetime.strptime(variable, "%Y-%m-%d")
+        date_str = str(variable).split("T")[0]
+        dt = datetime.strptime(date_str, "%Y-%m-%d")
+        return dt.date() if isinstance(column_type, Date) else dt
     else:
-        raise ValueError("Unsupported column type")
+        raise ValueError(f"Unsupported column type: {type(column_type)}")
