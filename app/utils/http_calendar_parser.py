@@ -39,7 +39,7 @@ class KarmakagyuCalendarParser:
         "100 times day",
         "100,000 times day",
         "10,000,000 times day",
-        # "100000x",
+        "10,000 times day",
         # "1000000x",
         # "10000000x",
         # "10,000,000x",
@@ -218,7 +218,7 @@ class KarmakagyuCalendarParser:
         }
 
         # Разделяем по разделителю ⋅
-        parts = [p.strip() for p in line.split("⋅")]
+        parts = [p.strip() for p in line.split("·")]
         if len(parts) < 3:
             return None
 
