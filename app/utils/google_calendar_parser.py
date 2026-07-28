@@ -33,7 +33,9 @@ class GoogleCalendarParser:
         "🌕",
         "100x",
         "1000x",
+        "1,000x",
         "10000x",
+        "10,000x",
         "100000x",
         "1000000x",
         "10000000x",
@@ -96,24 +98,27 @@ class GoogleCalendarParser:
         days_info = []
         new_events = set()
         for day in calendar_days_info:
-            summary = day.get("summary", "").split(" ⋅ ")
+            summary = day.get("summary", "")
+            summary_parts = [
+                p.strip() for p in re.split(r"\s*[⋅·]\s*", summary) if p.strip()
+            ]
             descriptions = day.get("description", "").split("\n\n")
 
             needle = "haircutting day"
 
-            for idx, item in enumerate(summary):
+            for idx, item in enumerate(summary_parts):
                 if needle in item:
                     # если элемент не последний
-                    if idx < len(summary) - 1:
-                        tail = summary[idx + 1 :]  # всё после haircutting day
-                        del summary[idx + 1 :]  # вырезаем хвост
+                    if idx < len(summary_parts) - 1:
+                        tail = summary_parts[idx + 1 :]  # всё после haircutting day
+                        del summary_parts[idx + 1 :]  # вырезаем хвост
                         # вставляем хвост между 0 и 1
-                        summary[1:1] = tail
+                        summary_parts[1:1] = tail
                     break
 
             new_summary = [
                 event
-                for event in summary
+                for event in summary_parts
                 if all([word not in event for word in self.FILTER_WORDS_OUT_EVENTS])
             ]
 
