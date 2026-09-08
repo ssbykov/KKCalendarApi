@@ -27,7 +27,7 @@ class DayInfoRepository(GetBackNextIdMixin[DayInfo]):
         super().__init__(session)
         self.session = session
         self.main_stmt = select(self.model).options(
-            selectinload(self.model.elements),
+            selectinload(self.model.element),
             selectinload(self.model.arch),
             selectinload(self.model.la),
             selectinload(self.model.yelam),
