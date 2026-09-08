@@ -43,7 +43,7 @@ class DayInfo(BaseWithId, ToDictMixin):
     date: Mapped[str] = mapped_column(String(10), nullable=False, unique=True)
     moon_day: Mapped[str] = mapped_column(String(15), nullable=False)
     elements_id: Mapped[int] = mapped_column(ForeignKey("elements.id"), nullable=False)
-    element: Mapped["Elements"] = relationship(
+    elements: Mapped["Elements"] = relationship(
         "Elements",
         foreign_keys=[elements_id],
         back_populates="day_infos",
