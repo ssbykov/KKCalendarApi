@@ -30,7 +30,7 @@ class ElementsAdmin(
         "ru_text",
         "is_positive",
     )
-    can_edit = False
+    can_edit = True
     can_delete = False
     can_export = False
     can_create = False

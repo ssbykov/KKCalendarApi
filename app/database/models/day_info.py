@@ -43,10 +43,10 @@ class DayInfo(BaseWithId, ToDictMixin):
     date: Mapped[str] = mapped_column(String(10), nullable=False, unique=True)
     moon_day: Mapped[str] = mapped_column(String(15), nullable=False)
     elements_id: Mapped[int] = mapped_column(ForeignKey("elements.id"), nullable=False)
-    elements = relationship(
+    element: Mapped["Elements"] = relationship(
         "Elements",
         foreign_keys=[elements_id],
-        backref=backref("elements", lazy="dynamic"),
+        back_populates="day_infos",
     )
     arch_id: Mapped[int] = mapped_column(
         ForeignKey("skylight_arches.id"), nullable=False
@@ -98,11 +98,17 @@ class Elements(BaseWithId, PropertyAliasMixin):
 
     init_data = ELEMENTS
     __tablename__ = "elements"
+
     en_name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
     ru_name: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
     ru_text: Mapped[str] = mapped_column(Text, nullable=True)
     en_text: Mapped[str] = mapped_column(Text, nullable=True)
     is_positive: Mapped[bool] = mapped_column(nullable=False)
+
+    day_infos: Mapped[list["DayInfo"]] = relationship(
+        "DayInfo",
+        back_populates="element",
+    )
 
     def __str__(self) -> str:
         return self.ru_name
