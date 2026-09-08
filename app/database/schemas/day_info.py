@@ -71,7 +71,7 @@ class DayInfoSchema(BaseModel):
     id: int
     date: str
     moon_day: str
-    elements: ElementsSchema
+    element: ElementsSchema
     arch: ArchSchema
     la: LaSchema
     yelam: YelamSchema
