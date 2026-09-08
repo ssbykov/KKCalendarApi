@@ -107,7 +107,7 @@ class Elements(BaseWithId, PropertyAliasMixin):
 
     day_infos: Mapped[list["DayInfo"]] = relationship(
         "DayInfo",
-        back_populates="element",
+        back_populates="elements",
     )
 
     def __str__(self) -> str:
