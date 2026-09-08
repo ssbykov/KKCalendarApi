@@ -20,7 +20,7 @@ class ElementsAdmin(
         "en_name": "Заголовок на английском",
         "ru_name": "Заголовок на русском",
         "ru_text": "Описание на русском",
-        "en_text": "Описание на русском",
+        "en_text": "Описание на английском",
         "is_positive": "Позитивный",
     }
     column_details_list = (
