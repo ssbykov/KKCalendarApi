@@ -219,15 +219,32 @@ class GoogleCalendarParser:
 
         return processed_event_ids, new_events, events_for_translate
 
+    ELEMENTS_RE = re.compile(r"\(\s*([A-Za-z]+)\s*-\s*([A-Za-z]+)\s*\)")
+    PLAIN_ELEMENTS_RE = re.compile(r"^\s*([A-Za-z]+)\s*-\s*([A-Za-z]+)\s*$")
+
+    @classmethod
+    def _find_elements(cls, text: str) -> tuple[str, str] | None:
+        m = cls.ELEMENTS_RE.search(text) or cls.PLAIN_ELEMENTS_RE.match(text)
+        if not m:
+            return None
+        return m.group(1).capitalize(), m.group(2).capitalize()
+
     async def _build_day_info(
         self, summary: list[str], day: dict[str, Any], events: list[int]
     ) -> DayInfoSchemaCreate:
         moon, moon_day = map(int, summary[0].strip(".").split("."))
 
-        el1, el2 = summary[-1].split("-")
+        els = self._find_elements(summary[-1])
+        if not els:
+            raise ValueError(f"Не найдены стихии в summary: {summary}")
+        el1, el2 = els
+
         elements_id = self._elements.get(f"{el1}-{el2}") or self._elements.get(
             f"{el2}-{el1}"
         )
+        if elements_id is None:
+            raise ValueError(f"Комбинации стихий нет в справочнике: {el1}-{el2}")
+
         return DayInfoSchemaCreate(
             date=day.get("start", {}).get("date", ""),
             moon_day=f"{moon_day}.{moon}",
