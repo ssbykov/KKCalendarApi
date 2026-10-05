@@ -1,6 +1,9 @@
+import asyncio
+import html
 import json
 import logging
 import re
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
@@ -23,11 +26,20 @@ from app.utils.translator import translate
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 
 
+@dataclass
+class ParsedDay:
+    moon: int
+    moon_day: int
+    elements: tuple[str, str]
+    events: list[dict[str, str]]
+
+
 class GoogleCalendarParser:
     HOST = "https://www.karmakagyucalendar.org/current-calendar"
     MONTHS_TAG = "CjVfdc"
     DAY_TAG = "n8H08c UVNKR"
     URL_PATTERN = r"➡️ [^\s]+|🌐 [^\s]+|https?://[^\s]+"
+
     FILTER_WORDS_IN_EVENTS = (
         "🌑",
         "🌕",
@@ -42,13 +54,6 @@ class GoogleCalendarParser:
         "100,000x",
         "10,000,000x",
     )
-    FILTER_WORDS_OUT_EVENTS = (
-        "Yelam",
-        "haircutting day",
-        "LA:",
-        ": Do no",
-        ": No memorial",
-    )
 
     DUCHEN_EVENTS = {
         "Chötrül Düchen",
@@ -56,6 +61,19 @@ class GoogleCalendarParser:
         "Chökhor Düchen",
         "Lha Bab Düchen",
     }
+
+    BLOCK_SPLIT_RE = re.compile(r"<br\s*/?>\s*<br\s*/?>", re.I)
+    BR_RE = re.compile(r"<br\s*/?>", re.I)
+    TAG_RE = re.compile(r"<[^>]+>")
+    LINK_BLOCK_RE = re.compile(
+        r'^\s*<a\s+[^>]*href="([^"]+)"[^>]*>(.*?)</a>(.*)$', re.I | re.S
+    )
+    BOLD_BLOCK_RE = re.compile(r"^\s*<b>(.*?)</b>(.*)$", re.I | re.S)
+    DATE_RE = re.compile(r"^(\d{1,2})\s*\.\s*(\d{1,2})\.?$")
+    HEADER_SPLIT_RE = re.compile(r"\s*[⋅·]\s*")
+    ELEMENTS_RE = re.compile(r"\(\s*([A-Za-z]+)\s*-\s*([A-Za-z]+)\s*\)")
+    NOISE_RE = re.compile(r"^[\d,\s]+(x|times)(\s+day)?$", re.I)
+    STOP_PREFIXES = ("ELEMENTAL COMBINATION", "-----", "THE KARMA KAGYU")
 
     def __init__(self, session: SessionDep):
         self.calendar_id = settings.calendar.calendar_id
@@ -96,50 +114,29 @@ class GoogleCalendarParser:
         user_repo = UsersRepository(self.session)
         user_id = await user_repo.get_user_id(settings.super_user.email)
         days_info = []
-        new_events = set()
+        new_events: set[str] = set()
+
         for day in calendar_days_info:
-            summary = day.get("summary", "")
-            summary_parts = [
-                p.strip() for p in re.split(r"\s*[⋅·]\s*", summary) if p.strip()
-            ]
-            descriptions = day.get("description", "").split("\n\n")
-
-            needle = "haircutting day"
-
-            for idx, item in enumerate(summary_parts):
-                if needle in item:
-                    # если элемент не последний
-                    if idx < len(summary_parts) - 1:
-                        tail = summary_parts[idx + 1 :]  # всё после haircutting day
-                        del summary_parts[idx + 1 :]  # вырезаем хвост
-                        # вставляем хвост между 0 и 1
-                        summary_parts[1:1] = tail
-                    break
-
-            new_summary = [
-                event
-                for event in summary_parts
-                if all([word not in event for word in self.FILTER_WORDS_OUT_EVENTS])
-            ]
-
-            head_events = new_summary[1:-1].copy()
-            body_events = self._extract_body_events(descriptions)
-            parsed_events = self._events_filter(head_events, body_events)
-
-            processed, new, to_translate = await self._handle_events(
-                parsed_events=parsed_events, user_id=user_id, update=update
-            )
-            new_events |= new
             try:
-                day_info = await self._build_day_info(
-                    summary=new_summary,
-                    day=day,
-                    events=processed,
+                parsed = self._parse_description(day.get("description", ""))
+                elements_id = self._resolve_elements_id(parsed.elements)
+                processed, new, _ = await self._handle_events(
+                    parsed_events=parsed.events, user_id=user_id, update=update
                 )
-            except Exception as error:
-                logging.error(f"Во время обработки дня {day} произошла ошибка: {error}")
+                day_info = self._build_day_info(parsed, day, elements_id, processed)
+            except Exception:
+                logging.exception(
+                    "Ошибка обработки дня %s (%s)", day.get("id"), day.get("summary")
+                )
                 continue
+            new_events |= new
             days_info.append(day_info)
+
+        if calendar_days_info and not days_info:
+            raise RuntimeError(
+                f"Ни один из {len(calendar_days_info)} дней не разобран, "
+                "смотрите ошибки выше"
+            )
 
         result = await self.day_info_repo.add_days(days_info, update)
         if new_events:
@@ -174,14 +171,148 @@ class GoogleCalendarParser:
             logging.error(f"An error occurred: {error}")
             return []
 
+    # ------------------------------------------------------------------
+    # Разбор description
+    # ------------------------------------------------------------------
+
+    @classmethod
+    def _html_to_text(cls, fragment: str) -> str:
+        text = cls.BR_RE.sub("\n", fragment)
+        return html.unescape(cls.TAG_RE.sub("", text)).strip()
+
     @staticmethod
-    def _extract_body_events(descriptions: list[str]) -> list[str]:
-        body_events = []
-        for index, value in enumerate(descriptions):
-            if "ELEMENTAL COMBINATION" in value:
-                body_events.extend(descriptions[:index])
+    def _clean_name(s: str) -> str:
+        # только нормализация пробелов; звёздочки сохраняются
+        return re.sub(r"\s+", " ", s).strip()
+
+    @classmethod
+    def _is_noise(cls, name: str) -> bool:
+        return (
+                not name
+                or name in cls.FILTER_WORDS_IN_EVENTS
+                or bool(cls.NOISE_RE.match(name))
+        )
+
+    @staticmethod
+    def _norm(s: str) -> str:
+        # только пробелы и регистр; X, X* и X** остаются разными событиями
+        return re.sub(r"\s+", " ", s).strip().casefold()
+
+    def _parse_description(self, description: str) -> ParsedDay:
+        blocks = [
+            b.strip() for b in self.BLOCK_SPLIT_RE.split(description) if b.strip()
+        ]
+        if not blocks:
+            raise ValueError("Пустое описание")
+
+        # Заголовок: дата · события · стихии · служебные поля
+        parts = [
+            p.strip()
+            for p in self.HEADER_SPLIT_RE.split(self._html_to_text(blocks[0]))
+            if p.strip()
+        ]
+        m = self.DATE_RE.match(parts[0]) if parts else None
+        if not m:
+            raise ValueError(f"Не удалось разобрать дату: {parts[:1]}")
+        moon, moon_day = int(m[1]), int(m[2])
+
+        el_idx, elements = None, None
+        for i, p in enumerate(parts[1:], 1):
+            if em := self.ELEMENTS_RE.search(p):
+                el_idx, elements = i, (em[1].capitalize(), em[2].capitalize())
                 break
-        return body_events
+        if elements is None or el_idx is None:
+            raise ValueError(f"Стихии не найдены в заголовке: {parts}")
+
+        head_names = [self._clean_name(p) for p in parts[1:el_idx]]
+
+        # Блоки событий до ELEMENTAL COMBINATION
+        body: list[dict[str, str]] = []
+        for block in blocks[1:]:
+            plain = self._html_to_text(block)
+            if plain.startswith(self.STOP_PREFIXES):
+                break
+            if lm := self.LINK_BLOCK_RE.match(block):
+                link, name_html, rest = lm.groups()
+            elif bm := self.BOLD_BLOCK_RE.match(block):
+                link, (name_html, rest) = "", bm.groups()
+            else:
+                # блок без названия: продолжение текста предыдущего события
+                if body:
+                    body[-1]["text"] = (body[-1]["text"] + "\n" + plain).strip()
+                continue
+
+            rest_text = self._html_to_text(rest)
+            stars = re.match(r"\**", rest_text).group(0)  # '*', '**' или ''
+            body.append(
+                {
+                    "name": self._clean_name(self._html_to_text(name_html)) + stars,
+                    "text": rest_text[len(stars):].lstrip(". ").strip(),
+                    "link": link,
+                }
+            )
+
+        # Сопоставление событий заголовка с блоками тела: только точное
+        used: set[int] = set()
+        events: list[dict[str, str]] = []
+        for name in head_names:
+            if self._is_noise(name):
+                continue
+            key = self._norm(name)
+            found = next(
+                (
+                    i
+                    for i, b in enumerate(body)
+                    if i not in used and self._norm(b["name"]) == key
+                ),
+                None,
+            )
+            if found is None:
+                events.append({"name": name, "text": "", "link": ""})
+            else:
+                used.add(found)
+                b = body[found]
+                events.append({"name": name, "text": b["text"], "link": b["link"]})
+
+        # Блоки тела, которых нет в заголовке
+        for i, b in enumerate(body):
+            if i not in used and not self._is_noise(b["name"]):
+                events.append(dict(b))
+
+        self._parse_links([e for e in events if not e["link"]])
+        return ParsedDay(moon, moon_day, elements, events)
+
+    def _resolve_elements_id(self, elements: tuple[str, str]) -> int:
+        el1, el2 = elements
+        elements_id = self._elements.get(f"{el1}-{el2}") or self._elements.get(
+            f"{el2}-{el1}"
+        )
+        if elements_id is None:
+            raise ValueError(f"Комбинации стихий нет в справочнике: {el1}-{el2}")
+        return elements_id
+
+    def _build_day_info(
+        self,
+        parsed: ParsedDay,
+        day: dict[str, Any],
+        elements_id: int,
+        events: list[int],
+    ) -> DayInfoSchemaCreate:
+        moon, moon_day = parsed.moon, parsed.moon_day
+        return DayInfoSchemaCreate(
+            date=day.get("start", {}).get("date", ""),
+            moon_day=f"{moon_day}.{moon}",
+            elements_id=elements_id,
+            arch_id=self._archs.get(moon_day % 10),
+            la_id=self._las.get(moon_day),
+            haircutting_id=self._haircuttings.get(moon_day),
+            yelam_id=self._yelams.get(moon),
+            events=events,
+        )
+
+    # ------------------------------------------------------------------
+    # События
+    # ------------------------------------------------------------------
 
     async def _handle_events(
         self, parsed_events: list[dict[str, str]], user_id: int, update: bool
@@ -199,7 +330,11 @@ class GoogleCalendarParser:
                 processed_event_ids.append(existing_id)
             else:
                 new_events.add(event_name)
-                ru_text = translate(event["text"]) if event["text"] else ""
+                ru_text = (
+                    await asyncio.to_thread(translate, event["text"])
+                    if event["text"]
+                    else ""
+                )
                 schema = EventSchemaCreate(
                     name=event_name,
                     en_name=event_name,
@@ -218,83 +353,6 @@ class GoogleCalendarParser:
                 self._events[event_name] = new_id
 
         return processed_event_ids, new_events, events_for_translate
-
-    ELEMENTS_RE = re.compile(r"\(\s*([A-Za-z]+)\s*-\s*([A-Za-z]+)\s*\)")
-    PLAIN_ELEMENTS_RE = re.compile(r"^\s*([A-Za-z]+)\s*-\s*([A-Za-z]+)\s*$")
-
-    @classmethod
-    def _find_elements(cls, text: str) -> tuple[str, str] | None:
-        m = cls.ELEMENTS_RE.search(text) or cls.PLAIN_ELEMENTS_RE.match(text)
-        if not m:
-            return None
-        return m.group(1).capitalize(), m.group(2).capitalize()
-
-    async def _build_day_info(
-        self, summary: list[str], day: dict[str, Any], events: list[int]
-    ) -> DayInfoSchemaCreate:
-        moon, moon_day = map(int, summary[0].strip(".").split("."))
-
-        els = self._find_elements(summary[-1])
-        if not els:
-            raise ValueError(f"Не найдены стихии в summary: {summary}")
-        el1, el2 = els
-
-        elements_id = self._elements.get(f"{el1}-{el2}") or self._elements.get(
-            f"{el2}-{el1}"
-        )
-        if elements_id is None:
-            raise ValueError(f"Комбинации стихий нет в справочнике: {el1}-{el2}")
-
-        return DayInfoSchemaCreate(
-            date=day.get("start", {}).get("date", ""),
-            moon_day=f"{moon_day}.{moon}",
-            elements_id=elements_id,
-            arch_id=self._archs.get(moon_day % 10),
-            la_id=self._las.get(moon_day),
-            haircutting_id=self._haircuttings.get(moon_day),
-            yelam_id=self._yelams.get(moon),
-            events=events,
-        )
-
-    def _events_filter(
-        self, head_events: list[str], body_events: list[str]
-    ) -> list[dict[str, str]]:
-        events: list[dict[str, str]] = []
-        buffer_body_events = body_events.copy()
-        len_body_events = len(body_events)
-        for head_event in head_events:
-            if head_event not in self.FILTER_WORDS_IN_EVENTS:
-                event = {"name": head_event, "text": "", "link": ""}
-                for idx, body_event in enumerate(body_events):
-                    if head_event in body_event:
-                        if body_event.startswith(head_event):
-                            event["text"] = (
-                                body_event.lstrip(head_event).lstrip(".:").strip()
-                            )
-                        else:
-                            event["text"] = body_event
-                        ext_events = []
-                        if buffer_idx := buffer_body_events.index(body_event):
-                            if events:
-                                ext_events = buffer_body_events[:buffer_idx]
-                                events[-1]["text"] += "\n" + "\n".join(ext_events)
-                        buffer_body_events = body_events.copy()[idx + 1 :]
-                        for ext_event in ext_events:
-                            body_events.remove(ext_event)
-                        body_events.remove(body_event)
-                        break
-                events.append(event)
-
-        if buffer_body_events and len(buffer_body_events) != len_body_events:
-            if events:
-                events[-1]["text"] += "\n" + "\n".join(buffer_body_events)
-                for buffer_body_event in buffer_body_events:
-                    body_events.remove(buffer_body_event)
-
-        for body_event in body_events:
-            events.append({"name": body_event, "text": "", "link": ""})
-
-        return self._parse_links(events)
 
     def _parse_links(self, events: list[dict[str, str]]) -> list[dict[str, str]]:
         for event in events:
